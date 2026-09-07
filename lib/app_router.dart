@@ -190,11 +190,13 @@ final router = GoRouter(
           state.uri.path == '/auth' ? '/auth/login' : null,
       routes: [
         GoRoute(path: 'login', builder: (context, state) => LoginPage()),
-        GoRoute(path: 'signup', builder: (context, state) => SignupPage()),
-        GoRoute(
-          path: 'complete',
-          builder: (context, state) => SignupCompletePage(),
-        ),
+        GoRoute(path: 'signup', builder: (context, state) => SignupPage(),
+        routes: [
+          GoRoute(
+            path: 'complete',
+            builder: (context, state) => SignupCompletePage(),
+          ),
+        ]),
         GoRoute(
           path: 'password',
           builder: (context, state) => ResetPasswordPage(),
