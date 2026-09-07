@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme.dart';
+import 'package:move_sketch/app_router.dart';
 
 void main() {
   runApp(const MoveSketchApp());
@@ -10,10 +11,10 @@ class MoveSketchApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       title: '무브스케치',
       theme: MoveSketchTheme.lightTheme,
-      home: const Scaffold(),
     );
   }
 }
