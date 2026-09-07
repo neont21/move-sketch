@@ -136,10 +136,11 @@ class MoveSketchTheme {
         scrolledUnderElevation: 0,
         foregroundColor: brand500,
         titleTextStyle: TextStyle(
-          fontSize: 17,
+          fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: brand500,
+          color: ink,
         ),
+        centerTitle: false,
       ),
       focusColor: brand400.withValues(alpha: 0.12),
       elevatedButtonTheme: ElevatedButtonThemeData(
