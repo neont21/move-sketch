@@ -122,7 +122,8 @@ class MoveSketchTheme {
         ),
         labelMedium: TextStyle(
           fontSize: 12,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w400,
+          color: inkFaint,
         ),
         labelSmall: TextStyle(
           fontSize: 11,
