@@ -37,6 +37,9 @@ dependencies:
   go_router: ^18.0.1
   intl: ^0.20.2
   animated_toggle_switch: ^0.8.7
+  uuid: ^4.6.0
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
 
 dev_dependencies:
   flutter_test:
