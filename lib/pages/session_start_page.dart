@@ -64,7 +64,7 @@ class _SessionStartPageState extends State<SessionStartPage> {
           },
           icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
         ),
-        title: Text('뒤로'),
+        // title: Text('뒤로'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

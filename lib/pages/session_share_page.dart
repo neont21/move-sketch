@@ -175,7 +175,7 @@ class _SessionSharePageState extends State<SessionSharePage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     filled: true,
-                    fillColor: colorScheme.surfaceContainer,
+                    fillColor: colorScheme.surface,
                     counterStyle: textTheme.labelSmall,
                   ),
                 ),

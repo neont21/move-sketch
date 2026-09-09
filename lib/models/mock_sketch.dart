@@ -9,7 +9,7 @@ class MockSketch {
   String location;
   String? weather;
   bool isJogging;
-  List<MockUser>? cheeredUser = [];
+  List<MockUser> cheeredUser = [];
 
   MockSketch({
     required this.sketchId,
@@ -20,6 +20,6 @@ class MockSketch {
     this.sketchURL,
     this.text,
     this.weather,
-    this.cheeredUser,
+    required this.cheeredUser,
   });
 }

@@ -17,6 +17,7 @@ class FeedPage extends StatelessWidget {
       location: '동대문구 휘경동',
       weather: '맑음',
       text: '뇨이 만나러 가는 길에 중랑천 따릉이~~',
+      cheeredUser: [],
     ),
     MockSketch(
       sketchId: 'test2',
@@ -26,6 +27,7 @@ class FeedPage extends StatelessWidget {
       location: '동대문구 전농동',
       weather: '흐림',
       text: '생각보다 많이 걸었다...',
+      cheeredUser: [],
     ),
     MockSketch(
       sketchId: 'test3',
@@ -35,6 +37,7 @@ class FeedPage extends StatelessWidget {
       location: '임의의 장소',
       weather: '날씨',
       text: '60자 이내의 코멘트는 경우에 따라서 상당히 길어지기도 합니다. 그래서 다음 줄로 내려가는 경우도 발생하죠.',
+      cheeredUser: [],
     ),
     MockSketch(
       sketchId: 'test4',
@@ -44,6 +47,7 @@ class FeedPage extends StatelessWidget {
       location: '임의의 장소',
       weather: '날씨',
       text: '60자 이내의 코멘트',
+      cheeredUser: [],
     ),
     MockSketch(
       sketchId: 'test5',
@@ -53,6 +57,7 @@ class FeedPage extends StatelessWidget {
       location: '임의의 장소',
       weather: '날씨',
       text: '60자 이내의 코멘트',
+      cheeredUser: [],
     ),
     MockSketch(
       sketchId: 'test6',
@@ -62,6 +67,7 @@ class FeedPage extends StatelessWidget {
       location: '임의의 장소',
       weather: '날씨',
       text: '60자 이내의 코멘트',
+      cheeredUser: [],
     ),
     MockSketch(
       sketchId: 'test7',
@@ -71,12 +77,12 @@ class FeedPage extends StatelessWidget {
       location: '임의의 장소',
       weather: '날씨',
       text: '60자 이내의 코멘트',
+      cheeredUser: [],
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -95,7 +101,7 @@ class FeedPage extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: ListView.builder(
           itemCount: _sampleData.length, // test
           itemBuilder: (context, index) {
