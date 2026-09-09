@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
                     spacing: 4,
                     children: [
                       Text(_formattedDate, style: textTheme.bodySmall),
-                      Text('오늘도 가볍게\n움직여 볼까요?', style: textTheme.displayLarge),
+                      Text('오늘도 가볍게\n움직여 볼까요?', style: textTheme.displaySmall),
                     ],
                   ),
                   GestureDetector(
@@ -73,6 +73,7 @@ class _HomePageState extends State<HomePage> {
                   child: SketchCard(
                     imageProvider: AssetImage('assets/sample_sketch.png'),
                     caption: '첫 장을 기다리는 중',
+                    isHome: true,
                   ),
                 ),
               ),

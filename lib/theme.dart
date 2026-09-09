@@ -1,5 +1,60 @@
 import 'package:flutter/material.dart';
 
+extension ActivityColorsBuildContext on BuildContext {
+  ActivityColors get activityColors => Theme.of(this).extension<ActivityColors>()!;
+}
+
+class ActivityColors extends ThemeExtension<ActivityColors> {
+  final Color jogging;
+  final Color joggingInk;
+  final Color joggingFill;
+  final Color riding;
+  final Color ridingInk;
+  final Color ridingFill;
+
+  const ActivityColors({
+    required this.jogging,
+    required this.joggingInk,
+    required this.joggingFill,
+    required this.riding,
+    required this.ridingInk,
+    required this.ridingFill,
+  });
+
+  @override
+  ActivityColors copyWith({
+    Color? jogging,
+    Color? joggingInk,
+    Color? joggingFill,
+    Color? riding,
+    Color? ridingInk,
+    Color? ridingFill,
+  }) {
+    return ActivityColors(
+      jogging: jogging ?? this.jogging,
+      joggingInk: joggingInk ?? this.joggingInk,
+      joggingFill: joggingFill ?? this.joggingFill,
+      riding: riding ?? this.riding,
+      ridingInk: ridingInk ?? this.ridingInk,
+      ridingFill: ridingFill ?? this.ridingFill,
+    );
+  }
+
+  @override
+  ActivityColors lerp(ThemeExtension<ActivityColors>? other, double t) {
+    if (other is! ActivityColors) return this;
+
+    return ActivityColors(
+      jogging: Color.lerp(jogging, other.jogging, t)!,
+      joggingInk: Color.lerp(joggingInk, other.joggingInk, t)!,
+      joggingFill: Color.lerp(joggingFill, other.joggingFill, t)!,
+      riding: Color.lerp(riding, other.riding, t)!,
+      ridingInk: Color.lerp(ridingInk, other.ridingInk, t)!,
+      ridingFill: Color.lerp(ridingFill, other.ridingFill, t)!,
+    );
+  }
+}
+
 class MoveSketchTheme {
   static const Color brand300 = Color(0xFFEC6E38);
   static const Color brand400 = Color(0xFFDD4814);
@@ -87,11 +142,14 @@ class MoveSketchTheme {
           fontSize: 24,
           fontWeight: FontWeight.w700,
           fontFamily: 'NanumHandWriting',
+          letterSpacing: -0.2,
           color: navy,
         ),
         titleMedium: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
+          height: 1,
+          letterSpacing: -0.2,
           fontFamily: 'NanumHandWriting',
           color: navy,
         ),
@@ -154,10 +212,7 @@ class MoveSketchTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(36),
           ),
-          textStyle: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -166,6 +221,16 @@ class MoveSketchTheme {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
+      extensions: const [
+        ActivityColors(
+          jogging: jogging,
+          joggingInk: joggingInk,
+          joggingFill: joggingFill,
+          riding: riding,
+          ridingInk: ridingInk,
+          ridingFill: ridingFill,
+        ),
+      ],
     );
   }
 }

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class SketchCard extends StatelessWidget {
   final ImageProvider _imageProvider;
   final String? _caption;
+  final bool _isHome;
 
-  const SketchCard({super.key, required this._imageProvider, this._caption});
+  const SketchCard({super.key, required this._imageProvider, this._caption, this._isHome=false});
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +31,7 @@ class SketchCard extends StatelessWidget {
               ],
             ),
             child: Column(
+              crossAxisAlignment: _isHome ? CrossAxisAlignment.center : CrossAxisAlignment.start,
               children: [
                 AspectRatio(
                   aspectRatio: 1.0,
@@ -45,7 +47,7 @@ class SketchCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     _caption ?? '',
-                    style: textTheme.titleLarge,
+                    style: _isHome ? textTheme.titleLarge : textTheme.titleMedium,
                   ),
                 ),
               ],

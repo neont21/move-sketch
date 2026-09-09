@@ -74,6 +74,15 @@ final router = GoRouter(
                     String sketchId = state.pathParameters['sketch_id']!;
                     return FeedPostPage(sketchId: sketchId);
                   },
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      builder: (context, state) {
+                        String sketchId = state.pathParameters['sketch_id']!;
+                        return SessionSharePage(sessionId: sketchId, edit: true,);
+                      }
+                    )
+                  ]
                 ),
                 GoRoute(
                   path: 'notifications',
