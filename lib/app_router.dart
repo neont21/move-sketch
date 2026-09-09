@@ -69,9 +69,9 @@ final router = GoRouter(
               builder: (context, state) => FeedPage(),
               routes: [
                 GoRoute(
-                  path: 'post/:sketch-id',
+                  path: 'post/:sketch_id',
                   builder: (context, state) {
-                    String sketchId = state.pathParameters['sketch-id']!;
+                    String sketchId = state.pathParameters['sketch_id']!;
                     return FeedPostPage(sketchId: sketchId);
                   },
                 ),

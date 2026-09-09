@@ -136,7 +136,7 @@ class MoveSketchTheme {
         backgroundColor: paperBackground,
         elevation: 0,
         scrolledUnderElevation: 0,
-        foregroundColor: brand500,
+        foregroundColor: brand400,
         titleTextStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
