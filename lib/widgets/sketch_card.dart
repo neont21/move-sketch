@@ -15,7 +15,7 @@ class SketchCard extends StatelessWidget {
       child: FractionallySizedBox(
         widthFactor: 0.8,
         child: AspectRatio(
-          aspectRatio: 0.9,
+          aspectRatio: _caption != null ? 0.9 : 1,
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(

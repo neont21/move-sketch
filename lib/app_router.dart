@@ -159,25 +159,25 @@ final router = GoRouter(
       builder: (context, state) => SessionTrackingPage(),
     ),
     GoRoute(
-      path: '/session-result/:session-id',
+      path: '/session-result/:session_id',
       builder: (context, state) {
-        String sessionId = state.pathParameters['session-id']!;
+        String sessionId = state.pathParameters['session_id']!;
         return SessionResultPage(sessionId: sessionId);
       },
       routes: [
         GoRoute(
           path: 'share',
           builder: (context, state) {
-            String sessionId = state.pathParameters['session-id']!;
+            String sessionId = state.pathParameters['session_id']!;
             return SessionSharePage(sessionId: sessionId);
           },
         ),
       ],
     ),
     GoRoute(
-      path: '/profile/:user-id',
+      path: '/profile/:user_id',
       builder: (context, state) {
-        String userId = state.pathParameters['user-id']!;
+        String userId = state.pathParameters['user_id']!;
         return UserProfilePage(userId: userId);
       },
     ),

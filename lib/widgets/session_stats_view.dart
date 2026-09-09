@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:move_sketch/models/mock_mission_data.dart';
+import '../models/mock_mission_data.dart';
 
 class SessionStatsView extends StatefulWidget {
   const SessionStatsView({super.key});

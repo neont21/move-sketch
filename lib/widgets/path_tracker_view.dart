@@ -10,7 +10,7 @@ class PathTrackerView extends StatefulWidget {
 }
 
 class _PathTrackerViewState extends State<PathTrackerView> {
-  List<LatLng> gpsRoute = [
+  final List<LatLng> _gpsRoute = [
     // sample data
     LatLng(37.5285, 126.9330),
     LatLng(37.5290, 126.9350),
@@ -29,6 +29,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return FractionallySizedBox(
       widthFactor: 1,
       child: AspectRatio(
@@ -37,18 +38,21 @@ class _PathTrackerViewState extends State<PathTrackerView> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: colorScheme.outline),
-            color: Colors.white,
           ),
+          clipBehavior: Clip.hardEdge,
           child: FlutterMap(
             options: MapOptions(
-              initialCenter: gpsRoute.last,
+              initialCenter: _gpsRoute.last,
               initialZoom: 13,
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.none,
+              ),
             ),
               children: [
                 PolylineLayer(
                   polylines: [
                     Polyline(
-                      points: gpsRoute,
+                      points: _gpsRoute,
                       color: colorScheme.primary,
                       strokeWidth: 2,
                     ),
@@ -57,7 +61,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: gpsRoute.first,
+                      point: _gpsRoute.first,
                       width: 14,
                       height: 14,
                       child: Icon(
@@ -71,7 +75,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: gpsRoute.last,
+                      point: _gpsRoute.last,
                       width: 26,
                       height: 26,
                       child: Transform.rotate(

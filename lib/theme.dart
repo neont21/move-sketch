@@ -45,6 +45,7 @@ class MoveSketchTheme {
         tertiaryContainer: inkFaint,
         surface: paperSurface,
         surfaceDim: dim,
+        secondaryContainer: paperBackground,
         onSurface: brand500,
         outline: border,
         outlineVariant: borderStrong,

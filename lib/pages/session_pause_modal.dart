@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/pages/session_tracking_page.dart';
+import '../pages/session_tracking_page.dart';
 import '../models/mock_mission_data.dart';
 import '../models/mock_session_data.dart';
 
@@ -14,7 +14,7 @@ class SessionPauseModal extends StatelessWidget {
     kcal: 186,
   );
   final List<MockMissionData> _missionStats = [
-    MockMissionData(title: '현재 페이스', data: '6\' 17\'\'', unit: '/km'),
+    MockMissionData(title: '페이스', data: '6\' 17\'\'', unit: '/km'),
     MockMissionData(title: '지속 시간', data: '18', unit: '분'),
   ];
 
@@ -24,9 +24,7 @@ class SessionPauseModal extends StatelessWidget {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -34,27 +32,47 @@ class SessionPauseModal extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('여기까지 ${_sessionData.km}km 왔어요', style: textTheme.headlineSmall,),
-            Text('잠시 쉬었다 가도 괜찮아요.', style: textTheme.labelMedium,),
+            Text(
+              '여기까지 ${_sessionData.km}km 왔어요',
+              style: textTheme.headlineSmall,
+            ),
+            Text('잠시 쉬었다 가도 괜찮아요.', style: textTheme.labelMedium),
             Divider(),
-            Text('지금 종료하면', style: textTheme.labelSmall?.copyWith(color: colorScheme.secondary),),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('페이스 · 충분히 해냈어요', style: textTheme.labelMedium,),
-                  Text('6\'18\'\'/km', style: textTheme.labelLarge,),
-                ]
+            Text(
+              '지금 종료하면',
+              style: textTheme.labelSmall?.copyWith(
+                color: colorScheme.secondary,
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('지속 시간 · 무난히 해냈어요', style: textTheme.labelMedium,),
-                Text('32분', style: textTheme.labelLarge,),
-              ]
+                Text(
+                  '${_missionStats[0].title} · 충분히 해냈어요',
+                  style: textTheme.labelMedium,
+                ),
+                Text(
+                  '${_missionStats[0].data}${_missionStats[0].unit}',
+                  style: textTheme.labelLarge,
+                ),
+              ],
             ),
-            Divider(color: colorScheme.surface,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '${_missionStats[1].title} · 무난히 해냈어요',
+                  style: textTheme.labelMedium,
+                ),
+                Text(
+                  '${_missionStats[1].data}${_missionStats[1].unit}',
+                  style: textTheme.labelLarge,
+                ),
+              ],
+            ),
+            Divider(color: colorScheme.surface),
             Row(
               spacing: 20,
               children: [
@@ -65,10 +83,15 @@ class SessionPauseModal extends StatelessWidget {
                       onPressed: () {
                         context.go('/session-result/${_sessionData.id}');
                       },
-                      style:  ElevatedButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.outline,
                       ),
-                      child: Text('여기서 종료', style: textTheme.bodyMedium?.copyWith(color: colorScheme.tertiaryContainer),),
+                      child: Text(
+                        '여기서 종료',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.tertiaryContainer,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -79,7 +102,12 @@ class SessionPauseModal extends StatelessWidget {
                       onPressed: () {
                         context.pop();
                       },
-                      child: Text('계속하기', style: textTheme.bodyMedium?.copyWith(color: colorScheme.onPrimary),),
+                      child: Text(
+                        '계속하기',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
                     ),
                   ),
                 ),
