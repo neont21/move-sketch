@@ -79,14 +79,26 @@ final router = GoRouter(
                       path: 'edit',
                       builder: (context, state) {
                         String sketchId = state.pathParameters['sketch_id']!;
-                        return SessionSharePage(sessionId: sketchId, edit: true,);
-                      }
-                    )
-                  ]
+                        return SessionSharePage(
+                          sessionId: sketchId,
+                          edit: true,
+                        );
+                      },
+                    ),
+                  ],
                 ),
                 GoRoute(
                   path: 'notifications',
                   builder: (context, state) => FeedNotificationsPage(),
+                  routes: [
+                    GoRoute(
+                      path: 'post/:sketch_id',
+                      builder: (context, state) {
+                        String sketchId = state.pathParameters['sketch_id']!;
+                        return FeedPostPage(sketchId: sketchId);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -199,13 +211,16 @@ final router = GoRouter(
           state.uri.path == '/auth' ? '/auth/login' : null,
       routes: [
         GoRoute(path: 'login', builder: (context, state) => LoginPage()),
-        GoRoute(path: 'signup', builder: (context, state) => SignupPage(),
-        routes: [
-          GoRoute(
-            path: 'complete',
-            builder: (context, state) => SignupCompletePage(),
-          ),
-        ]),
+        GoRoute(
+          path: 'signup',
+          builder: (context, state) => SignupPage(),
+          routes: [
+            GoRoute(
+              path: 'complete',
+              builder: (context, state) => SignupCompletePage(),
+            ),
+          ],
+        ),
         GoRoute(
           path: 'password',
           builder: (context, state) => ResetPasswordPage(),
