@@ -33,21 +33,29 @@ class SessionResultPage extends StatelessWidget {
                         Text('오늘도 수고했어요', style: textTheme.displaySmall),
                       ],
                     ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.download),
-                      color: colorScheme.tertiaryContainer,
-                      style: IconButton.styleFrom(
-                        backgroundColor: colorScheme.outline,
-                      ),
-                    ),
+                    // IconButton(
+                    //   onPressed: () {},
+                    //   icon: Icon(Icons.download),
+                    //   color: colorScheme.tertiaryContainer,
+                    //   style: IconButton.styleFrom(
+                    //     backgroundColor: colorScheme.outline,
+                    //   ),
+                    // ),
                   ],
                 ),
                 // 사진
                 SketchCard(
                   imageProvider: AssetImage('assets/sample_sketch.png'),
                 ),
-                Divider(color: Colors.transparent,),
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: Icon(Icons.download),
+                  label: Text('이미지 내려받기', style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.surfaceContainer,
+                    foregroundColor: colorScheme.tertiaryContainer,
+                  ),
+                ),
                 // 경로
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),

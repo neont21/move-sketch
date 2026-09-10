@@ -113,10 +113,24 @@ final router = GoRouter(
               builder: (context, state) => HistoryPage(),
               routes: [
                 GoRoute(
-                  path: 'details/:session-id',
+                  path: 'details/:session_id',
                   builder: (context, state) {
-                    String sessionId = state.pathParameters['session-id']!;
+                    String sessionId = state.pathParameters['session_id']!;
                     return HistoryDetailsPage(sessionId: sessionId);
+                  },
+                ),
+                GoRoute(
+                  path: 'feed/:sketch_id',
+                  builder: (context, state) {
+                    String sketchId = state.pathParameters['sketch_id']!;
+                    return FeedPostPage(sketchId: sketchId);
+                  },
+                ),
+                GoRoute(
+                  path: 'share/:sketch_id',
+                  builder: (context, state) {
+                    String sessionId = state.pathParameters['sketch_id']!;
+                    return SessionSharePage(sessionId: sessionId);
                   },
                 ),
               ],
