@@ -43,6 +43,7 @@ dependencies:
   table_calendar: ^3.2.1
   month_picker_dialog: ^6.7.2
   image_picker: ^1.2.3
+  package_info_plus: ^10.2.1
 
 dev_dependencies:
   flutter_test:
