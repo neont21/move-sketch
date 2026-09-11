@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../models/mock_user.dart';
 import '../widgets/profile_grid.dart';
-import 'modify_profile_modal.dart';
+import '../dialogs/modify_profile_modal.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});

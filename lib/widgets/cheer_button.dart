@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:move_sketch/models/mock_user.dart';
 
-import '../pages/cheered_user_modal.dart';
+import '../dialogs/cheered_user_modal.dart';
 
 class CheerButton extends StatefulWidget {
   final MockUser _author;

@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../models/mock_session_data.dart';
 import '../widgets/session_stats_view.dart';
 import '../widgets/path_tracker_view.dart';
-import 'session_pause_modal.dart';
+import '../dialogs/session_pause_modal.dart';
 
 const uuid = Uuid();
 

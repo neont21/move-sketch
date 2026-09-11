@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:move_sketch/models/mock_user.dart';
-import 'package:move_sketch/pages/mutual_friends_modal.dart';
+import 'package:move_sketch/dialogs/mutual_friends_modal.dart';
 
 final List<MockUser> mutualsList = [
   MockUser.byId('@user1'),

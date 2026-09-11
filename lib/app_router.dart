@@ -246,7 +246,7 @@ final router = GoRouter(
       },
     ),
     GoRoute(
-      path: 'auth',
+      path: '/auth',
       redirect: (context, state) =>
           state.uri.path == '/auth' ? '/auth/login' : null,
       routes: [
