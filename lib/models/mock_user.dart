@@ -10,4 +10,8 @@ class MockUser {
     this.imageURL,
     this.description,
   });
+
+  factory MockUser.byId(String id) {
+    return MockUser(id: id, name: '$id의 닉네임', description: '$id입니다');
+  }
 }

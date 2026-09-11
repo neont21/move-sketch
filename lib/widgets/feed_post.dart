@@ -12,7 +12,7 @@ class FeedPost extends StatelessWidget {
   final MockUser user = MockUser(id: '@daniil_a_np', name: '다닐루쉬카');
   final bool _isDetail;
 
-  FeedPost({super.key, required this._sketch, this._isDetail=false});
+  FeedPost({super.key, required this._sketch, this._isDetail = false});
 
   Row? metadata(BuildContext context) {
     if (_isDetail) {
@@ -23,22 +23,19 @@ class FeedPost extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(Icons.star_outline, color: colorScheme.tertiaryContainer,
-            size: 16),
-        Text(
-          '응원 ${_sketch.cheeredUser.length}',
-          style: textTheme.labelMedium,
+        Icon(
+          Icons.star_outline,
+          color: colorScheme.tertiaryContainer,
+          size: 16,
         ),
+        Text('응원 ${_sketch.cheeredUser.length}', style: textTheme.labelMedium),
         SizedBox(width: 10),
         Icon(
           Icons.mode_comment_outlined,
           color: colorScheme.tertiaryContainer,
           size: 16,
         ),
-        Text(
-          '댓글 ${_sketch.cheeredUser.length}',
-          style: textTheme.labelMedium,
-        ),
+        Text('댓글 ${_sketch.cheeredUser.length}', style: textTheme.labelMedium),
       ],
     );
   }
@@ -57,13 +54,11 @@ class FeedPost extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                context.go('/profile/${_sketch.author.id}');
+                context.go('/feed/profile/${_sketch.author.id}');
               },
               child: CircleAvatar(
                 radius: 20,
-                backgroundImage: const AssetImage(
-                  'assets/default_profile.png',
-                ),
+                backgroundImage: const AssetImage('assets/default_profile.png'),
               ),
             ),
             Column(
@@ -72,7 +67,15 @@ class FeedPost extends StatelessWidget {
                 Row(
                   spacing: 8,
                   children: [
-                    Text(_sketch.author.name, style: textTheme.bodyLarge),
+                    GestureDetector(
+                      onTap: () {
+                        context.go('/feed/profile/${_sketch.author.id}');
+                      },
+                      child: Text(
+                        _sketch.author.name,
+                        style: textTheme.bodyLarge,
+                      ),
+                    ),
                     Container(
                       padding: EdgeInsets.symmetric(vertical: 1, horizontal: 4),
                       decoration: BoxDecoration(
@@ -105,7 +108,11 @@ class FeedPost extends StatelessWidget {
               ],
             ),
             Spacer(),
-            BottomSheetButton(authorId: _sketch.author.id, isPost: true, currentPath: GoRouterState.of(context).uri.path,),
+            BottomSheetButton(
+              authorId: _sketch.author.id,
+              isPost: true,
+              currentPath: GoRouterState.of(context).uri.path,
+            ),
           ],
         ),
         GestureDetector(
@@ -123,7 +130,7 @@ class FeedPost extends StatelessWidget {
           ),
         ),
         ?metadata(context),
-        if (!_isDetail) Divider(color: Colors.transparent,),
+        if (!_isDetail) Divider(color: Colors.transparent),
       ],
     );
   }

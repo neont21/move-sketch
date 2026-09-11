@@ -42,7 +42,7 @@ class UserComment extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              context.go('/profile/${_comment.user.id}');
+              context.go('/feed/profile/${_comment.user.id}');
             },
             child: CircleAvatar(
               radius: 20,
@@ -53,11 +53,14 @@ class UserComment extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 이름
                 Row(
                   spacing: 12,
                   children: [
-                    Text(_comment.user.name, style: textTheme.bodyLarge),
+                    GestureDetector(
+                      onTap: () {
+                        context.go('/feed/profile/${_comment.user.id}');
+                      },
+                    child: Text(_comment.user.name, style: textTheme.bodyLarge)),
                     Text(
                       DateFormat(
                         'MM/dd (E) HH:mm',
@@ -84,7 +87,6 @@ class UserComment extends StatelessWidget {
                     BottomSheetButton(authorId: _comment.user.id),
                   ],
                 ),
-                // 내용
                 Padding(
                   padding: EdgeInsets.only(right: 20),
                   child: Text(

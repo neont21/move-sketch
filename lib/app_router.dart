@@ -100,6 +100,13 @@ final router = GoRouter(
                     ),
                   ],
                 ),
+                GoRoute(
+                  path: '/profile/:user_id',
+                  builder: (context, state) {
+                    String userId = state.pathParameters['user_id']!;
+                    return UserProfilePage(userId: userId);
+                  },
+                ),
               ],
             ),
           ],
@@ -228,6 +235,9 @@ final router = GoRouter(
         ),
       ],
     ),
+    GoRoute(path: '/license', builder: (context, state) => OSSLicensePage()),
+    GoRoute(path: '/privacy', builder: (context, state) => PrivacyPage()),
+    GoRoute(path: '/tos', builder: (context, state) => TermOfServicePage()),
     GoRoute(
       path: '/profile/:user_id',
       builder: (context, state) {
@@ -235,9 +245,6 @@ final router = GoRouter(
         return UserProfilePage(userId: userId);
       },
     ),
-    GoRoute(path: '/license', builder: (context, state) => OSSLicensePage()),
-    GoRoute(path: '/privacy', builder: (context, state) => PrivacyPage()),
-    GoRoute(path: '/tos', builder: (context, state) => TermOfServicePage()),
     GoRoute(
       path: 'auth',
       redirect: (context, state) =>
