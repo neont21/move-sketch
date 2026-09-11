@@ -7,7 +7,11 @@ import '../widgets/sketch_card.dart';
 class SessionSharePage extends StatefulWidget {
   final String _sessionId;
   final bool _edit;
-  const SessionSharePage({super.key, required this._sessionId, this._edit=false});
+  const SessionSharePage({
+    super.key,
+    required this._sessionId,
+    this._edit = false,
+  });
 
   @override
   State<SessionSharePage> createState() => _SessionSharePageState();
@@ -35,7 +39,11 @@ class _SessionSharePageState extends State<SessionSharePage> {
           IconButton(
             onPressed: () {
               // TODO implement save
-              context.go('/feed/post/${widget._sessionId}');
+              if (GoRouterState.of(context).uri.path.startsWith('/me')) {
+                context.go('/me/post/${widget._sessionId}');
+              } else {
+                context.go('/feed/post/${widget._sessionId}');
+              }
             },
             icon: Icon(Icons.check),
           ),
@@ -48,7 +56,9 @@ class _SessionSharePageState extends State<SessionSharePage> {
             child: Column(
               spacing: 20,
               children: [
-                SketchCard(imageProvider: AssetImage('assets/sample_sketch.png')),
+                SketchCard(
+                  imageProvider: AssetImage('assets/sample_sketch.png'),
+                ),
                 Text(
                   '위치 태그 선택',
                   style: textTheme.labelSmall?.copyWith(
@@ -117,7 +127,10 @@ class _SessionSharePageState extends State<SessionSharePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: colorScheme.outline),
@@ -134,7 +147,10 @@ class _SessionSharePageState extends State<SessionSharePage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: colorScheme.outline),

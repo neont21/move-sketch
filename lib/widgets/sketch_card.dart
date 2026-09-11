@@ -4,8 +4,9 @@ class SketchCard extends StatelessWidget {
   final ImageProvider _imageProvider;
   final String? _caption;
   final bool _isHome;
+  final bool _isGrid;
 
-  const SketchCard({super.key, required this._imageProvider, this._caption, this._isHome=false});
+  const SketchCard({super.key, required this._imageProvider, this._caption, this._isHome=false, this._isGrid=false});
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +15,11 @@ class SketchCard extends StatelessWidget {
 
     return Center(
       child: FractionallySizedBox(
-        widthFactor: 0.8,
+        widthFactor: _isGrid ? 0.9 : 0.8,
         child: AspectRatio(
           aspectRatio: _caption != null ? 0.9 : 1,
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: _isGrid ? const EdgeInsets.all(4) : const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: colorScheme.surface,
               borderRadius: BorderRadius.circular(4),

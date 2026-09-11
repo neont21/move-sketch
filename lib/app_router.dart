@@ -156,6 +156,25 @@ final router = GoRouter(
                   ],
                 ),
                 GoRoute(
+                  path: 'post/:sketch_id',
+                  builder: (context, state) {
+                    String sketchId = state.pathParameters['sketch_id']!;
+                    return FeedPostPage(sketchId: sketchId);
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      builder: (context, state) {
+                        String sketchId = state.pathParameters['sketch_id']!;
+                        return SessionSharePage(
+                          sessionId: sketchId,
+                          edit: true,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                GoRoute(
                   path: 'settings',
                   builder: (context, state) => SettingsPage(),
                   routes: [

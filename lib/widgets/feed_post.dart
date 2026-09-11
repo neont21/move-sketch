@@ -105,7 +105,7 @@ class FeedPost extends StatelessWidget {
               ],
             ),
             Spacer(),
-            BottomSheetButton(authorId: _sketch.author.id, sketchIdIfPost: _sketch.sketchId,),
+            BottomSheetButton(authorId: _sketch.author.id, isPost: true, currentPath: GoRouterState.of(context).uri.path,),
           ],
         ),
         GestureDetector(
