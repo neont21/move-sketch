@@ -21,7 +21,7 @@ import 'pages/setting_account_page.dart';
 import 'pages/modify_password_page.dart';
 import 'pages/change_character_page.dart';
 import 'pages/setting_notifications_page.dart';
-import 'pages/oss_license_page.dart';
+import 'pages/oss_licenses_page.dart';
 import 'pages/privacy_page.dart';
 import 'pages/term_of_service_page.dart';
 import 'pages/login_page.dart';
@@ -235,7 +235,7 @@ final router = GoRouter(
         ),
       ],
     ),
-    GoRoute(path: '/license', builder: (context, state) => OSSLicensePage()),
+    GoRoute(path: '/license', builder: (context, state) => OSSLicensesPage()),
     GoRoute(path: '/privacy', builder: (context, state) => PrivacyPage()),
     GoRoute(path: '/tos', builder: (context, state) => TermOfServicePage()),
     GoRoute(

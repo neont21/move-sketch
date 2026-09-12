@@ -84,7 +84,7 @@ class SettingsPage extends StatelessWidget {
               Text('앱 정보', style: textTheme.labelLarge),
               ListTile(
                 onTap: () {
-                  context.go('/privacy');
+                  context.push('/privacy');
                 },
                 title: Text('개인정보처리방침', style: textTheme.bodyMedium),
                 trailing: Icon(
@@ -94,7 +94,7 @@ class SettingsPage extends StatelessWidget {
               ),
               ListTile(
                 onTap: () {
-                  context.go('/tos');
+                  context.push('/tos');
                 },
                 title: Text('이용약관', style: textTheme.bodyMedium),
                 trailing: Icon(
@@ -104,7 +104,7 @@ class SettingsPage extends StatelessWidget {
               ),
               ListTile(
                 onTap: () {
-                  context.go('/license');
+                  context.push('/license');
                 },
                 title: Text('오픈소스 라이선스', style: textTheme.bodyMedium),
                 trailing: Icon(
@@ -124,7 +124,10 @@ class SettingsPage extends StatelessWidget {
                         return Container();
                       }
                       info = snapshot.data!;
-                      return Text('v${info.version}', style: textTheme.labelSmall,);
+                      return Text(
+                        'v${info.version}',
+                        style: textTheme.labelSmall,
+                      );
                     },
                   ),
                 ],
