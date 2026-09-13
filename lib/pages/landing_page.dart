@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/widgets/sketch_card.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -9,7 +8,7 @@ class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
-    ;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(

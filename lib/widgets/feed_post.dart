@@ -110,8 +110,7 @@ class FeedPost extends StatelessWidget {
             Spacer(),
             BottomSheetButton(
               authorId: _sketch.author.id,
-              isPost: true,
-              currentPath: GoRouterState.of(context).uri.path,
+              sketchIdIfPost: _sketch.sketchId,
             ),
           ],
         ),

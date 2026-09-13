@@ -74,18 +74,6 @@ final router = GoRouter(
                     String sketchId = state.pathParameters['sketch_id']!;
                     return FeedPostPage(sketchId: sketchId);
                   },
-                  routes: [
-                    GoRoute(
-                      path: 'edit',
-                      builder: (context, state) {
-                        String sketchId = state.pathParameters['sketch_id']!;
-                        return SessionSharePage(
-                          sessionId: sketchId,
-                          edit: true,
-                        );
-                      },
-                    ),
-                  ],
                 ),
                 GoRoute(
                   path: 'notifications',
@@ -168,18 +156,6 @@ final router = GoRouter(
                     String sketchId = state.pathParameters['sketch_id']!;
                     return FeedPostPage(sketchId: sketchId);
                   },
-                  routes: [
-                    GoRoute(
-                      path: 'edit',
-                      builder: (context, state) {
-                        String sketchId = state.pathParameters['sketch_id']!;
-                        return SessionSharePage(
-                          sessionId: sketchId,
-                          edit: true,
-                        );
-                      },
-                    ),
-                  ],
                 ),
                 GoRoute(
                   path: 'settings',
@@ -234,6 +210,13 @@ final router = GoRouter(
           },
         ),
       ],
+    ),
+    GoRoute(
+      path: '/edit/:sketch_id',
+      builder: (context, state) {
+        String sketchId = state.pathParameters['sketch_id']!;
+        return SessionSharePage(sessionId: sketchId, edit: true);
+      },
     ),
     GoRoute(path: '/license', builder: (context, state) => OSSLicensesPage()),
     GoRoute(path: '/privacy', builder: (context, state) => PrivacyPage()),

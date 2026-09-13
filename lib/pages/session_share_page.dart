@@ -39,8 +39,8 @@ class _SessionSharePageState extends State<SessionSharePage> {
           IconButton(
             onPressed: () {
               // TODO implement save
-              if (GoRouterState.of(context).uri.path.startsWith('/me')) {
-                context.go('/me/post/${widget._sessionId}');
+              if (widget._edit) {
+                context.pop();
               } else {
                 context.go('/feed/post/${widget._sessionId}');
               }

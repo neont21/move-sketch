@@ -8,10 +8,9 @@ final MockUser user = MockUser(id: '@user_id', name: '테스트');
 
 class BottomSheetButton extends StatelessWidget {
   final String _authorId;
-  final bool _isPost;
   final String? _parentId;
-  final String? _currentPath;
-  const BottomSheetButton({super.key, required this._authorId, this._parentId, this._isPost=false, this._currentPath});
+  final String? _sketchIdIfPost;
+  const BottomSheetButton({super.key, required this._authorId, this._parentId, this._sketchIdIfPost});
 
 List<ListTile> buildBottomSheet(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
@@ -19,12 +18,12 @@ List<ListTile> buildBottomSheet(BuildContext context) {
     List<ListTile> menuItems = [];
 
     if (_authorId == user.id || _parentId == user.id) {
-      if (_isPost) {
+      if (_sketchIdIfPost != null) {
         menuItems.add(ListTile(
           title: Text('편집하기', style: textTheme.bodyLarge),
           onTap: () {
             context.pop();
-            context.go('$_currentPath/edit');
+            context.push('/edit/$_sketchIdIfPost');
           },
         ));
       }

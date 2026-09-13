@@ -33,14 +33,6 @@ class SessionResultPage extends StatelessWidget {
                         Text('오늘도 수고했어요', style: textTheme.displaySmall),
                       ],
                     ),
-                    // IconButton(
-                    //   onPressed: () {},
-                    //   icon: Icon(Icons.download),
-                    //   color: colorScheme.tertiaryContainer,
-                    //   style: IconButton.styleFrom(
-                    //     backgroundColor: colorScheme.outline,
-                    //   ),
-                    // ),
                   ],
                 ),
                 // 사진
