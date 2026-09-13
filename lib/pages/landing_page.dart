@@ -13,6 +13,9 @@ class LandingPage extends StatelessWidget {
         ElevatedButton(onPressed: () {
           context.go('/home');
         }, child: const Text('goto Home')),
+        ElevatedButton(onPressed: () {
+          context.go('/auth');
+        }, child: const Text('goto Auth')),
       ],
     )));
   }
