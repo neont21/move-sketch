@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:move_sketch/widgets/labeled_text_form_field.dart';
 
 class ModifyPasswordPage extends StatefulWidget {
   const ModifyPasswordPage({super.key});
@@ -36,105 +37,35 @@ class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
               spacing: 20,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  keyboardType: TextInputType.visiblePassword,
-                  obscureText: !_showPassword,
-                  decoration: InputDecoration(
-                    labelText: '기존 비밀번호',
-                    labelStyle: textTheme.labelLarge,
-                    hintText: '기존 비밀번호',
-                    hintStyle: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.tertiaryContainer,
-                    ),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _showPassword = !_showPassword;
-                        });
-                      },
-                      icon: Icon(
-                        _showPassword ? Icons.visibility : Icons.visibility_off,
-                        color: colorScheme.tertiaryContainer,
-                      ),
-                    ),
-                    border: OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                  ),
+                LabeledTextFormField(
+                  labelText: '기존 비밀번호',
+                  hintText: '기존 비밀번호',
+                  showPassword: _showPassword,
+                  toggleVisibility: () {
+                    setState(() {
+                      _showPassword = !_showPassword;
+                    });
+                  },
                 ),
-                TextField(
-                  keyboardType: TextInputType.visiblePassword,
-                  obscureText: !_showNewPassword,
-                  decoration: InputDecoration(
-                    labelText: '새 비밀번호',
-                    labelStyle: textTheme.labelLarge,
-                    hintText: '새 비밀번호',
-                    hintStyle: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.tertiaryContainer,
-                    ),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _showNewPassword = !_showNewPassword;
-                        });
-                      },
-                      icon: Icon(
-                        _showNewPassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: colorScheme.tertiaryContainer,
-                      ),
-                    ),
-                    border: OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                  ),
+                LabeledTextFormField(
+                  labelText: '새 비밀번호',
+                  hintText: '새 비밀번호',
+                  showPassword: _showNewPassword,
+                  toggleVisibility: () {
+                    setState(() {
+                      _showNewPassword = !_showNewPassword;
+                    });
+                  },
                 ),
-                TextField(
-                  keyboardType: TextInputType.visiblePassword,
-                  obscureText: !_showCheckPassword,
-                  decoration: InputDecoration(
-                    labelText: '새 비밀번호 확인',
-                    labelStyle: textTheme.labelLarge,
-                    hintText: '새 비밀번호 확인',
-                    hintStyle: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.tertiaryContainer,
-                    ),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _showCheckPassword = !_showCheckPassword;
-                        });
-                      },
-                      icon: Icon(
-                        _showCheckPassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                        color: colorScheme.tertiaryContainer,
-                      ),
-                    ),
-                    border: OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                  ),
+                LabeledTextFormField(
+                  labelText: '새 비밀번호 확인',
+                  hintText: '새 비밀번호 확인',
+                  showPassword: _showCheckPassword,
+                  toggleVisibility: () {
+                    setState(() {
+                      _showCheckPassword = !_showCheckPassword;
+                    });
+                  },
                 ),
                 Text(
                   '영문과 숫자를 섞어 8자 이상으로 정해 주세요.',

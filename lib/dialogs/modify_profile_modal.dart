@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:move_sketch/widgets/labeled_text_form_field.dart';
 
 import '../models/mock_user.dart';
 
@@ -165,67 +166,21 @@ class _ModifyProfileModalState extends State<ModifyProfileModal> {
                 ],
               ),
               Column(
+                spacing: 20,
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextFormField(
-                    keyboardType: TextInputType.name,
+                  LabeledTextFormField(
+                    labelText: '닉네임',
+                    hintText: '닉네임은 10자 이내로 정해주세요',
                     initialValue: user.name,
-                    style: textTheme.bodyMedium,
                     maxLength: 10,
-                    decoration: InputDecoration(
-                      labelText: '닉네임',
-                      labelStyle: textTheme.labelLarge,
-                      hintText: '닉네임은 10자 이내로 정해주세요.',
-                      hintStyle: textTheme.labelMedium,
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: colorScheme.surface,
-                      counterStyle: textTheme.labelSmall,
-                    ),
                   ),
-                  TextFormField(
-                    keyboardType: TextInputType.text,
+                  LabeledTextFormField(
+                    labelText: '한 줄 소개',
+                    hintText: '나에 대한 짧은 소개를 작성해 보아요',
                     initialValue: user.description,
-                    style: textTheme.bodyMedium,
                     maxLength: 30,
-                    maxLines: 2,
-                    decoration: InputDecoration(
-                      labelText: '한 줄 소개',
-                      labelStyle: textTheme.labelLarge,
-                      hintText: '나에 대한 짧은 소개를 작성해 보아요',
-                      hintStyle: textTheme.labelMedium,
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: colorScheme.outline,
-                          width: 1,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: colorScheme.surface,
-                      counterStyle: textTheme.labelSmall,
-                    ),
                   ),
                 ],
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import '../widgets/labeled_text_form_field.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -96,61 +97,20 @@ class _LoginPageState extends State<LoginPage> {
                     ],
                   ),
                 ),
-                TextField(
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: '이메일',
-                    labelStyle: textTheme.labelLarge,
-                    hintText: '이메일',
-                    hintStyle: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.tertiaryContainer,
-                    ),
-                    filled: true,
-                    fillColor: colorScheme.surface,
-                    border: OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                  ),
+                LabeledTextFormField(
+                  labelText: '아이디',
+                  hintText: '아이디',
                 ),
-                TextField(
-                  keyboardType: TextInputType.visiblePassword,
-                  obscureText: !_showPassword,
-                  decoration: InputDecoration(
-                    labelText: '비밀번호',
-                    labelStyle: textTheme.labelLarge,
-                    hintText: '비밀번호',
-                    hintStyle: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.tertiaryContainer,
-                    ),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _showPassword = !_showPassword;
-                        });
-                      },
-                      icon: Icon(
-                        _showPassword ? Icons.visibility : Icons.visibility_off,
-                        color: colorScheme.tertiaryContainer,
-                      ),
-                    ),
-                    filled: true,
-                    fillColor: colorScheme.surface,
-                    border: OutlineInputBorder(),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: colorScheme.outline),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                  ),
+                LabeledTextFormField(
+                  inputType: TextInputType.visiblePassword,
+                  labelText: '비밀번호',
+                  hintText: '비밀번호',
+                  showPassword: _showPassword,
+                  toggleVisibility: () {
+                    setState(() {
+                      _showPassword = !_showPassword;
+                    });
+                  },
                 ),
                 SizedBox(
                   width: double.infinity,
@@ -171,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text('아직 계정이 없나요?', style: textTheme.labelMedium,),
                     GestureDetector(
                       onTap: () {
-                        context.go('/auth/signup');
+                        context.push('/auth/signup');
                       },
                       child: Text('회원가입', style: textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.w700,
@@ -182,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    context.go('/auth/password');
+                    context.push('/auth/password');
                   },
                   child: Text('비밀번호를 잊으셨나요?', style: textTheme.labelMedium
                   ),
