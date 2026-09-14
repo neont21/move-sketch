@@ -40,6 +40,12 @@ class DeleteAccountDialog extends StatelessWidget {
               // TODO: controller를 통해 입력값이 정확할 때만 수행
               context.pop();
               context.go('/auth/login');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('계정이 삭제되었습니다.'),
+                  duration: Duration(seconds: 3),
+                ),
+              );
             },
             onCancel: () {
               context.pop();

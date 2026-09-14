@@ -171,6 +171,12 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
                         onConfirm: () {
                           context.pop();
                           context.go('/auth/login');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('로그아웃 되었습니다.'),
+                              duration: Duration(seconds: 3),
+                            ),
+                          );
                         },
                       ),
                     ),

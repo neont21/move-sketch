@@ -183,6 +183,13 @@ class _ModifyProfileDialogState extends State<ModifyProfileDialog> {
               onConfirm: () {
                 // TODO: form 내용 반영
                 context.pop();
+                // FIXME: 변동사항이 있을 경우에만
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('프로필이 수정되었습니다.'),
+                    duration: Duration(seconds: 3),
+                  ),
+                );
               },
               onCancel: () {
                 context.pop();
