@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../models/mock_sketch_list.dart';
 import '../models/mock_user.dart';
 import '../widgets/profile_grid.dart';
-import '../dialogs/modify_profile_modal.dart';
+import '../dialogs/modify_profile_dialog.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});
@@ -85,7 +85,7 @@ class _MyPageState extends State<MyPage> {
                       showDialog(
                         context: context,
                         builder: (context) =>
-                            Dialog(child: ModifyProfileModal()),
+                            Dialog(child: ModifyProfileDialog()),
                       );
                     },
                     child: Text(

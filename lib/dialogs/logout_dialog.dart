@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/dialog_action_buttons.dart';
 
-class LogoutModal extends StatelessWidget {
-  const LogoutModal({super.key});
+class LogoutDialog extends StatelessWidget {
+  const LogoutDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

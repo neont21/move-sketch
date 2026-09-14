@@ -5,8 +5,8 @@ import '../pages/session_tracking_page.dart';
 import '../models/mock_mission_data.dart';
 import '../models/mock_session_data.dart';
 
-class SessionPauseModal extends StatelessWidget {
-  SessionPauseModal({super.key});
+class SessionPauseDialog extends StatelessWidget {
+  SessionPauseDialog({super.key});
   final _sessionData = MockSessionData(
     id: uuid.v4(),
     minutes: 18,

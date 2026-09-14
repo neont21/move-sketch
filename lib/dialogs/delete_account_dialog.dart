@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/dialog_action_buttons.dart';
 
-class DeleteAccountModal extends StatelessWidget {
-  const DeleteAccountModal({super.key});
+class DeleteAccountDialog extends StatelessWidget {
+  const DeleteAccountDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

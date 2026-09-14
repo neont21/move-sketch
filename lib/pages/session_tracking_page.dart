@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../models/mock_session_data.dart';
 import '../widgets/session_stats_view.dart';
 import '../widgets/path_tracker_view.dart';
-import '../dialogs/session_pause_modal.dart';
+import '../dialogs/session_pause_dialog.dart';
 
 const uuid = Uuid();
 
@@ -97,7 +97,7 @@ class _SessionTrackingPageState extends State<SessionTrackingPage> {
                         showDialog(
                           context: context,
                           builder: (context) =>
-                              Dialog(child: SessionPauseModal()),
+                              Dialog(child: SessionPauseDialog()),
                         );
                       },
                       icon: Icon(Icons.pause),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/mock_user.dart';
-import '../dialogs/user_list_modal.dart';
+import '../dialogs/user_list_dialog.dart';
 
 final List<MockUser> mutualsList = [
   MockUser.byId('@user1'),
@@ -119,7 +119,7 @@ class MutualFriends extends StatelessWidget {
               showDialog(
                 context: context,
                 builder: (context) => Dialog(
-                  child: UserListModal(
+                  child: UserListDialog(
                     title: '함께 아는 친구',
                     userList: mutualsList,
                   ),

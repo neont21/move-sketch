@@ -6,14 +6,14 @@ import '../widgets/dialog_action_buttons.dart';
 import '../widgets/labeled_text_form_field.dart';
 import '../models/mock_user.dart';
 
-class ModifyProfileModal extends StatefulWidget {
-  const ModifyProfileModal({super.key});
+class ModifyProfileDialog extends StatefulWidget {
+  const ModifyProfileDialog({super.key});
 
   @override
-  State<ModifyProfileModal> createState() => _ModifyProfileModalState();
+  State<ModifyProfileDialog> createState() => _ModifyProfileDialogState();
 }
 
-class _ModifyProfileModalState extends State<ModifyProfileModal> {
+class _ModifyProfileDialogState extends State<ModifyProfileDialog> {
   final MockUser user = MockUser(
     id: '@daniil_a_np',
     name: '다닐루쉬카',
@@ -37,7 +37,7 @@ class _ModifyProfileModalState extends State<ModifyProfileModal> {
     }
   }
 
-  List<ListTile> _buildBottomModalSheet(BuildContext context) {
+  List<ListTile> _buildBottomDialogSheet(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     List<ListTile> menuItems = [];
@@ -140,7 +140,7 @@ class _ModifyProfileModalState extends State<ModifyProfileModal> {
                             return SafeArea(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
-                                children: _buildBottomModalSheet(context),
+                                children: _buildBottomDialogSheet(context),
                               ),
                             );
                           },

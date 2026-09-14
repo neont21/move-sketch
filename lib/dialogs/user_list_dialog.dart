@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/mock_user.dart';
 
-class UserListModal extends StatelessWidget {
+class UserListDialog extends StatelessWidget {
   final String title;
   final List<MockUser> userList;
-  const UserListModal({super.key, required this.title, required this.userList});
+  const UserListDialog({super.key, required this.title, required this.userList});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../dialogs/delete_account_modal.dart';
-import '../dialogs/logout_modal.dart';
+import '../dialogs/delete_account_dialog.dart';
+import '../dialogs/logout_dialog.dart';
 
 class SettingAccountPage extends StatefulWidget {
   const SettingAccountPage({super.key});
@@ -163,7 +163,7 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) => Dialog(child: LogoutModal()),
+                    builder: (context) => Dialog(child: LogoutDialog()),
                   );
                 },
                 title: Text('로그아웃', style: textTheme.bodyLarge),
@@ -176,7 +176,7 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) => Dialog(child: DeleteAccountModal()),
+                    builder: (context) => Dialog(child: DeleteAccountDialog()),
                   );
                 },
                 title: Text(

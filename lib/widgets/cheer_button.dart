@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/mock_user.dart';
-import '../dialogs/user_list_modal.dart';
+import '../dialogs/user_list_dialog.dart';
 
 class CheerButton extends StatefulWidget {
   final MockUser author;
@@ -38,7 +38,7 @@ class _CheerButtonState extends State<CheerButton> {
           showDialog(
             context: context,
             builder: (context) => Dialog(
-              child: UserListModal(
+              child: UserListDialog(
                 title: '응원한 친구',
                 userList: widget.cheeredUser,
               ),
