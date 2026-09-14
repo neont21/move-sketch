@@ -133,19 +133,25 @@ class SessionCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return TableCalendar(
       locale: 'ko_KR',
       firstDay: DateTime.utc(2026),
       lastDay: DateTime.utc(DateTime.now().year + 1),
       focusedDay: focusedDay,
+      startingDayOfWeek: StartingDayOfWeek.monday,
       selectedDayPredicate: (day) => false,
       onDaySelected: null,
       onPageChanged: (date) => onMonthChanged(date),
       headerStyle: const HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
+      ),
+      daysOfWeekStyle: DaysOfWeekStyle(
+        weekdayStyle: TextStyle(height: 1.0),
+        weekendStyle: TextStyle(height: 1.0, color: colorScheme.primary)
       ),
       calendarBuilders: CalendarBuilders(
         headerTitleBuilder: (context, date) => InkWell(
