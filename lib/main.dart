@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'theme.dart';
+import 'theme/theme.dart';
 import 'app_router.dart';
 
 void main() async {

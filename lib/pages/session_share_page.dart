@@ -1,16 +1,15 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../widgets/sketch_card.dart';
 
 class SessionSharePage extends StatefulWidget {
-  final String _sessionId;
-  final bool _edit;
+  final String sessionId;
+  final bool edit;
   const SessionSharePage({
     super.key,
-    required this._sessionId,
-    this._edit = false,
+    required this.sessionId,
+    this.edit = false,
   });
 
   @override
@@ -23,26 +22,20 @@ class _SessionSharePageState extends State<SessionSharePage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        title: Text(widget._edit ? '수정하기' : '피드에 올리기'),
+        title: Text(widget.edit ? '수정하기' : '피드에 올리기'),
         actions: [
           IconButton(
             onPressed: () {
               // TODO implement save
-              if (widget._edit) {
+              if (widget.edit) {
                 context.pop();
               } else {
-                context.go('/feed/post/${widget._sessionId}');
+                context.go('/feed/post/${widget.sessionId}');
               }
             },
             icon: Icon(Icons.check),
@@ -171,29 +164,7 @@ class _SessionSharePageState extends State<SessionSharePage> {
                   minLines: 4,
                   maxLength: 60,
                   style: textTheme.bodyMedium,
-                  decoration: InputDecoration(
-                    hintText: '오늘의 한마디를 적어보세요. (선택)',
-                    hintStyle: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.tertiaryContainer,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: colorScheme.outline,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: colorScheme.outline,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    filled: true,
-                    fillColor: colorScheme.surface,
-                    counterStyle: textTheme.labelSmall,
-                  ),
+                  decoration: InputDecoration(hintText: '오늘의 한마디를 적어보세요. (선택)'),
                 ),
               ],
             ),

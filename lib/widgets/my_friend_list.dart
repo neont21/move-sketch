@@ -6,10 +6,10 @@ class MyFriendList extends StatefulWidget {
   const MyFriendList({super.key});
 
   @override
-  State<MyFriendList> createState() => _RequestedFriendListState();
+  State<MyFriendList> createState() => _MyFriendListState();
 }
 
-class _RequestedFriendListState extends State<MyFriendList> {
+class _MyFriendListState extends State<MyFriendList> {
   final List<MockUser> _friendList = [
     MockUser(id: '@friend1', name: '친구1'),
     MockUser(id: '@friend2', name: '친구2'),
@@ -23,7 +23,7 @@ class _RequestedFriendListState extends State<MyFriendList> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

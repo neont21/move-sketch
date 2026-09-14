@@ -3,35 +3,35 @@ import 'package:go_router/go_router.dart';
 import '../models/mock_user.dart';
 
 class UserCard extends StatelessWidget {
-  final MockUser _user;
-  final bool _isFriend;
-  final bool _isRequested;
-  final bool _isSent;
-  final bool _onSearch;
-  final bool _onRecommend;
+  final MockUser user;
+  final bool isFriend;
+  final bool isRequested;
+  final bool isSent;
+  final bool onSearch;
+  final bool onRecommend;
 
   const UserCard({
     super.key,
-    required this._user,
-    this._isFriend = false,
-    this._isRequested = false,
-    this._isSent = false,
-    this._onSearch = false,
-    this._onRecommend = false,
+    required this.user,
+    this.isFriend = false,
+    this.isRequested = false,
+    this.isSent = false,
+    this.onSearch = false,
+    this.onRecommend = false,
   });
 
   Widget _buildTitle(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
-    if (_onSearch || (_isRequested && !_onRecommend)) {
-      return Text(_user.name, style: textTheme.bodyMedium);
+    if (onSearch || (isRequested && !onRecommend)) {
+      return Text(user.name, style: textTheme.bodyMedium);
     } else {
       return RichText(
         text: TextSpan(
           children: [
-            TextSpan(text: _user.name, style: textTheme.bodyMedium),
+            TextSpan(text: user.name, style: textTheme.bodyMedium),
             TextSpan(text: ' '),
-            TextSpan(text: _user.id, style: textTheme.labelMedium),
+            TextSpan(text: user.id, style: textTheme.labelMedium),
           ],
         ),
       );
@@ -41,14 +41,14 @@ class UserCard extends StatelessWidget {
   Widget _buildSubtitle(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
 
-    if (_onSearch || (_isRequested && !_onRecommend)) {
-      return Text(_user.id, style: textTheme.labelMedium);
-    } else if (_isFriend) {
+    if (onSearch || (isRequested && !onRecommend)) {
+      return Text(user.id, style: textTheme.labelMedium);
+    } else if (isFriend) {
       return Text('오늘 공유함', style: textTheme.labelMedium);
-    } else if (_onRecommend) {
+    } else if (onRecommend) {
       return Text('~~님과 아는 사이', style: textTheme.labelMedium);
     } else {
-      return Container();
+      return const SizedBox.shrink();
     }
   }
 
@@ -56,7 +56,7 @@ class UserCard extends StatelessWidget {
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    if (_isRequested) {
+    if (isRequested) {
       return Row(
         spacing: 4,
         mainAxisSize: MainAxisSize.min,
@@ -86,7 +86,7 @@ class UserCard extends StatelessWidget {
           ),
         ],
       );
-    } else if (_isSent) {
+    } else if (isSent) {
       return OutlinedButton(
         onPressed: () {},
         style: OutlinedButton.styleFrom(
@@ -95,7 +95,7 @@ class UserCard extends StatelessWidget {
         ),
         child: Text('요청 취소', style: textTheme.bodySmall),
       );
-    } else if (_isFriend) {
+    } else if (isFriend) {
       return Icon(Icons.chevron_right, color: colorScheme.tertiaryContainer);
     } else {
       return OutlinedButton(
@@ -118,12 +118,12 @@ class UserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        context.push('/profile/${_user.id}');
+        context.push('/profile/${user.id}');
       },
       leading: CircleAvatar(
         radius: 24,
-        backgroundImage: _user.imageURL != null
-            ? NetworkImage(_user.imageURL!)
+        backgroundImage: user.imageURL != null
+            ? NetworkImage(user.imageURL!)
             : AssetImage('assets/default_profile.png'),
       ),
       title: _buildTitle(context),

@@ -35,7 +35,7 @@ class _RequestedFriendListState extends State<SearchedFriendList> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

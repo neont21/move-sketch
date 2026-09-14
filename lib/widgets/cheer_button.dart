@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:move_sketch/models/mock_user.dart';
-
-import '../dialogs/cheered_user_modal.dart';
+import '../models/mock_user.dart';
+import '../dialogs/user_list_modal.dart';
 
 class CheerButton extends StatefulWidget {
-  final MockUser _author;
-  final MockUser _user;
-  final List<MockUser> _cheeredUser;
+  final MockUser author;
+  final MockUser user;
+  final List<MockUser> cheeredUser;
 
-  const CheerButton({super.key, required this._author, required this._user, required this._cheeredUser});
+  const CheerButton({
+    super.key,
+    required this.author,
+    required this.user,
+    required this.cheeredUser,
+  });
 
   @override
   State<CheerButton> createState() => _CheerButtonState();
@@ -20,35 +24,33 @@ class _CheerButtonState extends State<CheerButton> {
   @override
   void initState() {
     super.initState();
-    _isCheered = widget._cheeredUser.contains(widget._user);
+    _isCheered = widget.cheeredUser.contains(widget.user);
   }
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return
-    ElevatedButton(
+    return ElevatedButton(
       onPressed: () {
-        if (widget._author.id == widget._user.id) {
-          // 응원 목록
+        if (widget.author.id == widget.user.id) {
           showDialog(
             context: context,
             builder: (context) => Dialog(
-              child: CheeredUserModal(
-                cheeredUser: widget._cheeredUser,
+              child: UserListModal(
+                title: '응원한 친구',
+                userList: widget.cheeredUser,
               ),
             ),
           );
         } else {
-          // 응원하기
           setState(() {
             if (_isCheered) {
-              widget._cheeredUser.remove(widget._user);
+              widget.cheeredUser.remove(widget.user);
               _isCheered = false;
             } else {
-              widget._cheeredUser.add(widget._user);
+              widget.cheeredUser.add(widget.user);
               _isCheered = true;
             }
           });
@@ -74,11 +76,11 @@ class _CheerButtonState extends State<CheerButton> {
               size: 28,
             ),
             Text(
-              (widget._author.id == widget._user.id)
-                  ? '응원 ${widget._cheeredUser.length}명'
+              (widget.author.id == widget.user.id)
+                  ? '응원 ${widget.cheeredUser.length}명'
                   : (_isCheered)
-                  ? '응원했어요 ${widget._cheeredUser.length}'
-                  : '응원하기 ${widget._cheeredUser.length}',
+                  ? '응원했어요 ${widget.cheeredUser.length}'
+                  : '응원하기 ${widget.cheeredUser.length}',
               style: textTheme.headlineSmall?.copyWith(
                 color: _isCheered
                     ? colorScheme.onPrimary

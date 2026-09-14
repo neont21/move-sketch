@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:move_sketch/widgets/cheer_button.dart';
-import 'package:move_sketch/widgets/user_comment.dart';
+import '../widgets/cheer_button.dart';
+import '../widgets/user_comment.dart';
 import '../models/mock_sketch.dart';
 import '../models/mock_user.dart';
 import '../widgets/feed_post.dart';
 
 class FeedPostPage extends StatefulWidget {
-  final String _sketchId;
+  final String sketchId;
   late final MockSketch _sketch;
-  FeedPostPage({super.key, required this._sketchId}) {
+  FeedPostPage({super.key, required this.sketchId}) {
     _sketch = MockSketch(
-      sketchId: _sketchId,
+      sketchId: sketchId,
       author: MockUser(id: '@user_id', name: '테스트'),
       createdAt: DateTime.now(),
       isJogging: true,
@@ -22,6 +21,7 @@ class FeedPostPage extends StatefulWidget {
         MockUser(id: '@peeeeeter_j', name: '피터'),
         MockUser(id: '@nyong_nyoi', name: '뇨이'),
       ],
+      comments: [],
     );
   }
 
@@ -64,19 +64,11 @@ class _FeedPostPageState extends State<FeedPostPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        // title: Text('뒤로'),
-      ),
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: SingleChildScrollView(
@@ -101,32 +93,11 @@ class _FeedPostPageState extends State<FeedPostPage> {
           spacing: 8,
           children: [
             Expanded(
-              child: SizedBox(
-                child: TextField(
-                  keyboardType: TextInputType.text,
-                  style: textTheme.bodyMedium,
-                  minLines: 1,
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: colorScheme.surface,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide(
-                        color: colorScheme.outline,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide(
-                        color: colorScheme.outline,
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ),
+              child: TextField(
+                keyboardType: TextInputType.text,
+                style: textTheme.bodyMedium,
+                minLines: 1,
+                maxLines: 1,
               ),
             ),
             IconButton(

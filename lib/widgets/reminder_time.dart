@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
 class ReminderTime extends StatelessWidget {
-  final int _selectedTime;
-  final List<int> _timeList;
-  final Function(int?) _onChanged;
+  final int selectedTime;
+  final List<int> timeList;
+  final ValueChanged<int?> onChanged;
   const ReminderTime({
     super.key,
-    required this._selectedTime,
-    required this._timeList,
-    required this._onChanged,
+    required this.selectedTime,
+    required this.timeList,
+    required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: EdgeInsets.symmetric(vertical: 2, horizontal: 20),
@@ -24,10 +24,10 @@ class ReminderTime extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: DropdownButton<int>(
-        value: _selectedTime,
-        onChanged: _onChanged,
+        value: selectedTime,
+        onChanged: onChanged,
         underline: const SizedBox(),
-        items: _timeList.map((int hour) {
+        items: timeList.map((int hour) {
           return DropdownMenuItem(
             value: hour,
             child: Text('$hour시', style: textTheme.bodyMedium),

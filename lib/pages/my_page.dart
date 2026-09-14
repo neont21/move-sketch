@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import '../models/mock_sketch_list.dart';
 import '../models/mock_user.dart';
 import '../widgets/profile_grid.dart';
 import '../dialogs/modify_profile_modal.dart';
@@ -20,11 +20,11 @@ class _MyPageState extends State<MyPage> {
   );
 
   List<MockUser> friends = [];
+  late final MockSketchList _sketchList = MockSketchList.byUser(user.id);
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -33,7 +33,7 @@ class _MyPageState extends State<MyPage> {
             onPressed: () {
               context.go('/me/settings');
             },
-            icon: Icon(Icons.settings, color: colorScheme.tertiaryContainer),
+            icon: Icon(Icons.settings),
           ),
         ],
       ),
@@ -50,7 +50,7 @@ class _MyPageState extends State<MyPage> {
                     children: [
                       Text(user.name, style: textTheme.bodyLarge),
                       Text(user.id, style: textTheme.labelMedium),
-                      Container(height: 4),
+                      const SizedBox(height: 4),
                       user.description != null
                           ? Card(
                               child: Padding(
@@ -64,7 +64,7 @@ class _MyPageState extends State<MyPage> {
                                 ),
                               ),
                             )
-                          : Container(),
+                          : const SizedBox.shrink(),
                     ],
                   ),
                 ),
@@ -76,7 +76,7 @@ class _MyPageState extends State<MyPage> {
                 ),
               ],
             ),
-            Divider(color: Colors.transparent),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -108,9 +108,11 @@ class _MyPageState extends State<MyPage> {
                 ),
               ],
             ),
-            Divider(color: Colors.transparent,),
+            const SizedBox(height: 16),
             Divider(),
-            Expanded(child: ProfileGrid(userId: user.id)),
+            Expanded(child: ProfileGrid(userId: user.id, sketchList: _sketchList, onTap: (index) {
+            context.go('/me/post/${_sketchList.sketches[index].sketchId}');
+            }, )),
           ],
         ),
       ),

@@ -18,14 +18,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    DateTime now = DateTime.now();
-    _formattedDate = DateFormat('M월 d일 EEEE', 'ko').format(now);
+    _formattedDate = DateFormat('M월 d일 EEEE', 'ko').format(DateTime.now());
   }
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       body: SafeArea(
@@ -58,7 +57,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              // 날씨
               Row(
                 spacing: 8.0,
                 children: [
@@ -66,7 +64,6 @@ class _HomePageState extends State<HomePage> {
                   Text('서울 맑음 18℃ · 움직이기 좋아요', style: textTheme.bodySmall),
                 ],
               ),
-              // 사진 - 컴포넌트
               Expanded(
                 child: Transform.rotate(
                   angle: 0.05,
@@ -77,7 +74,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              // 세션 시작
               SizedBox(
                 width: double.infinity,
                 height: 60,
@@ -88,7 +84,6 @@ class _HomePageState extends State<HomePage> {
                   child: Text('세션 시작하기'),
                 ),
               ),
-              // 이번 주 기록
               WeeklyIndicator(isDone: List.filled(7, false)),
             ],
           ),

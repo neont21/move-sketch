@@ -28,7 +28,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return FractionallySizedBox(
       widthFactor: 1,

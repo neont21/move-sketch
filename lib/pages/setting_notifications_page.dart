@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:move_sketch/widgets/reminder_time.dart';
-import 'package:move_sketch/widgets/reminder_weekday.dart';
+import '../widgets/reminder_time.dart';
+import '../widgets/reminder_weekday.dart';
 import '../widgets/simple_binary_toggle.dart';
 
 class SettingNotificationsPage extends StatefulWidget {
@@ -21,16 +20,35 @@ class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
   Set<int> selectedSet = {};
   int selectedTime = 19;
   final List<int> times = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
   ];
 
-  List<ListTile>? _activateNotification(BuildContext context) {
+  List<ListTile>? _activateNotification(TextTheme textTheme) {
     if (!_toggleAll) {
       return null;
     }
-
-    TextTheme textTheme = Theme.of(context).textTheme;
 
     return [
       ListTile(
@@ -72,12 +90,10 @@ class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
     ];
   }
 
-  SingleChildScrollView? _activateReminder(BuildContext context) {
+  SingleChildScrollView? _activateReminder(TextTheme textTheme) {
     if (!_toggleAll || !_toggleReminder) {
       return null;
     }
-
-    TextTheme textTheme = Theme.of(context).textTheme;
 
     return SingleChildScrollView(
       child: Column(
@@ -96,11 +112,15 @@ class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
             },
           ),
           Text('시간', style: textTheme.labelLarge),
-          ReminderTime(selectedTime: selectedTime, timeList: times, onChanged: (int? newValue) {
-            setState(() {
-              selectedTime = newValue!;
-            });
-          })
+          ReminderTime(
+            selectedTime: selectedTime,
+            timeList: times,
+            onChanged: (int? newValue) {
+              setState(() {
+                selectedTime = newValue!;
+              });
+            },
+          ),
         ],
       ),
     );
@@ -108,19 +128,10 @@ class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        title: Text('푸시 알림'),
-      ),
+      appBar: AppBar(title: Text('푸시 알림')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
@@ -137,8 +148,8 @@ class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
                 },
               ),
             ),
-            ...?_activateNotification(context),
-            ?_activateReminder(context),
+            ...?_activateNotification(textTheme),
+            ?_activateReminder(textTheme),
           ],
         ),
       ),

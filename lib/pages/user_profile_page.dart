@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../models/mock_sketch_list.dart';
 import '../models/mock_user.dart';
 import '../widgets/mutual_friends.dart';
 import '../widgets/profile_grid.dart';
 import '../widgets/user_sheet_button.dart';
 
 class UserProfilePage extends StatefulWidget {
-  final String _userId;
-  const UserProfilePage({super.key, required this._userId});
+  final String userId;
+  const UserProfilePage({super.key, required this.userId});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -16,21 +17,22 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   late MockUser _user;
 
-  final List<MockUser> friendsList = [];
+  final List<MockUser> friendsList = [MockUser.byId('@daniil_a_np')];
   final List<MockUser> sentRequestList = [];
   final List<MockUser> receivedRequestList = [MockUser.byId('@edenjint3927')];
+  late final MockSketchList _sketchList = MockSketchList.byUser(_user.id);
 
   @override
   void initState() {
     super.initState();
-    _user = MockUser.byId(widget._userId);
+    _user = MockUser.byId(widget.userId);
   }
 
   Widget _buildDescriptionOrButton(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    if (friendsList.any((user) => user.id == widget._userId)) {
+    if (friendsList.any((user) => user.id == widget.userId)) {
       // 친구일 때
       return _user.description != null
           ? Card(
@@ -42,8 +44,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 child: Text(_user.description!, style: textTheme.bodyMedium),
               ),
             )
-          : Container();
-    } else if (sentRequestList.any((user) => user.id == widget._userId)) {
+          : const SizedBox.shrink();
+    } else if (sentRequestList.any((user) => user.id == widget.userId)) {
       // 친구 요청 보냈을 때
       return OutlinedButton(
         onPressed: () {
@@ -53,7 +55,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         },
         child: Text('친구 요청 취소', style: textTheme.bodyMedium),
       );
-    } else if (receivedRequestList.any((user) => user.id == widget._userId)) {
+    } else if (receivedRequestList.any((user) => user.id == widget.userId)) {
       // 친구 요청 받았을 때
       return OutlinedButton(
         onPressed: () {
@@ -92,19 +94,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        actions: [UserSheetButton(userId: widget._userId)],
-      ),
+      appBar: AppBar(actions: [UserSheetButton(userId: widget.userId)]),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
@@ -118,7 +111,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     children: [
                       Text(_user.name, style: textTheme.bodyLarge),
                       Text(_user.id, style: textTheme.labelMedium),
-                      Container(height: 4),
+                      const SizedBox(height: 4),
                       _buildDescriptionOrButton(context),
                     ],
                   ),
@@ -131,14 +124,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               ],
             ),
-            Divider(color: Colors.transparent),
-            friendsList.any((user) => user.id == widget._userId)
-                ? Container()
-                : MutualFriends(userId: widget._userId),
+            const SizedBox(height: 16),
+            friendsList.any((user) => user.id == widget.userId)
+                ? const SizedBox.shrink()
+                : MutualFriends(userId: widget.userId),
             Divider(),
             Expanded(
-              child: friendsList.any((user) => user.id == widget._userId)
-                  ? ProfileGrid(userId: widget._userId)
+              child: friendsList.any((user) => user.id == widget.userId)
+                  ? ProfileGrid(
+                      userId: widget.userId,
+                      sketchList: _sketchList,
+                      onTap: (index) {
+                        context.go(
+                          '/feed/post/${_sketchList.sketches[index].sketchId}',
+                        );
+                      },
+                    )
                   : Center(
                       child: Text(
                         '친구가 되면 기록을 볼 수 있어요',

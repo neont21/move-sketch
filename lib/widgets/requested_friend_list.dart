@@ -18,10 +18,10 @@ class _RequestedFriendListState extends State<RequestedFriendList> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     if (_requestedList.isEmpty) {
-      return Container();
+      return const SizedBox.shrink();
     }
 
     return Column(

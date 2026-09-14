@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ChangeCharacterPage extends StatefulWidget {
   const ChangeCharacterPage({super.key});
@@ -14,26 +13,18 @@ class _ChangeCharacterPageState extends State<ChangeCharacterPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        title: Text('내 캐릭터'),
-      ),
+      appBar: AppBar(title: Text('내 캐릭터')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('캐릭터를 변경하면 다음 세션부터 반영되요.', style: textTheme.bodyMedium),
-            Divider(color: Colors.transparent),
+            const SizedBox(height: 16),
             Expanded(
               child: GridView.builder(
                 itemCount: _characters.length,
@@ -49,9 +40,7 @@ class _ChangeCharacterPageState extends State<ChangeCharacterPage> {
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                            '캐릭터 변경 완료: ${_characters[_selected]}',
-                          ),
+                          content: Text('캐릭터 변경 완료: ${_characters[_selected]}'),
                           duration: Duration(seconds: 3),
                         ),
                       );

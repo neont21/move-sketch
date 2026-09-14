@@ -7,7 +7,7 @@ class LandingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       body: SafeArea(
@@ -34,7 +34,7 @@ class LandingPage extends StatelessWidget {
                   fontSize: textTheme.labelLarge?.fontSize,
                 ),
               ),
-              Divider(color: Colors.transparent, height: 20),
+              const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 height: 60,

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class OSSLicensesPage extends StatefulWidget {
   const OSSLicensesPage({super.key});
@@ -44,17 +43,14 @@ class _OSSLicensePageState extends State<OSSLicensesPage> {
   }
 
   void _showBottomSheet(BuildContext context, String package, List licenses) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
       isScrollControlled: true,
       builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
+        return SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -96,19 +92,11 @@ class _OSSLicensePageState extends State<OSSLicensesPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        title: Text('오픈소스 라이선스'),
-      ),
+      appBar: AppBar(title: Text('오픈소스 라이선스')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: _isLoading

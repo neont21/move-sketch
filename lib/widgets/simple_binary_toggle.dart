@@ -2,22 +2,22 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 
 class SimpleBinaryToggle extends StatelessWidget {
-  final bool _toggle;
-  final Function(bool) _onChanged;
+  final bool toggle;
+  final ValueChanged<bool> onChanged;
   const SimpleBinaryToggle({
     super.key,
-    required this._toggle,
-    required this._onChanged,
+    required this.toggle,
+    required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return AnimatedToggleSwitch<bool>.size(
-      current: _toggle,
+      current: toggle,
       values: const [false, true],
-      onChanged: _onChanged,
+      onChanged: onChanged,
       selectedIconScale: 1.0,
       height: 28,
       indicatorSize: const Size(20, 20),

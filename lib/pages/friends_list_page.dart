@@ -13,16 +13,8 @@ class FriendsListPage extends StatefulWidget {
 class _FriendsListPageState extends State<FriendsListPage> {
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
         title: Text('친구'),
         actions: [
           IconButton(
@@ -30,7 +22,6 @@ class _FriendsListPageState extends State<FriendsListPage> {
               context.go('/me/friends/search');
             },
             icon: Icon(Icons.search),
-            color: colorScheme.tertiary,
           ),
         ],
       ),
@@ -39,10 +30,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RequestedFriendList(),
-              MyFriendList(),
-            ],
+            children: [RequestedFriendList(), MyFriendList()],
           ),
         ),
       ),

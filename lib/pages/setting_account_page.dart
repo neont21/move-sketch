@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/dialogs/delete_account_modal.dart';
-import 'package:move_sketch/dialogs/logout_modal.dart';
+import '../dialogs/delete_account_modal.dart';
+import '../dialogs/logout_modal.dart';
 
 class SettingAccountPage extends StatefulWidget {
   const SettingAccountPage({super.key});
@@ -17,19 +17,11 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        title: Text('설정'),
-      ),
+      appBar: AppBar(title: Text('계정 정보')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: SingleChildScrollView(
@@ -154,7 +146,7 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
                         ),
                 ),
               ),
-              Divider(color: Colors.transparent),
+              const SizedBox(height: 16),
               _email
                   ? ListTile(
                       onTap: () {
@@ -166,7 +158,7 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
                         color: colorScheme.tertiaryContainer,
                       ),
                     )
-                  : Container(),
+                  : const SizedBox.shrink(),
               ListTile(
                 onTap: () {
                   showDialog(

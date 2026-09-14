@@ -98,7 +98,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(title: Text('기록')),
@@ -122,16 +122,22 @@ class _HistoryPageState extends State<HistoryPage> {
                 });
               },
             ),
-            _monthlyHistory.history.isEmpty ?
-                Expanded(child: Center(child: Text('이 달엔 기록이 없어요.',style: textTheme.labelMedium),))
-                :
-            Expanded(
-              child: ListView.builder(
-                itemCount: _monthlyHistory.history.length,
-                itemBuilder: (context, index) =>
-                    SessionCard(history: _monthlyHistory.history[index]),
-              ),
-            ),
+            _monthlyHistory.history.isEmpty
+                ? Expanded(
+                    child: Center(
+                      child: Text(
+                        '이 달엔 기록이 없어요.',
+                        style: textTheme.labelMedium,
+                      ),
+                    ),
+                  )
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: _monthlyHistory.history.length,
+                      itemBuilder: (context, index) =>
+                          SessionCard(history: _monthlyHistory.history[index]),
+                    ),
+                  ),
           ],
         ),
       ),

@@ -53,8 +53,8 @@ class _SessionStartPageState extends State<SessionStartPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -62,9 +62,8 @@ class _SessionStartPageState extends State<SessionStartPage> {
           onPressed: () {
             context.go('/home');
           },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
+          icon: Icon(Icons.chevron_left),
         ),
-        // title: Text('뒤로'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class MoveSketchShell extends StatelessWidget {
-  final StatefulNavigationShell _navigationShell;
-  const MoveSketchShell({super.key, required this._navigationShell});
+  final StatefulNavigationShell navigationShell;
+  const MoveSketchShell({super.key, required this.navigationShell});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _navigationShell,
+      body: navigationShell,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _navigationShell.currentIndex,
+        selectedIndex: navigationShell.currentIndex,
         destinations: [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -34,9 +34,9 @@ class MoveSketchShell extends StatelessWidget {
           ),
         ],
         onDestinationSelected: (index) {
-          _navigationShell.goBranch(
+          navigationShell.goBranch(
             index,
-            initialLocation: index == _navigationShell.currentIndex,
+            initialLocation: index == navigationShell.currentIndex,
           );
         },
       ),

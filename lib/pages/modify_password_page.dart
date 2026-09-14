@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/widgets/labeled_text_form_field.dart';
+import '../widgets/labeled_text_form_field.dart';
 
 class ModifyPasswordPage extends StatefulWidget {
   const ModifyPasswordPage({super.key});
@@ -16,19 +16,10 @@ class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        title: Text('비밀번호 변경'),
-      ),
+      appBar: AppBar(title: Text('비밀번호 변경')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(

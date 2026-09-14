@@ -1,73 +1,11 @@
 import 'package:flutter/material.dart';
-
-extension ActivityColorsBuildContext on BuildContext {
-  ActivityColors get activityColors => Theme.of(this).extension<ActivityColors>()!;
-}
-
-class ActivityColors extends ThemeExtension<ActivityColors> {
-  final Color jogging;
-  final Color joggingInk;
-  final Color joggingFill;
-  final Color riding;
-  final Color ridingInk;
-  final Color ridingFill;
-
-  const ActivityColors({
-    required this.jogging,
-    required this.joggingInk,
-    required this.joggingFill,
-    required this.riding,
-    required this.ridingInk,
-    required this.ridingFill,
-  });
-
-  @override
-  ActivityColors copyWith({
-    Color? jogging,
-    Color? joggingInk,
-    Color? joggingFill,
-    Color? riding,
-    Color? ridingInk,
-    Color? ridingFill,
-  }) {
-    return ActivityColors(
-      jogging: jogging ?? this.jogging,
-      joggingInk: joggingInk ?? this.joggingInk,
-      joggingFill: joggingFill ?? this.joggingFill,
-      riding: riding ?? this.riding,
-      ridingInk: ridingInk ?? this.ridingInk,
-      ridingFill: ridingFill ?? this.ridingFill,
-    );
-  }
-
-  @override
-  ActivityColors lerp(ThemeExtension<ActivityColors>? other, double t) {
-    if (other is! ActivityColors) return this;
-
-    return ActivityColors(
-      jogging: Color.lerp(jogging, other.jogging, t)!,
-      joggingInk: Color.lerp(joggingInk, other.joggingInk, t)!,
-      joggingFill: Color.lerp(joggingFill, other.joggingFill, t)!,
-      riding: Color.lerp(riding, other.riding, t)!,
-      ridingInk: Color.lerp(ridingInk, other.ridingInk, t)!,
-      ridingFill: Color.lerp(ridingFill, other.ridingFill, t)!,
-    );
-  }
-}
+import 'activity_colors.dart';
 
 class MoveSketchTheme {
   static const Color brand300 = Color(0xFFEC6E38);
   static const Color brand400 = Color(0xFFDD4814);
   static const Color brand500 = Color(0xFFAE3000);
   static const Color brandTint16 = Color(0xFFD54100);
-
-  static const Color jogging = Color(0xFF599940);
-  static const Color joggingInk = Color(0xFF2D6121);
-  static const Color joggingFill = Color(0x2E599940);
-
-  static const Color riding = Color(0xFF8864C0);
-  static const Color ridingInk = Color(0xFF643B9A);
-  static const Color ridingFill = Color(0x298864C0);
 
   static const Color navy = Color(0xFF3A4A7A);
   static const Color brickRed = Color(0xFFB23B1A);
@@ -102,7 +40,7 @@ class MoveSketchTheme {
         surface: paperSurface,
         surfaceDim: dim,
         surfaceContainer: paperBackground,
-        onSurface: brand500,
+        onSurface: ink,
         outline: border,
         outlineVariant: borderStrong,
         error: brickRed,
@@ -203,7 +141,77 @@ class MoveSketchTheme {
         ),
         centerTitle: false,
       ),
+      actionIconTheme: ActionIconThemeData(
+          backButtonIconBuilder: (context) => const Icon(Icons.chevron_left),
+      ),
       focusColor: brand400.withValues(alpha: 0.12),
+      navigationBarTheme: NavigationBarThemeData(
+        iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(
+              color: brand400,
+              size: 24,
+            );
+          }
+          return const IconThemeData(
+            color: inkFaint,
+            size: 24,
+          );
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: brand400,
+            );
+          }
+          return const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: inkFaint,
+          );
+        }),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: paperSurface,
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: border),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: border),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: border),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        counterStyle: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w400,
+          color: inkFaint,
+        ),
+        labelStyle: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: navy,
+        ),
+        hintStyle: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w400,
+          color: inkFaint,
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.vertical(top: Radius.circular(20)),
+        ),
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: brand400,
@@ -223,14 +231,7 @@ class MoveSketchTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       extensions: const [
-        ActivityColors(
-          jogging: jogging,
-          joggingInk: joggingInk,
-          joggingFill: joggingFill,
-          riding: riding,
-          ridingInk: ridingInk,
-          ridingFill: ridingFill,
-        ),
+        ActivityColors.light, // ✨ 등록
       ],
     );
   }

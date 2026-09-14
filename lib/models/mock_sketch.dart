@@ -1,3 +1,4 @@
+import 'package:move_sketch/models/mock_comment.dart';
 import 'mock_user.dart';
 
 class MockSketch {
@@ -10,6 +11,7 @@ class MockSketch {
   String? weather;
   bool isJogging;
   List<MockUser> cheeredUser = [];
+  List<MockComment> comments = [];
 
   MockSketch({
     required this.sketchId,
@@ -21,5 +23,6 @@ class MockSketch {
     this.text,
     this.weather,
     required this.cheeredUser,
+    required this.comments,
   });
 }

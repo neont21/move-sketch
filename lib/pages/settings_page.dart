@@ -9,19 +9,11 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        title: Text('설정'),
-      ),
+      appBar: AppBar(title: Text('설정')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: SingleChildScrollView(
@@ -80,7 +72,7 @@ class SettingsPage extends StatelessWidget {
                   color: colorScheme.tertiaryContainer,
                 ),
               ),
-              Divider(color: Colors.transparent),
+              const SizedBox(height: 16),
               Text('앱 정보', style: textTheme.labelLarge),
               ListTile(
                 onTap: () {
@@ -112,7 +104,7 @@ class SettingsPage extends StatelessWidget {
                   color: colorScheme.tertiaryContainer,
                 ),
               ),
-              Divider(color: Colors.transparent),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -121,7 +113,7 @@ class SettingsPage extends StatelessWidget {
                     builder: (context, snapshot) {
                       final PackageInfo info;
                       if (snapshot.hasError || !snapshot.hasData) {
-                        return Container();
+                        return const SizedBox.shrink();
                       }
                       info = snapshot.data!;
                       return Text(

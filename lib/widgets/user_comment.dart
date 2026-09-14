@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:move_sketch/widgets/bottom_sheet_button.dart';
+import '../widgets/bottom_sheet_button.dart';
 import '../models/mock_comment.dart';
-
 import '../models/mock_user.dart';
 
 class UserComment extends StatelessWidget {
@@ -29,13 +28,13 @@ class UserComment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: (_comment.parentCommentId == null)
-          ? EdgeInsets.symmetric(vertical: 10)
-          : EdgeInsets.fromLTRB(40, 10, 0, 10),
+          ? const EdgeInsets.symmetric(vertical: 10)
+          : const EdgeInsets.fromLTRB(40, 10, 0, 10),
       child: Row(
         spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,14 +80,14 @@ class UserComment extends StatelessWidget {
                               ),
                             ),
                           )
-                        : Container(),
+                        : const SizedBox.shrink(),
                     Spacer(),
                     // TODO: Provider 연결 후 sketch author id를 parentId로 전달
                     BottomSheetButton(authorId: _comment.user.id),
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.only(right: 20),
                   child: Text(
                     _comment.text,
                     style: textTheme.bodyMedium,

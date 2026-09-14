@@ -89,7 +89,7 @@ final router = GoRouter(
                   ],
                 ),
                 GoRoute(
-                  path: '/profile/:user_id',
+                  path: 'profile/:user_id',
                   builder: (context, state) {
                     String userId = state.pathParameters['user_id']!;
                     return UserProfilePage(userId: userId);
@@ -115,7 +115,7 @@ final router = GoRouter(
                   },
                 ),
                 GoRoute(
-                  path: 'feed/:sketch_id',
+                  path: 'post/:sketch_id',
                   builder: (context, state) {
                     String sketchId = state.pathParameters['sketch_id']!;
                     return FeedPostPage(sketchId: sketchId);

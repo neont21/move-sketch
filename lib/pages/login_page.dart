@@ -15,8 +15,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -27,11 +27,19 @@ class _LoginPageState extends State<LoginPage> {
               spacing: 12,
               children: [
                 Container(
-                  width: 100, height: 100,
-                    decoration: BoxDecoration(
-                      boxShadow: [BoxShadow(blurRadius: 40, spreadRadius: -32, color: colorScheme.tertiaryContainer)],
-                    ),
-                    child: SvgPicture.asset('assets/brand/logo-mark.svg')),
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 40,
+                        spreadRadius: -32,
+                        color: colorScheme.tertiaryContainer,
+                      ),
+                    ],
+                  ),
+                  child: SvgPicture.asset('assets/brand/logo-mark.svg'),
+                ),
                 Text('가볍게 시작해 볼까요?', style: textTheme.displaySmall),
                 Text(
                   '오늘의 조깅과 라이딩을 기록해요',
@@ -39,12 +47,12 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: textTheme.bodyLarge?.fontSize,
                   ),
                 ),
-                Divider(color: Colors.transparent,),
+                const SizedBox(height: 16),
                 OutlinedButton(
                   onPressed: () {
                     // TODO implement Google login
                   },
-                  style: ElevatedButton.styleFrom(
+                  style: OutlinedButton.styleFrom(
                     backgroundColor: colorScheme.surface,
                     foregroundColor: colorScheme.tertiaryContainer,
                   ),
@@ -67,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     // TODO implement Apple login
                   },
-                  style: ElevatedButton.styleFrom(
+                  style: OutlinedButton.styleFrom(
                     backgroundColor: colorScheme.surface,
                     foregroundColor: colorScheme.tertiaryContainer,
                   ),
@@ -92,15 +100,12 @@ class _LoginPageState extends State<LoginPage> {
                     spacing: 20,
                     children: [
                       Expanded(child: Divider()),
-                      Text('혹은', style: textTheme.labelMedium,),
+                      Text('혹은', style: textTheme.labelMedium),
                       Expanded(child: Divider()),
                     ],
                   ),
                 ),
-                LabeledTextFormField(
-                  labelText: '아이디',
-                  hintText: '아이디',
-                ),
+                LabeledTextFormField(labelText: '아이디', hintText: '아이디'),
                 LabeledTextFormField(
                   inputType: TextInputType.visiblePassword,
                   labelText: '비밀번호',
@@ -123,30 +128,32 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text('로그인'),
                   ),
                 ),
-                Divider(color: Colors.transparent,),
+                const SizedBox(height: 16),
                 Row(
                   spacing: 20,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('아직 계정이 없나요?', style: textTheme.labelMedium,),
+                    Text('아직 계정이 없나요?', style: textTheme.labelMedium),
                     GestureDetector(
                       onTap: () {
                         context.push('/auth/signup');
                       },
-                      child: Text('회원가입', style: textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: textTheme.labelLarge?.color,
-                      ),),
-                    )
+                      child: Text(
+                        '회원가입',
+                        style: textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: textTheme.labelLarge?.color,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 GestureDetector(
                   onTap: () {
                     context.push('/auth/password');
                   },
-                  child: Text('비밀번호를 잊으셨나요?', style: textTheme.labelMedium
-                  ),
-                )
+                  child: Text('비밀번호를 잊으셨나요?', style: textTheme.labelMedium),
+                ),
               ],
             ),
           ),

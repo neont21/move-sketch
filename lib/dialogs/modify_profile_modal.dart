@@ -1,10 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:move_sketch/widgets/labeled_text_form_field.dart';
-
+import '../widgets/dialog_action_buttons.dart';
+import '../widgets/labeled_text_form_field.dart';
 import '../models/mock_user.dart';
 
 class ModifyProfileModal extends StatefulWidget {
@@ -39,7 +38,7 @@ class _ModifyProfileModalState extends State<ModifyProfileModal> {
   }
 
   List<ListTile> _buildBottomModalSheet(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     List<ListTile> menuItems = [];
 
@@ -98,136 +97,98 @@ class _ModifyProfileModalState extends State<ModifyProfileModal> {
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          child: Column(
-            spacing: 20,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('프로필 편집', style: textTheme.headlineSmall),
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 36,
-                    backgroundImage: user.imageURL != null
-                        ? NetworkImage(user.imageURL!)
-                        : _pickedImage != null
-                        ? _previewImage
-                        : AssetImage('assets/default_profile.png'),
-                  ),
-                  Positioned(
-                    top: 48,
-                    right: 0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: colorScheme.primary,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: colorScheme.surface,
-                          width: 2,
-                        ),
-                      ),
-                      width: 24,
-                      height: 24,
-                      child: IconButton(
-                        onPressed: () {
-                          // TODO 프로필 사진 변경
-                          showModalBottomSheet(
-                            context: context,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadiusGeometry.vertical(
-                                top: Radius.circular(20),
-                              ),
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Form(
+        child: Column(
+          spacing: 20,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('프로필 편집', style: textTheme.headlineSmall),
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 36,
+                  backgroundImage: _pickedImage != null
+                      ? _previewImage
+                      : user.imageURL != null
+                      ? NetworkImage(user.imageURL!)
+                      : AssetImage('assets/default_profile.png'),
+                ),
+                Positioned(
+                  top: 48,
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: colorScheme.surface, width: 2),
+                    ),
+                    width: 24,
+                    height: 24,
+                    child: IconButton(
+                      onPressed: () {
+                        // TODO 프로필 사진 변경
+                        showModalBottomSheet(
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadiusGeometry.vertical(
+                              top: Radius.circular(20),
                             ),
-                            builder: (context) {
-                              return SafeArea(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: _buildBottomModalSheet(context),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        icon: Icon(Icons.camera_alt_outlined),
-                        iconSize: 14,
-                        padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(),
-                        style: IconButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                spacing: 20,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  LabeledTextFormField(
-                    labelText: '닉네임',
-                    hintText: '닉네임은 10자 이내로 정해주세요',
-                    initialValue: user.name,
-                    maxLength: 10,
-                  ),
-                  LabeledTextFormField(
-                    labelText: '한 줄 소개',
-                    hintText: '나에 대한 짧은 소개를 작성해 보아요',
-                    initialValue: user.description,
-                    maxLength: 30,
-                  ),
-                ],
-              ),
-              // 버튼
-              Row(
-                spacing: 20,
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 40,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.pop();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.outline,
-                        ),
-                        child: Text(
-                          '취소',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.tertiaryContainer,
                           ),
-                        ),
+                          builder: (context) {
+                            return SafeArea(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: _buildBottomModalSheet(context),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      icon: Icon(Icons.camera_alt_outlined),
+                      iconSize: 14,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                      style: IconButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: SizedBox(
-                      height: 40,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // TODO: form 내용 반영
-                          context.pop();
-                        },
-                        child: Text(
-                          '저장',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+            Column(
+              spacing: 20,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LabeledTextFormField(
+                  labelText: '닉네임',
+                  hintText: '닉네임은 10자 이내로 정해주세요',
+                  initialValue: user.name,
+                  maxLength: 10,
+                ),
+                LabeledTextFormField(
+                  labelText: '한 줄 소개',
+                  hintText: '나에 대한 짧은 소개를 작성해 보아요',
+                  initialValue: user.description,
+                  maxLength: 30,
+                ),
+              ],
+            ),
+            DialogActionButtons(
+              confirmText: '저장',
+              onConfirm: () {
+                // TODO: form 내용 반영
+                context.pop();
+              },
+              onCancel: () {
+                context.pop();
+              },
+            ),
+          ],
         ),
       ),
     );

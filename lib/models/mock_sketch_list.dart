@@ -18,6 +18,7 @@ class MockSketchList {
           location: '동대문구 휘경동',
           weather: '맑음',
           cheeredUser: [],
+          comments: [],
         ),
         MockSketch(
           sketchId: 'test7',
@@ -28,6 +29,7 @@ class MockSketchList {
           location: '동대문구 휘경동',
           weather: '맑음',
           cheeredUser: [],
+          comments: [],
         ),
         MockSketch(
           sketchId: 'test6',
@@ -38,6 +40,7 @@ class MockSketchList {
           location: '동대문구 휘경동',
           weather: '맑음',
           cheeredUser: [],
+          comments: [],
         ),
         MockSketch(
           sketchId: 'test5',
@@ -48,6 +51,7 @@ class MockSketchList {
           location: '동대문구 휘경동',
           weather: '맑음',
           cheeredUser: [],
+          comments: [],
         ),
         MockSketch(
           sketchId: 'test4',
@@ -58,6 +62,7 @@ class MockSketchList {
           location: '동대문구 휘경동',
           weather: '맑음',
           cheeredUser: [],
+          comments: [],
         ),
         MockSketch(
           sketchId: 'test3',
@@ -68,6 +73,7 @@ class MockSketchList {
           location: '동대문구 휘경동',
           weather: '맑음',
           cheeredUser: [],
+          comments: [],
         ),
         MockSketch(
           sketchId: 'test2',
@@ -78,6 +84,7 @@ class MockSketchList {
           location: '동대문구 휘경동',
           weather: '맑음',
           cheeredUser: [],
+          comments: [],
         ),
         MockSketch(
           sketchId: 'test1',
@@ -88,6 +95,7 @@ class MockSketchList {
           location: '동대문구 휘경동',
           weather: '맑음',
           cheeredUser: [],
+          comments: [],
         ),
       ],
     );

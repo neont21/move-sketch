@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/models/mock_sketch.dart';
-import 'package:move_sketch/models/mock_user.dart';
-
+import '../models/mock_sketch.dart';
+import '../models/mock_user.dart';
 import '../widgets/feed_post.dart';
 
 class FeedPage extends StatelessWidget {
@@ -18,6 +17,7 @@ class FeedPage extends StatelessWidget {
       weather: '맑음',
       text: '뇨이 만나러 가는 길에 중랑천 따릉이~~',
       cheeredUser: [],
+      comments: [],
     ),
     MockSketch(
       sketchId: 'test2',
@@ -28,6 +28,7 @@ class FeedPage extends StatelessWidget {
       weather: '흐림',
       text: '생각보다 많이 걸었다...',
       cheeredUser: [],
+      comments: [],
     ),
     MockSketch(
       sketchId: 'test3',
@@ -38,6 +39,7 @@ class FeedPage extends StatelessWidget {
       weather: '날씨',
       text: '60자 이내의 코멘트는 경우에 따라서 상당히 길어지기도 합니다. 그래서 다음 줄로 내려가는 경우도 발생하죠.',
       cheeredUser: [],
+      comments: [],
     ),
     MockSketch(
       sketchId: 'test4',
@@ -48,6 +50,7 @@ class FeedPage extends StatelessWidget {
       weather: '날씨',
       text: '60자 이내의 코멘트',
       cheeredUser: [],
+      comments: [],
     ),
     MockSketch(
       sketchId: 'test5',
@@ -58,6 +61,7 @@ class FeedPage extends StatelessWidget {
       weather: '날씨',
       text: '60자 이내의 코멘트',
       cheeredUser: [],
+      comments: [],
     ),
     MockSketch(
       sketchId: 'test6',
@@ -68,6 +72,7 @@ class FeedPage extends StatelessWidget {
       weather: '날씨',
       text: '60자 이내의 코멘트',
       cheeredUser: [],
+      comments: [],
     ),
     MockSketch(
       sketchId: 'test7',
@@ -78,13 +83,12 @@ class FeedPage extends StatelessWidget {
       weather: '날씨',
       text: '60자 이내의 코멘트',
       cheeredUser: [],
+      comments: [],
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('피드'),
@@ -93,10 +97,7 @@ class FeedPage extends StatelessWidget {
             onPressed: () {
               context.go('/feed/notifications');
             },
-            icon: Icon(
-              Icons.notifications_outlined,
-              color: colorScheme.tertiaryContainer,
-            ),
+            icon: Icon(Icons.notifications_outlined),
           ),
         ],
       ),

@@ -16,19 +16,11 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left),
-        ),
-        title: Text('계정 만들기'),
-      ),
+      appBar: AppBar(title: Text('계정 만들기')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -74,31 +66,40 @@ class _SignupPageState extends State<SignupPage> {
               ),
               Row(
                 children: [
-                  Checkbox(value: _agree, onChanged: (newValue) {
-                    setState(() {
-                      _agree = newValue ?? !_agree;
-                    });
-                  }),
+                  Checkbox(
+                    value: _agree,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _agree = newValue ?? !_agree;
+                      });
+                    },
+                  ),
                   GestureDetector(
                     onTap: () {
                       context.push('/tos');
                     },
-                    child: Text('이용약관',style: textTheme.labelMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                    ),),
+                    child: Text(
+                      '이용약관',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
-                  Text('과', style: textTheme.labelMedium,),
+                  Text('과', style: textTheme.labelMedium),
                   GestureDetector(
                     onTap: () {
                       context.push('/privacy');
                     },
-                    child: Text('개인정보 처리 방침',style: textTheme.labelMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                    ),),
+                    child: Text(
+                      '개인정보 처리 방침',
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
-                  Text('에 동의해요', style: textTheme.labelMedium,),
+                  Text('에 동의해요', style: textTheme.labelMedium),
                   Text('(필수)', style: textTheme.labelMedium),
                 ],
               ),
@@ -106,10 +107,12 @@ class _SignupPageState extends State<SignupPage> {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: _agree ? () {
-                    // FIXME: only if signup complete
-                    context.go('/auth/signup/complete');
-                  } : null,
+                  onPressed: _agree
+                      ? () {
+                          // FIXME: only if signup complete
+                          context.go('/auth/signup/complete');
+                        }
+                      : null,
                   child: Text('가입하기'),
                 ),
               ),

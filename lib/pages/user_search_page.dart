@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import '../widgets/recommend_friend_list.dart';
 import '../widgets/searched_friend_list.dart';
 
@@ -15,19 +14,11 @@ class _UserSearchPageState extends State<UserSearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
-        title: Text('친구 찾기'),
-      ),
+      appBar: AppBar(title: Text('친구 찾기')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
@@ -37,32 +28,11 @@ class _UserSearchPageState extends State<UserSearchPage> {
               spacing: 8,
               children: [
                 Expanded(
-                  child: SizedBox(
-                    child: TextField(
-                      keyboardType: TextInputType.text,
-                      style: textTheme.bodyMedium,
-                      minLines: 1,
-                      maxLines: 1,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: colorScheme.surface,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(
-                            color: colorScheme.outline,
-                            width: 1,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide(
-                            color: colorScheme.outline,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                    ),
+                  child: TextField(
+                    keyboardType: TextInputType.text,
+                    style: textTheme.bodyMedium,
+                    minLines: 1,
+                    maxLines: 1,
                   ),
                 ),
                 IconButton(

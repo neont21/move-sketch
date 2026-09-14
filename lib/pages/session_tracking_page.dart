@@ -32,8 +32,8 @@ class _SessionTrackingPageState extends State<SessionTrackingPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -42,9 +42,7 @@ class _SessionTrackingPageState extends State<SessionTrackingPage> {
           child: Column(
             spacing: 20,
             children: [
-              // 지나온 길
               PathTrackerView(),
-              // 기본 요약
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -85,10 +83,8 @@ class _SessionTrackingPageState extends State<SessionTrackingPage> {
                 ],
               ),
               Divider(),
-              // 미션
               Row(children: [Text('오늘의 미션', style: textTheme.bodySmall)]),
               SessionStatsView(),
-              // 버튼
               Spacer(),
               Row(
                 spacing: 20,

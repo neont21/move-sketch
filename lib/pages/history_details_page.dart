@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:move_sketch/theme.dart';
-import 'package:move_sketch/widgets/sketch_card.dart';
-
+import 'package:move_sketch/widgets/activity_badge.dart';
+import '../widgets/sketch_card.dart';
 import '../models/mock_mission_data.dart';
 import '../models/mock_session_data.dart';
 import '../models/mock_session_history.dart';
 import '../widgets/path_tracker_view.dart';
 
 class HistoryDetailsPage extends StatelessWidget {
-  final String _sessionId;
-  HistoryDetailsPage({super.key, required this._sessionId});
+  final String sessionId;
+  HistoryDetailsPage({super.key, required this.sessionId});
 
   final _history = MockSessionHistory(
     sessionId: 'test1',
@@ -36,8 +35,8 @@ class HistoryDetailsPage extends StatelessWidget {
   );
 
   List<Row> _buildMissionData(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    List<Row> texts = [];
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final List<Row> texts = [];
 
     for (var mission in _history.missionData) {
       texts.add(
@@ -58,7 +57,7 @@ class HistoryDetailsPage extends StatelessWidget {
   }
 
   Widget? _buildBottomButton(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     if (_history.shared) {
       return Padding(
@@ -66,29 +65,31 @@ class HistoryDetailsPage extends StatelessWidget {
         child: SafeArea(
           child: ElevatedButton(
             onPressed: () {
-              context.go('/history/feed/$_sessionId');
+              context.go('/history/post/$sessionId');
             },
-            style: IconButton.styleFrom(
-                backgroundColor: colorScheme.surfaceContainer,
-                foregroundColor: colorScheme.tertiaryContainer,
-                side: BorderSide(color: colorScheme.outline)
-            ), child: Text('피드에서 보기'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.surfaceContainer,
+              foregroundColor: colorScheme.tertiaryContainer,
+              side: BorderSide(color: colorScheme.outline),
+            ),
+            child: Text('피드에서 보기'),
           ),
         ),
       );
-      } else if (_history.createdAt == DateTime.now()) {
+    } else if (_history.createdAt == DateTime.now()) {
       // TODO: 조건 변경 필요 -- 가장 최근 기록일 때
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
         child: SafeArea(
           child: ElevatedButton(
             onPressed: () {
-              context.go('/history/share/$_sessionId');
+              context.go('/history/share/$sessionId');
             },
-            style: IconButton.styleFrom(
+            style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,
-            ), child: Text('피드에 올리기'),
+            ),
+            child: Text('피드에 올리기'),
           ),
         ),
       );
@@ -98,45 +99,16 @@ class HistoryDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    ActivityColors activityColors = context.activityColors;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            context.pop();
-          },
-          icon: Icon(Icons.chevron_left, color: colorScheme.tertiary),
-        ),
         title: Row(
           spacing: 20,
           children: [
             Text(DateFormat('yyyy-MM-dd (E)', 'ko').format(_history.createdAt)),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: _history.isJogging
-                      ? activityColors.jogging
-                      : activityColors.riding,
-                ),
-                color: _history.isJogging
-                    ? activityColors.joggingFill
-                    : activityColors.ridingFill,
-              ),
-              child: Text(
-                _history.isJogging ? '조깅' : '라이딩',
-                style: textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: _history.isJogging
-                      ? activityColors.joggingInk
-                      : activityColors.ridingInk,
-                ),
-              ),
-            ),
+            ActivityBadge(isJogging: _history.isJogging),
           ],
         ),
       ),
@@ -170,7 +142,7 @@ class HistoryDetailsPage extends StatelessWidget {
                   widthFactor: 0.9,
                   child: PathTrackerView(),
                 ),
-                Divider(color: Colors.transparent),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -214,7 +186,7 @@ class HistoryDetailsPage extends StatelessWidget {
                 ),
                 Divider(),
                 ..._buildMissionData(context),
-                Divider(color: Colors.transparent),
+                const SizedBox(height: 16),
                 Row(
                   spacing: 8,
                   children: [
@@ -234,26 +206,6 @@ class HistoryDetailsPage extends StatelessWidget {
                   style: textTheme.bodyMedium,
                   decoration: InputDecoration(
                     hintText: '나만 보는 메모를 남길 수 있어요. 피드에도 친구에게도 보이지 않아요.',
-                    hintStyle: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.tertiaryContainer,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: colorScheme.outline,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: colorScheme.outline,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    filled: true,
-                    fillColor: colorScheme.surface,
-                    counterStyle: textTheme.labelSmall,
                   ),
                 ),
               ],

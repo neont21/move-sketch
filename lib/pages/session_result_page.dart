@@ -5,13 +5,13 @@ import '../widgets/path_tracker_view.dart';
 import '../widgets/result_stats_view.dart';
 
 class SessionResultPage extends StatelessWidget {
-  final String _sessionId;
-  const SessionResultPage({super.key, required this._sessionId});
+  final String sessionId;
+  const SessionResultPage({super.key, required this.sessionId});
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       body: SafeArea(
@@ -21,7 +21,6 @@ class SessionResultPage extends StatelessWidget {
             child: Column(
               spacing: 20,
               children: [
-                // 제목
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -35,20 +34,23 @@ class SessionResultPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                // 사진
                 SketchCard(
                   imageProvider: AssetImage('assets/sample_sketch.png'),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {},
                   icon: Icon(Icons.download),
-                  label: Text('이미지 내려받기', style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),),
+                  label: Text(
+                    '이미지 내려받기',
+                    style: textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.surfaceContainer,
                     foregroundColor: colorScheme.tertiaryContainer,
                   ),
                 ),
-                // 경로
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
@@ -66,8 +68,6 @@ class SessionResultPage extends StatelessWidget {
                   widthFactor: 0.9,
                   child: PathTrackerView(),
                 ),
-                // 미션 요약
-                // 세션 요약
                 ResultStatsView(),
               ],
             ),
@@ -76,45 +76,43 @@ class SessionResultPage extends StatelessWidget {
       ),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.all(20),
-        child:
-            // 버튼
-            Row(
-              spacing: 20,
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: SizedBox(
-                    height: 60,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        context.go('/home');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: colorScheme.outline,
-                      ),
-                      child: Text(
-                        '홈으로',
-                        style: textTheme.headlineSmall?.copyWith(
-                          color: colorScheme.tertiaryContainer,
-                        ),
-                      ),
+        child: Row(
+          spacing: 20,
+          children: [
+            Expanded(
+              flex: 1,
+              child: SizedBox(
+                height: 60,
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.go('/home');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.outline,
+                  ),
+                  child: Text(
+                    '홈으로',
+                    style: textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.tertiaryContainer,
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 2,
-                  child: SizedBox(
-                    height: 60,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        context.go('/session-result/$_sessionId/share');
-                      },
-                      child: Text('기록하기'),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
+            Expanded(
+              flex: 2,
+              child: SizedBox(
+                height: 60,
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.go('/session-result/$sessionId/share');
+                  },
+                  child: Text('기록하기'),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

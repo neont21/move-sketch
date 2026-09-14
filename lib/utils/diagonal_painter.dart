@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class DiagonalPainter extends CustomPainter {
-  final Color _topLeftColor;
-  final Color _bottomRightColor;
+  final Color topLeftColor;
+  final Color bottomRightColor;
 
-  DiagonalPainter({
-    required this._topLeftColor,
-    required this._bottomRightColor,
+  const DiagonalPainter({
+    required this.topLeftColor,
+    required this.bottomRightColor,
   });
 
   @override
@@ -14,7 +14,7 @@ class DiagonalPainter extends CustomPainter {
     final paint = Paint()..style = PaintingStyle.fill;
     final path = Path();
 
-    paint.color = _topLeftColor;
+    paint.color = topLeftColor;
     path.moveTo(0, 0);
     path.lineTo(size.width, 0);
     path.lineTo(0, size.height);
@@ -23,7 +23,7 @@ class DiagonalPainter extends CustomPainter {
 
     path.reset();
 
-    paint.color = _bottomRightColor;
+    paint.color = bottomRightColor;
     path.moveTo(size.width, 0);
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);

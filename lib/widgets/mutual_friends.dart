@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:move_sketch/models/mock_user.dart';
-import 'package:move_sketch/dialogs/mutual_friends_modal.dart';
+import '../models/mock_user.dart';
+import '../dialogs/user_list_modal.dart';
 
 final List<MockUser> mutualsList = [
   MockUser.byId('@user1'),
@@ -11,8 +11,8 @@ final List<MockUser> mutualsList = [
 ];
 
 class MutualFriends extends StatelessWidget {
-  final String _userId;
-  const MutualFriends({super.key, required this._userId});
+  final String userId;
+  const MutualFriends({super.key, required this.userId});
 
   List<Widget> _buildMutualFriendsImage(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
@@ -25,10 +25,7 @@ class MutualFriends extends StatelessWidget {
           decoration: BoxDecoration(
             color: colorScheme.primary,
             shape: BoxShape.circle,
-            border: Border.all(
-              color: colorScheme.surfaceContainer,
-              width: 2,
-            ),
+            border: Border.all(color: colorScheme.surfaceContainer, width: 2),
           ),
           child: CircleAvatar(
             radius: 16,
@@ -39,7 +36,7 @@ class MutualFriends extends StatelessWidget {
         ),
       ),
     );
-    images.add(Container(width: 40,));
+    images.add(const SizedBox(width: 40));
     if (mutualsList.length >= 2) {
       images.add(
         Positioned(
@@ -48,10 +45,7 @@ class MutualFriends extends StatelessWidget {
             decoration: BoxDecoration(
               color: colorScheme.primary,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: colorScheme.surfaceContainer,
-                width: 2,
-              ),
+              border: Border.all(color: colorScheme.surfaceContainer, width: 2),
             ),
             child: CircleAvatar(
               radius: 16,
@@ -62,7 +56,7 @@ class MutualFriends extends StatelessWidget {
           ),
         ),
       );
-      images.add(Container(width: 60,));
+      images.add(const SizedBox(width: 60));
     }
     if (mutualsList.length > 2) {
       images.add(
@@ -72,20 +66,20 @@ class MutualFriends extends StatelessWidget {
             decoration: BoxDecoration(
               color: colorScheme.primary,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: colorScheme.surfaceContainer,
-                width: 2,
-              ),
+              border: Border.all(color: colorScheme.surfaceContainer, width: 2),
             ),
             child: CircleAvatar(
               radius: 16,
               backgroundColor: colorScheme.outline,
-              child: Text('+${mutualsList.length-2}', style: textTheme.bodySmall,),
+              child: Text(
+                '+${mutualsList.length - 2}',
+                style: textTheme.bodySmall,
+              ),
             ),
           ),
         ),
       );
-      images.add(Container(width: 80,));
+      images.add(const SizedBox(width: 80));
     }
 
     return images;
@@ -103,10 +97,11 @@ class MutualFriends extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     if (mutualsList.isEmpty) {
-      return Container();
+      return const SizedBox.shrink();
     }
 
     return Column(
@@ -115,9 +110,7 @@ class MutualFriends extends StatelessWidget {
       children: [
         Text(
           '함께 아는 친구',
-          style: textTheme.labelSmall?.copyWith(
-            color: textTheme.labelLarge?.color,
-          ),
+          style: textTheme.labelSmall?.copyWith(color: colorScheme.secondary),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -126,7 +119,10 @@ class MutualFriends extends StatelessWidget {
               showDialog(
                 context: context,
                 builder: (context) => Dialog(
-                  child: MutualFriendsModal(mutualsList: mutualsList),
+                  child: UserListModal(
+                    title: '함께 아는 친구',
+                    userList: mutualsList,
+                  ),
                 ),
               );
             },
@@ -134,11 +130,12 @@ class MutualFriends extends StatelessWidget {
               children: [
                 Stack(
                   clipBehavior: Clip.none,
-                    children: _buildMutualFriendsImage(context)),
+                  children: _buildMutualFriendsImage(context),
+                ),
                 Text(
                   _buildMutualFriendsText(),
                   style: textTheme.labelMedium?.copyWith(
-                    color: textTheme.bodyMedium?.color,
+                    color: colorScheme.tertiary,
                   ),
                 ),
               ],
