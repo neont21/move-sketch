@@ -2,8 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/dialog_action_buttons.dart';
 
-class LogoutDialog extends StatelessWidget {
-  const LogoutDialog({super.key});
+class SystemAlertDialog extends StatelessWidget {
+  final String title;
+  final String description;
+  final String confirmText;
+  final VoidCallback onConfirm;
+  const SystemAlertDialog({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.confirmText,
+    required this.onConfirm,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,17 +26,14 @@ class LogoutDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('로그아웃 할까요?', style: textTheme.headlineSmall),
+          Text(title, style: textTheme.headlineSmall),
           Text(
-            '기록은 그대로 남아 있어요.\n다시 로그인하면 이어서 볼 수 있어요.',
+            description,
             style: textTheme.labelMedium,
           ),
           DialogActionButtons(
-            confirmText: '로그아웃',
-            onConfirm: () {
-              context.pop();
-              context.go('/auth/login');
-            },
+            confirmText: confirmText,
+            onConfirm: onConfirm,
             onCancel: () {
               context.pop();
             },

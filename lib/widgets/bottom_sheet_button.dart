@@ -17,7 +17,7 @@ class BottomSheetButton extends StatelessWidget {
   });
 
   List<ListTile> buildBottomSheet(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     List<ListTile> menuItems = [];
 
@@ -25,7 +25,7 @@ class BottomSheetButton extends StatelessWidget {
       if (sketchIdIfPost != null) {
         menuItems.add(
           ListTile(
-            title: Text('편집하기', style: textTheme.bodyLarge),
+            title: Text('편집하기'),
             onTap: () {
               context.pop();
               context.push('/edit/$sketchIdIfPost');
@@ -35,7 +35,7 @@ class BottomSheetButton extends StatelessWidget {
       }
       menuItems.add(
         ListTile(
-          title: Text('삭제하기'),
+          title: Text('삭제하기', style: TextStyle(color: colorScheme.error),),
           onTap: () {
             // TODO: implement delete
             context.pop();
@@ -46,7 +46,16 @@ class BottomSheetButton extends StatelessWidget {
     if (authorId != user.id) {
       menuItems.add(
         ListTile(
-          title: Text('신고하기'),
+          title: Text('신고하기', style: TextStyle(color: colorScheme.error),),
+          onTap: () {
+            // TODO: implement report
+            context.pop();
+          },
+        ),
+      );
+      menuItems.add(
+        ListTile(
+          title: Text('차단하기', style: TextStyle(color: colorScheme.error),),
           onTap: () {
             // TODO: implement report
             context.pop();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../dialogs/system_alert_dialog.dart';
 import '../models/mock_user.dart';
 
 class UserCard extends StatelessWidget {
@@ -9,6 +10,7 @@ class UserCard extends StatelessWidget {
   final bool isSent;
   final bool onSearch;
   final bool onRecommend;
+  final bool onBlocked;
 
   const UserCard({
     super.key,
@@ -18,12 +20,13 @@ class UserCard extends StatelessWidget {
     this.isSent = false,
     this.onSearch = false,
     this.onRecommend = false,
+    this.onBlocked = false,
   });
 
   Widget _buildTitle(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    if (onSearch || (isRequested && !onRecommend)) {
+    if (onSearch || (isRequested && !onRecommend) || onBlocked) {
       return Text(user.name, style: textTheme.bodyMedium);
     } else {
       return RichText(
@@ -41,7 +44,7 @@ class UserCard extends StatelessWidget {
   Widget _buildSubtitle(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
 
-    if (onSearch || (isRequested && !onRecommend)) {
+    if (onSearch || (isRequested && !onRecommend) || onBlocked) {
       return Text(user.id, style: textTheme.labelMedium);
     } else if (isFriend) {
       return Text('오늘 공유함', style: textTheme.labelMedium);
@@ -97,6 +100,26 @@ class UserCard extends StatelessWidget {
       );
     } else if (isFriend) {
       return Icon(Icons.chevron_right, color: colorScheme.tertiaryContainer);
+    } else if (onBlocked) {
+      return OutlinedButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => Dialog(
+              child: SystemAlertDialog(
+                title: '차단을 해제할까요?',
+                description: '차단을 해제하면 서로의 프로필을 다시 볼 수 있어요.',
+                confirmText: '차단 해제',
+                onConfirm: () {
+                  // TODO implement
+                  context.pop();
+                },
+              ),
+            ),
+          );
+        },
+        child: Text('차단 해제', style: textTheme.bodySmall),
+      );
     } else {
       return OutlinedButton(
         onPressed: () {},

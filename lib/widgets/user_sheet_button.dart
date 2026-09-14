@@ -11,6 +11,8 @@ class UserSheetButton extends StatelessWidget {
   const UserSheetButton({super.key, required this.userId});
 
   List<ListTile> buildBottomSheet(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     List<ListTile> menuItems = [];
     if (friendsList.any((user) => user.id == userId)) {
       menuItems.add(
@@ -25,7 +27,16 @@ class UserSheetButton extends StatelessWidget {
     }
     menuItems.add(
       ListTile(
-        title: Text('신고하기'),
+        title: Text('신고하기', style: TextStyle(color: colorScheme.error),),
+        onTap: () {
+          // TODO: implement delete
+          context.pop();
+        },
+      ),
+    );
+    menuItems.add(
+      ListTile(
+        title: Text('차단하기', style: TextStyle(color: colorScheme.error),),
         onTap: () {
           // TODO: implement delete
           context.pop();

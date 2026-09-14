@@ -23,7 +23,7 @@ class FeedNotificationsPage extends StatelessWidget {
       user: MockUser(id: '@whoami', name: '익명의라이더'),
       createdAt: DateTime.now(),
       action: 'requestFriend',
-      goTo: '/profile/whoami',
+      goTo: '/feed/notifications/profile/whoami',
       read: true,
     ),
   ];

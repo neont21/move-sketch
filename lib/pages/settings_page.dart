@@ -72,6 +72,20 @@ class SettingsPage extends StatelessWidget {
                   color: colorScheme.tertiaryContainer,
                 ),
               ),
+              ListTile(
+                onTap: () {
+                  context.go('/me/settings/blocked');
+                },
+                leading: Icon(
+                  Icons.block,
+                  color: colorScheme.tertiaryContainer,
+                ),
+                title: Text('차단한 사용자 관리', style: textTheme.bodyLarge),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: colorScheme.tertiaryContainer,
+                ),
+              ),
               const SizedBox(height: 16),
               Text('앱 정보', style: textTheme.labelLarge),
               ListTile(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:move_sketch/pages/setting_blocked_user.dart';
 import 'pages/move_sketch_shell.dart';
 import 'pages/landing_page.dart';
 import 'pages/home_page.dart';
@@ -84,6 +85,13 @@ final router = GoRouter(
                       builder: (context, state) {
                         String sketchId = state.pathParameters['sketch_id']!;
                         return FeedPostPage(sketchId: sketchId);
+                      },
+                    ),
+                    GoRoute(
+                      path: 'profile/:user_id',
+                      builder: (context, state) {
+                        String userId = state.pathParameters['user_id']!;
+                        return UserProfilePage(userId: userId);
                       },
                     ),
                   ],
@@ -178,6 +186,10 @@ final router = GoRouter(
                     GoRoute(
                       path: 'notifications',
                       builder: (context, state) => SettingNotificationsPage(),
+                    ),
+                    GoRoute(
+                      path: 'blocked',
+                      builder: (context, state) => SettingBlockedUser(),
                     ),
                   ],
                 ),

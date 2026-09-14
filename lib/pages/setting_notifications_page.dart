@@ -19,31 +19,7 @@ class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
 
   Set<int> selectedSet = {};
   int selectedTime = 19;
-  final List<int> times = [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-    20,
-    21,
-    22,
-    23,
-  ];
+  final List<int> times = List.generate(23, (index) => index + 1);
 
   List<ListTile>? _activateNotification(TextTheme textTheme) {
     if (!_toggleAll) {

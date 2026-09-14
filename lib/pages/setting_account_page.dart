@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../dialogs/delete_account_dialog.dart';
-import '../dialogs/logout_dialog.dart';
+import '../dialogs/system_alert_dialog.dart';
 
 class SettingAccountPage extends StatefulWidget {
   const SettingAccountPage({super.key});
@@ -163,7 +163,17 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) => Dialog(child: LogoutDialog()),
+                    builder: (context) => Dialog(
+                      child: SystemAlertDialog(
+                        title: '로그아웃 할까요?',
+                        description: '기록은 그대로 남아 있어요.\n다시 로그인하면 이어서 볼 수 있어요.',
+                        confirmText: '로그아웃',
+                        onConfirm: () {
+                          context.pop();
+                          context.go('/auth/login');
+                        },
+                      ),
+                    ),
                   );
                 },
                 title: Text('로그아웃', style: textTheme.bodyLarge),
