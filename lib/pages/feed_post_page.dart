@@ -32,6 +32,13 @@ class FeedPostPage extends StatefulWidget {
 class _FeedPostPageState extends State<FeedPostPage> {
   final MockUser user = MockUser(id: '@daniil_a_np', name: '다닐루쉬카');
   // final MockUser user = MockUser(id: '@user_id', name: '테스트');
+  String? _replyTargetId;
+
+  void _onReply(String commentId) {
+    setState(() {
+      _replyTargetId = commentId;
+    });
+  }
 
   Column buildComments() {
     List<UserComment> comments = [
@@ -41,6 +48,7 @@ class _FeedPostPageState extends State<FeedPostPage> {
         sketchId: 'test1',
         commentId: 'test1-1',
         text: '댓글 달고 갑니다~~ 댓글도 너무 길게 달진 않도록 할까 하는데 어떻게 생각하세요?',
+        onReply: _onReply,
       ),
       UserComment(
         user: MockUser(id: '@edenjint3927', name: '후이'),
@@ -56,6 +64,7 @@ class _FeedPostPageState extends State<FeedPostPage> {
         sketchId: 'test1',
         commentId: 'test1-3',
         text: '이게 뭐람.',
+        onReply: _onReply,
       ),
     ];
 
@@ -87,31 +96,64 @@ class _FeedPostPageState extends State<FeedPostPage> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-        child: Row(
-          spacing: 8,
-          children: [
-            Expanded(
-              child: TextField(
-                keyboardType: TextInputType.text,
-                style: textTheme.bodyMedium,
-                minLines: 1,
-                maxLines: 1,
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (_replyTargetId != null)
+            Container(
+              decoration: BoxDecoration(
+                color: colorScheme.outlineVariant,
+                borderRadius: BorderRadiusGeometry.vertical(
+                  top: const Radius.circular(20),
+                ),
+              ),
+              padding: const EdgeInsets.only(left: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // FIXME: Comment.getById(_replyTargetId).user.name
+                  Text('$_replyTargetId 에 답글 다는 중'),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _replyTargetId = null;
+                      });
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      size: textTheme.labelLarge?.fontSize,
+                    ),
+                  ),
+                ],
               ),
             ),
-            IconButton(
-              onPressed: () {
-                // TODO: 댓글 추가
-              },
-              icon: Icon(Icons.arrow_upward),
-              style: IconButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+            child: Row(
+              spacing: 8,
+              children: [
+                Expanded(
+                  child: TextField(
+                    keyboardType: TextInputType.text,
+                    style: textTheme.bodyMedium,
+                    minLines: 1,
+                    maxLines: 1,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    // TODO: 댓글 추가
+                  },
+                  icon: Icon(Icons.arrow_upward),
+                  style: IconButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

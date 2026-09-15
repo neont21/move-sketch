@@ -7,6 +7,7 @@ import '../models/mock_user.dart';
 
 class UserComment extends StatelessWidget {
   late final MockComment _comment;
+  final ValueChanged<String>? onReply;
   UserComment({
     super.key,
     required MockUser user,
@@ -15,6 +16,7 @@ class UserComment extends StatelessWidget {
     required String commentId,
     required String text,
     String? parentCommentId,
+    this.onReply,
   }) {
     _comment = MockComment(
       user: user,
@@ -67,11 +69,9 @@ class UserComment extends StatelessWidget {
                       ).format(_comment.createdAt),
                       style: textTheme.labelMedium,
                     ),
-                    (_comment.parentCommentId == null)
+                    (_comment.parentCommentId == null && onReply != null)
                         ? GestureDetector(
-                            onTap: () {
-                              // TODO: 답글 토글. callback function 써서 commentId 전달
-                            },
+                            onTap: () { onReply!(_comment.commentId);},
                             child: Text(
                               '답글',
                               style: textTheme.labelMedium?.copyWith(
