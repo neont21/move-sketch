@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:move_sketch/dialogs/system_alert_dialog.dart';
 import '../widgets/dialog_action_buttons.dart';
 import '../pages/session_tracking_page.dart';
 import '../models/mock_mission_data.dart';
@@ -66,7 +67,7 @@ class SessionPauseDialog extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16,),
+          const SizedBox(height: 16),
           DialogActionButtons(
             confirmText: '계속하기',
             onConfirm: () {
@@ -76,6 +77,34 @@ class SessionPauseDialog extends StatelessWidget {
             onCancel: () {
               context.go('/session-result/${_sessionData.id}');
             },
+          ),
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  child: SystemAlertDialog(
+                    title: '정말 기록을 남기지 않나요?',
+                    description: '기록을 남기지 않고 종료하면 되돌릴 수 없어요.',
+                    confirmText: '그래도 종료',
+                    onConfirm: () {
+                      context.pop();
+                      context.go('/home');
+                    },
+                  ),
+                ),
+              );
+            },
+            child: Center(
+              child: Text(
+                '기록을 남기지 않고 종료하기',
+                style: textTheme.labelMedium?.copyWith(
+                  color: colorScheme.error,
+                  decoration: TextDecoration.underline,
+                  decorationColor: colorScheme.error,
+                ),
+              ),
+            ),
           ),
         ],
       ),
