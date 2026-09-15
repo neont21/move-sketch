@@ -10,6 +10,7 @@ class NotificationCard extends StatelessWidget {
   final DateTime createdAt;
   final String goTo;
   final bool read;
+  final VoidCallback onRead;
 
   const NotificationCard({
     super.key,
@@ -18,6 +19,7 @@ class NotificationCard extends StatelessWidget {
     required this.createdAt,
     required this.goTo,
     this.read=false,
+    required this.onRead,
   });
 
   @override
@@ -28,16 +30,12 @@ class NotificationCard extends StatelessWidget {
     return ListTile(
       tileColor: read ? colorScheme.surfaceContainer : colorScheme.outline,
       onTap: () {
+        onRead();
         context.go(goTo);
       },
-      leading: GestureDetector(
-        onTap: () {
-          context.go('/profile/${user.id}');
-        },
-        child: CircleAvatar(
-          radius: 20,
-          backgroundImage: const AssetImage('assets/default_profile.png'),
-        ),
+      leading: CircleAvatar(
+        radius: 20,
+        backgroundImage: const AssetImage('assets/default_profile.png'),
       ),
       title: RichText(
         text: TextSpan(

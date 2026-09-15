@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/dialogs/system_alert_dialog.dart';
+import '../dialogs/system_alert_dialog.dart';
 import '../widgets/dialog_action_buttons.dart';
 import '../pages/session_tracking_page.dart';
 import '../models/mock_mission_data.dart';
