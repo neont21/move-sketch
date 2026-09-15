@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../dialogs/delete_history_dialog.dart';
 import '../widgets/activity_badge.dart';
 import '../models/mock_session_history.dart';
 
@@ -32,6 +33,15 @@ class SessionCard extends StatelessWidget {
       child: ListTile(
         onTap: () {
           context.go('/history/details/${history.sessionId}');
+        },
+        onLongPress: () {
+          showDialog(
+            context: context,
+            builder: (context) => Dialog(
+              child: DeleteHistoryDialog(sessionId: history.sessionId)
+              ),
+          );
+
         },
         leading: Image(
           image: history.imageURL != null
