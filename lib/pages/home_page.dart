@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:move_sketch/dialogs/session_resume_dialog.dart';
+import 'package:move_sketch/models/mock_session_data.dart';
+import '../models/mock_mission_data.dart';
 import '../widgets/sketch_card.dart';
 import '../widgets/weekly_indicator.dart';
 
@@ -14,11 +17,36 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late String _formattedDate;
 
+  void _checkUncompletedSession() {
+    if (mounted) {
+      // FIXME only if the session is not completed
+      final MockSessionData sessionData = MockSessionData(
+        id: 'mock-data',
+        minutes: 18,
+        seconds: 42,
+        km: 3.1,
+        kcal: 186,
+      );
+      final List<MockMissionData> missionStats = [
+        MockMissionData(title: '페이스', data: '6\' 17\'\'', unit: '/km'),
+        MockMissionData(title: '지속 시간', data: '18', unit: '분'),
+      ];
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (context) =>
+              Dialog(child: SessionResumeDialog(sessionData: sessionData, missionStats: missionStats)),
+        );
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
     _formattedDate = DateFormat('M월 d일 EEEE', 'ko').format(DateTime.now());
+    _checkUncompletedSession();
   }
 
   @override
