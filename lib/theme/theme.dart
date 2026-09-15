@@ -31,7 +31,7 @@ class MoveSketchTheme {
       colorScheme: const ColorScheme.light(
         primary: brand400,
         onPrimary: Colors.white,
-        primaryContainer: brandTint16,
+        primaryContainer: brand300,
         secondary: navy,
         secondaryContainer: paperBackground,
         tertiary: ink,

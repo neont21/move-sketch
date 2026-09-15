@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:move_sketch/widgets/hold_button.dart';
 import 'package:uuid/uuid.dart';
 import '../models/mock_session_data.dart';
 import '../widgets/session_stats_view.dart';
@@ -110,12 +111,9 @@ class _SessionTrackingPageState extends State<SessionTrackingPage> {
                   Expanded(
                     child: SizedBox(
                       height: 60,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.go('/session-result/${_sessionData.id}');
-                        },
-                        child: Text('종료'),
-                      ),
+                      child: HoldButton(title: '종료', onActionTriggered: () {
+                        context.go('/session-result/${_sessionData.id}');
+                      }),
                     ),
                   ),
                 ],
