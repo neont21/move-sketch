@@ -92,8 +92,7 @@ class TrackingSession {
   SessionResult toResult({
     required SketchComposition sketchComposition,
     String? routePolyline,
-    String? mapThumbnailPath,
-    String? locationTag,
+    String? routeImageUrl,
   }) {
     if (!isValidSession) {
       throw StateError('위치 좌표가 없어 결과를 생성할 수 없습니다.');
@@ -115,8 +114,7 @@ class TrackingSession {
       endLocation: pathPoints.last,
 
       routePolyline: routePolyline,
-      mapThumbnailPath: mapThumbnailPath,
-      locationTag: locationTag,
+      routeImageUrl: routeImageUrl,
       missions: List.unmodifiable(missions),
       createdAt: DateTime.now(),
     );

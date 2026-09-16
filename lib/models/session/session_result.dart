@@ -28,7 +28,7 @@ class SessionResult {
   final List<MissionInstance> missions;
 
   final String? routePolyline;
-  final String? mapThumbnailPath;
+  final String? routeImageUrl;
   final String? resultSketchImagePath;
   final String? locationTag;
   final SyncStatus syncStatus;
@@ -53,7 +53,7 @@ class SessionResult {
     this.averagePaceInSeconds,
     this.averageSpeedKmh,
     this.routePolyline,
-    this.mapThumbnailPath,
+    this.routeImageUrl,
     this.resultSketchImagePath,
     this.locationTag,
     this.syncStatus = SyncStatus.synced,
@@ -80,7 +80,7 @@ class SessionResult {
       'sketchComposition': sketchComposition.toMap(),
       'missions': missions.map((m) => m.toMap()).toList(),
       'routePolyline': routePolyline,
-      'mapThumbnailPath': mapThumbnailPath,
+      'routeImageUrl': routeImageUrl,
       'resultSketchImagePath': resultSketchImagePath,
       'locationTag': locationTag,
       'syncStatus': syncStatus.name,
@@ -121,7 +121,7 @@ class SessionResult {
               .toList() ??
           [],
       routePolyline: map['routePolyline'] as String?,
-      mapThumbnailPath: map['mapThumbnailPath'] as String?,
+      routeImageUrl: map['routeImageUrl'] as String?,
       resultSketchImagePath: map['resultSketchImagePath'] as String?,
       locationTag: map['locationTag'] as String?,
       syncStatus: SyncStatus.fromString(map['syncStatus'] as String?),

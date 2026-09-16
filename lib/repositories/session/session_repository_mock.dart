@@ -94,7 +94,7 @@ class SessionRepositoryMock implements SessionRepository {
     required String sessionId,
     required SketchComposition sketchComposition,
     String? routePolyline,
-    String? mapThumbnailPath,
+    String? routeImageUrl,
     String? resultSketchImagePath,
     String? locationTag,
   }) async {
@@ -107,8 +107,7 @@ class SessionRepositoryMock implements SessionRepository {
     final result = _currentSession!.toResult(
       sketchComposition: sketchComposition,
       routePolyline: routePolyline,
-      mapThumbnailPath: mapThumbnailPath,
-      locationTag: locationTag,
+      routeImageUrl: routeImageUrl,
     );
 
     _currentSession = null;

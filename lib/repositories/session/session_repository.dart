@@ -41,9 +41,8 @@ abstract interface class SessionRepository {
     required String sessionId,
     required SketchComposition sketchComposition,
     String? routePolyline,
-    String? mapThumbnailPath,
+    String? routeImageUrl,
     String? resultSketchImagePath,
-    String? locationTag,
   });
 
   /// 세션 기록 후 raw data를 폐기한다. (세션 종료 후 서버 업로드 시 1회 호출)
