@@ -47,22 +47,24 @@ class _ReportDialogState extends State<ReportDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('신고 사유를 선택해 주세요', style: textTheme.headlineSmall),
-          Column(
-            children: ReportReason.values.map((reason) {
-              return RadioListTile<ReportReason>(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                activeColor: colorScheme.primary,
-                title: Text(reason.label, style: textTheme.bodyMedium),
-                value: reason,
-                groupValue: _selectedReason,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedReason = value;
-                  });
-                },
-              );
-            }).toList(),
+          RadioGroup<ReportReason>(
+            groupValue: _selectedReason,
+            onChanged: (value) {
+              setState(() {
+                _selectedReason = value;
+              });
+            },
+            child: Column(
+              children: ReportReason.values.map((reason) {
+                return RadioListTile<ReportReason>(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: colorScheme.primary,
+                  title: Text(reason.label, style: textTheme.bodyMedium),
+                  value: reason,
+                );
+              }).toList(),
+            ),
           ),
           if (_selectedReason == ReportReason.other)
             TextField(
