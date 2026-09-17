@@ -39,24 +39,13 @@ class LocationService {
   }
 
   Future<LocationPoint?> getCurrentLocation() async {
-    try {
-      final Position pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 5),
-        ),
-      );
-      return _toLocationPoint(pos);
-    } on TimeoutException catch (e) {
-      debugPrint('[LocationService] 현재 위치 조회 시간 만료: $e');
-      throw Exception('[LocationService] 현재 위치 조회 시간 만료: $e');
-    } on LocationServiceDisabledException catch (e) {
-      debugPrint('[LocationService] 기기 위치 정보 사용 불가: $e');
-      throw Exception('[LocationService] 기기 위치 정보 사용 불가: $e');
-    } catch (e) {
-      debugPrint('[LocationService] 현재 위치 조회 실패: $e');
-      throw Exception('[LocationService] 현재 위치 조회 실패: $e');
-    }
+    final Position pos = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 5),
+      ),
+    );
+    return _toLocationPoint(pos);
   }
 
   Stream<LocationPoint> getPositionStream({int distanceFilterMeters = 0}) {
