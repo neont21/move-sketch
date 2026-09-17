@@ -29,7 +29,7 @@ class SessionResult {
 
   final String? routePolyline;
   final String? routeImageUrl;
-  final String? resultSketchImagePath;
+  final String? resultSketchImageUrl;
   final String? locationTag;
   final SyncStatus syncStatus;
   final DateTime createdAt;
@@ -54,7 +54,7 @@ class SessionResult {
     this.averageSpeedKmh,
     this.routePolyline,
     this.routeImageUrl,
-    this.resultSketchImagePath,
+    this.resultSketchImageUrl,
     this.locationTag,
     this.syncStatus = SyncStatus.synced,
     this.updatedAt,
@@ -81,7 +81,7 @@ class SessionResult {
       'missions': missions.map((m) => m.toMap()).toList(),
       'routePolyline': routePolyline,
       'routeImageUrl': routeImageUrl,
-      'resultSketchImagePath': resultSketchImagePath,
+      'resultSketchImageUrl': resultSketchImageUrl,
       'locationTag': locationTag,
       'syncStatus': syncStatus.name,
       'createdAt': createdAt.toUtc().toIso8601String(),
@@ -122,7 +122,7 @@ class SessionResult {
           [],
       routePolyline: map['routePolyline'] as String?,
       routeImageUrl: map['routeImageUrl'] as String?,
-      resultSketchImagePath: map['resultSketchImagePath'] as String?,
+      resultSketchImageUrl: map['resultSketchImageUrl'] as String?,
       locationTag: map['locationTag'] as String?,
       syncStatus: SyncStatus.fromString(map['syncStatus'] as String?),
       createdAt: parseDateTime(map['createdAt']).toLocal(),

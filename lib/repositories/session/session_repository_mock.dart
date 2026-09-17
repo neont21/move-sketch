@@ -95,7 +95,7 @@ class SessionRepositoryMock implements SessionRepository {
     required SketchComposition sketchComposition,
     String? routePolyline,
     String? routeImageUrl,
-    String? resultSketchImagePath,
+    String? resultSketchImageUrl,
     String? locationTag,
   }) async {
     await Future.delayed(const Duration(milliseconds: 100));
