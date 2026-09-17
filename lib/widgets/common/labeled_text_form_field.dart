@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class LabeledTextFormField extends StatelessWidget {
   final TextInputType inputType;
-  final String labelText;
+  final String? labelText;
   final String hintText;
   final bool? showPassword;
   final VoidCallback? toggleVisibility;
@@ -12,7 +12,7 @@ class LabeledTextFormField extends StatelessWidget {
   const LabeledTextFormField({
     super.key,
     this.inputType = TextInputType.name,
-    required this.labelText,
+    this.labelText,
     required this.hintText,
     this.showPassword,
     this.toggleVisibility,

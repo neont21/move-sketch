@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:move_sketch/widgets/common/labeled_text_form_field.dart';
 import '../common/dialog_action_buttons.dart';
 
-class DeleteAccountDialog extends StatelessWidget {
+class DeleteAccountDialog extends StatefulWidget {
   const DeleteAccountDialog({super.key});
+
+  @override
+  State<DeleteAccountDialog> createState() => _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
+  bool _showPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +31,17 @@ class DeleteAccountDialog extends StatelessWidget {
           ),
           Text('지금까지 남긴 기록이 모두 지워지고 되돌릴 수 없어요.', style: textTheme.labelMedium),
           Text(
-            '확인을 위해 아이디를 입력해 주세요',
+            '확인을 위해 비밀번호를 입력해 주세요',
             style: textTheme.labelSmall?.copyWith(color: colorScheme.secondary),
           ),
-          TextField(
-            keyboardType: TextInputType.text,
-            style: textTheme.bodyMedium,
-            minLines: 1,
-            maxLines: 1,
-            decoration: InputDecoration(hintText: 'user_id'),
+          LabeledTextFormField(
+            hintText: '비밀번호 입력',
+            showPassword: _showPassword,
+            toggleVisibility: () {
+              setState(() {
+                _showPassword = !_showPassword;
+              });
+            },
           ),
           DialogActionButtons(
             confirmText: '삭제',
