@@ -34,8 +34,16 @@ class _HomePageState extends State<HomePage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showDialog(
           context: context,
-          builder: (context) =>
-              Dialog(child: SessionResumeDialog(sessionData: sessionData, missionStats: missionStats)),
+          barrierDismissible: false,
+          builder: (context) => PopScope(
+            canPop: false,
+            child: Dialog(
+              child: SessionResumeDialog(
+                sessionData: sessionData,
+                missionStats: missionStats,
+              ),
+            ),
+          ),
         );
       });
     }
