@@ -117,6 +117,7 @@ class TrackingSession {
       routeImageUrl: routeImageUrl,
       missions: List.unmodifiable(missions),
       createdAt: DateTime.now(),
+      isShared: false,
     );
   }
 

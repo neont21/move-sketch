@@ -30,10 +30,14 @@ class SessionResult {
   final String? routePolyline;
   final String? routeImageUrl;
   final String? resultSketchImageUrl;
-  final String? locationTag;
+
+  final String? secretMemo;
+  final bool isShared;
+
   final SyncStatus syncStatus;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final DateTime? deletedAt;
 
   const SessionResult({
     required this.id,
@@ -50,17 +54,20 @@ class SessionResult {
     required this.sketchComposition,
     required this.missions,
     required this.createdAt,
+    required this.isShared,
     this.averagePaceInSeconds,
     this.averageSpeedKmh,
     this.routePolyline,
     this.routeImageUrl,
     this.resultSketchImageUrl,
-    this.locationTag,
+    this.secretMemo,
     this.syncStatus = SyncStatus.synced,
     this.updatedAt,
+    this.deletedAt,
   });
 
   double get distanceInKm => distanceInMeters / 1000.0;
+  bool get isDeleted => deletedAt != null;
 
   Map<String, dynamic> toMap() {
     return {
@@ -82,10 +89,12 @@ class SessionResult {
       'routePolyline': routePolyline,
       'routeImageUrl': routeImageUrl,
       'resultSketchImageUrl': resultSketchImageUrl,
-      'locationTag': locationTag,
+      'secretMemo': secretMemo,
+      'isShared': isShared,
       'syncStatus': syncStatus.name,
       'createdAt': createdAt.toUtc().toIso8601String(),
       'updatedAt': updatedAt?.toUtc().toIso8601String(),
+      'deletedAt': deletedAt?.toUtc().toIso8601String(),
     };
   }
 
@@ -123,10 +132,75 @@ class SessionResult {
       routePolyline: map['routePolyline'] as String?,
       routeImageUrl: map['routeImageUrl'] as String?,
       resultSketchImageUrl: map['resultSketchImageUrl'] as String?,
-      locationTag: map['locationTag'] as String?,
+      secretMemo: map['secretMemo'] as String?,
+      isShared: map['isShared'] as bool? ?? false,
       syncStatus: SyncStatus.fromString(map['syncStatus'] as String?),
       createdAt: parseDateTime(map['createdAt']).toLocal(),
       updatedAt: tryParseDateTime(map['updatedAt'])?.toLocal(),
+      deletedAt: tryParseDateTime(map['deletedAt'])?.toLocal(),
+    );
+  }
+
+  SessionResult copyWith({
+    String? id,
+    String? userId,
+    ActivityType? activityType,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    Duration? elapsedDuration,
+    double? distanceInMeters,
+    int? caloriesBurned,
+    ValueGetter<int?>? averagePaceInSeconds,
+    ValueGetter<double?>? averageSpeedKmh,
+    LocationPoint? startLocation,
+    LocationPoint? waypoint,
+    LocationPoint? endLocation,
+    SketchComposition? sketchComposition,
+    List<MissionInstance>? missions,
+    ValueGetter<String?>? routePolyline,
+    ValueGetter<String?>? routeImageUrl,
+    ValueGetter<String?>? resultSketchImageUrl,
+    ValueGetter<String?>? secretMemo,
+    bool? isShared,
+    ValueGetter<String?>? sharedPostId,
+    SyncStatus? syncStatus,
+    DateTime? createdAt,
+    ValueGetter<DateTime?>? updatedAt,
+    ValueGetter<DateTime?>? deletedAt,
+  }) {
+    return SessionResult(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      activityType: activityType ?? this.activityType,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      elapsedDuration: elapsedDuration ?? this.elapsedDuration,
+      distanceInMeters: distanceInMeters ?? this.distanceInMeters,
+      caloriesBurned: caloriesBurned ?? this.caloriesBurned,
+      averagePaceInSeconds: averagePaceInSeconds != null
+          ? averagePaceInSeconds()
+          : this.averagePaceInSeconds,
+      averageSpeedKmh: averageSpeedKmh != null
+          ? averageSpeedKmh()
+          : this.averageSpeedKmh,
+      startLocation: startLocation ?? this.startLocation,
+      waypoint: waypoint ?? this.waypoint,
+      endLocation: endLocation ?? this.endLocation,
+      sketchComposition: sketchComposition ?? this.sketchComposition,
+      missions: missions ?? this.missions,
+      routePolyline:
+      routePolyline != null ? routePolyline() : this.routePolyline,
+      routeImageUrl:
+      routeImageUrl != null ? routeImageUrl() : this.routeImageUrl,
+      resultSketchImageUrl: resultSketchImageUrl != null
+          ? resultSketchImageUrl()
+          : this.resultSketchImageUrl,
+      secretMemo: secretMemo != null ? secretMemo() : this.secretMemo,
+      isShared: isShared ?? this.isShared,
+      syncStatus: syncStatus ?? this.syncStatus,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt != null ? updatedAt() : this.updatedAt,
+      deletedAt: deletedAt != null ? deletedAt() : this.deletedAt,
     );
   }
 
