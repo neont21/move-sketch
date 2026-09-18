@@ -155,6 +155,7 @@ class UserService {
   Future<List<User>> searchUsers({
     required String query,
     int limit = 20,
+    List<String>? excludeUserIds,
   }) async {
     if (query.trim().isEmpty) {
       return [];
@@ -166,9 +167,11 @@ class UserService {
         .limit(limit)
         .get();
 
+    final excludeSet = excludeUserIds?.toSet() ?? {};
+
     return snapshot.docs
         .map((doc) => User.fromMap(doc.data(), uid: doc.id))
-        .where((user) => !user.isDeleted)
+        .where((user) => !user.isDeleted && !excludeSet.contains(user.uid))
         .toList();
   }
 }

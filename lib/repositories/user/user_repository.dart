@@ -29,6 +29,7 @@ abstract interface class UserRepository {
 
   /// query로 시작하는 username을 가진 사용자의 프로필 정보를 조회한다.
   Future<List<User>> searchUsers({
+    required String userId,
     required String query,
     int limit = 20,
   });
