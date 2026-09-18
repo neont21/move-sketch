@@ -5,32 +5,41 @@ import 'notification_settings.dart';
 
 @immutable
 class UserSummary {
-  final String id;
+  final String uid;
   final String username;
+  final String nickname;
   final String? imageUrl;
 
-  const UserSummary({required this.id, required this.username, this.imageUrl});
+  const UserSummary({
+    required this.uid,
+    required this.username,
+    required this.nickname,
+    this.imageUrl,
+  });
 
   Map<String, dynamic> toMap() {
-    return {'id': id, 'username': username, 'imageUrl': imageUrl};
+    return {'uid': uid, 'username': username, 'nickname': nickname, 'imageUrl': imageUrl};
   }
 
   factory UserSummary.fromMap(Map<String, dynamic> map) {
     return UserSummary(
-      id: map['id'] as String,
+      uid: map['uid'] as String,
       username: map['username'] as String,
+      nickname: map['nickname'] as String,
       imageUrl: map['imageUrl'] as String?,
     );
   }
 
   UserSummary copyWith({
-    String? id,
+    String? uid,
     String? username,
+    String? nickname,
     ValueGetter<String?>? imageUrl,
   }) {
     return UserSummary(
-      id: id ?? this.id,
+      uid: uid ?? this.uid,
       username: username ?? this.username,
+      nickname: nickname ?? this.nickname,
       imageUrl: imageUrl != null ? imageUrl() : this.imageUrl,
     );
   }
@@ -40,17 +49,18 @@ class UserSummary {
       identical(this, other) ||
       other is UserSummary &&
           runtimeType == other.runtimeType &&
-          id == other.id;
+          uid == other.uid;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => uid.hashCode;
 }
 
 @immutable
 class User {
-  final String id;
+  final String uid;
   final String username;
   final String? email;
+  final String nickname;
   final String? imageUrl;
   final String? description;
   final CharacterType selectedCharacter;
@@ -62,9 +72,10 @@ class User {
   final DateTime? deletedAt;
 
   const User({
-    required this.id,
-    required this.email,
+    required this.uid,
     required this.username,
+    required this.email,
+    required this.nickname,
     required this.createdAt,
     this.updatedAt,
     this.deletedAt,
@@ -74,15 +85,23 @@ class User {
     this.notificationSettings = const NotificationSettings(),
   });
 
+  bool get isDeleted => deletedAt != null;
+
   UserSummary toSummary() {
-    return UserSummary(id: id, username: username, imageUrl: imageUrl);
+    return UserSummary(
+      uid: uid,
+      username: username,
+      nickname: nickname,
+      imageUrl: imageUrl,
+    );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'email': email,
+      'uid': uid,
       'username': username,
+      'email': email,
+      'nickname': nickname,
       'imageUrl': imageUrl,
       'description': description,
       'selectedCharacterId': selectedCharacter.id,
@@ -93,14 +112,17 @@ class User {
     };
   }
 
-  factory User.fromMap(Map<String, dynamic> map, {String? id}) {
+  factory User.fromMap(Map<String, dynamic> map, {String? uid}) {
     return User(
-      id: (map['id'] as String?) ?? id ?? '',
+      uid: (map['uid'] as String?) ?? uid ?? '',
+      username: map['username'] as String? ?? '',
       email: map['email'] as String? ?? '',
-      username: map['username'] as String,
+      nickname: map['nickname'] as String,
       imageUrl: map['imageUrl'] as String?,
       description: map['description'] as String?,
-      selectedCharacter: CharacterType.fromString(map['selectedCharacterId'] as String?),
+      selectedCharacter: CharacterType.fromString(
+        map['selectedCharacterId'] as String?,
+      ),
       notificationSettings: map['notificationSettings'] != null
           ? NotificationSettings.fromMap(
               map['notificationSettings'] as Map<String, dynamic>,
@@ -113,9 +135,10 @@ class User {
   }
 
   User copyWith({
-    String? id,
+    String? uid,
     String? username,
     ValueGetter<String?>? email,
+    String? nickname,
     ValueGetter<String?>? imageUrl,
     ValueGetter<String?>? description,
     CharacterType? selectedCharacter,
@@ -125,9 +148,10 @@ class User {
     ValueGetter<DateTime?>? deletedAt,
   }) {
     return User(
-      id: id ?? this.id,
-      email: email != null ? email() : this.email,
+      uid: uid ?? this.uid,
       username: username ?? this.username,
+      email: email != null ? email() : this.email,
+      nickname: nickname ?? this.nickname,
       imageUrl: imageUrl != null ? imageUrl() : this.imageUrl,
       description: description != null ? description() : this.description,
       selectedCharacter: selectedCharacter ?? this.selectedCharacter,
@@ -141,8 +165,10 @@ class User {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is User && runtimeType == other.runtimeType && id == other.id;
+      other is User &&
+          runtimeType == other.runtimeType &&
+          uid == other.uid;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => uid.hashCode;
 }

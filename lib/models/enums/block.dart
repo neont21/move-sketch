@@ -2,18 +2,18 @@ import '../social/user.dart';
 
 class Block {
   final String id;
-  final String blockerId;
+  final String blockerUid;
   final UserSummary blockedUser;
   final DateTime createdAt;
 
   const Block({
     required this.id,
-    required this.blockerId,
+    required this.blockerUid,
     required this.blockedUser,
     required this.createdAt,
   });
 
-  String get blockedId => blockedUser.id;
+  String get blockedUid => blockedUser.uid;
 
   static String createId(String blockerId, String blockedId) =>
       '${blockerId}_$blockedId';
@@ -21,7 +21,7 @@ class Block {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'blockerId': blockerId,
+      'blockerUid': blockerUid,
       'blockedUser': blockedUser.toMap(),
       'createdAt': createdAt.toIso8601String(),
     };
@@ -30,7 +30,7 @@ class Block {
   factory Block.fromMap(Map<String, dynamic> map) {
     return Block(
       id: map['id'] as String,
-      blockerId: map['blockerId'] as String,
+      blockerUid: map['blockerUid'] as String,
       blockedUser: UserSummary.fromMap(
         map['blockedUser'] as Map<String, dynamic>,
       ),
@@ -40,13 +40,13 @@ class Block {
 
   Block copyWith({
     String? id,
-    String? blockerId,
+    String? blockerUid,
     UserSummary? blockedUser,
     DateTime? createdAt,
   }) {
     return Block(
       id: id ?? this.id,
-      blockerId: blockerId ?? this.blockerId,
+      blockerUid: blockerUid ?? this.blockerUid,
       blockedUser: blockedUser ?? this.blockedUser,
       createdAt: createdAt ?? this.createdAt,
     );

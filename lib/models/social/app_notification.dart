@@ -25,8 +25,8 @@ class AppNotification {
     this.isRead = false,
   });
 
-  String get senderId => sender.id;
-  String get message => '${sender.username} ${type.notification}';
+  String get senderUid => sender.uid;
+  String get message => '${sender.nickname} ${type.notification}';
 
   AppNotification markAsRead() => copyWith(isRead: true);
 

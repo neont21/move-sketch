@@ -23,7 +23,7 @@ class Comment {
   });
 
   bool get isReply => parentCommentId != null && parentCommentId!.isNotEmpty;
-  String get authorId => author.id;
+  String get authorUid => author.uid;
   bool get isDeleted => deletedAt != null;
 
   Map<String, dynamic> toMap() {
