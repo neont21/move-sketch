@@ -1,3 +1,5 @@
+import 'package:move_sketch/utils/date_time_utils.dart';
+
 import '../social/user.dart';
 
 class Block {
@@ -34,7 +36,7 @@ class Block {
       blockedUser: UserSummary.fromMap(
         map['blockedUser'] as Map<String, dynamic>,
       ),
-      createdAt: DateTime.parse(map['createdAt'] as String),
+      createdAt: parseDateTime(map['createdAt']),
     );
   }
 
