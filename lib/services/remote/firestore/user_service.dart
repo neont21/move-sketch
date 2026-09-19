@@ -157,13 +157,14 @@ class UserService {
     int limit = 20,
     List<String>? excludeUserIds,
   }) async {
-    if (query.trim().isEmpty) {
+    final trimmed = query.trim().toLowerCase();
+    if (trimmed.isEmpty) {
       return [];
     }
 
     final snapshot = await _usersRef
-        .where('username', isGreaterThanOrEqualTo: query)
-        .where('username', isLessThanOrEqualTo: '$query\uf8ff')
+        .where('username', isGreaterThanOrEqualTo: trimmed)
+        .where('username', isLessThanOrEqualTo: '$trimmed\uf8ff')
         .limit(limit)
         .get();
 
