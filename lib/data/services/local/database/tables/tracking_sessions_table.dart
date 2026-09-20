@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import '../../../../domain/models/enums/activity_type.dart';
-import '../../../../domain/models/enums/session_status.dart';
+import '../../../../../domain/models/enums/activity_type.dart';
+import '../../../../../domain/models/enums/session_status.dart';
 
 class TrackingSessionsTable extends Table {
   TextColumn get id => text()();

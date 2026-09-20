@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
+import '../../../data/services/local/database/app_database.dart';
 import '../enums/activity_type.dart';
 import '../enums/session_status.dart';
 import '../fixed/sketch_parts.dart';
@@ -66,6 +67,28 @@ class TrackingSession {
   TrackingSession addPoint(LocationPoint point) {
     return copyWith(pathPoints: [...pathPoints, point]);
   }
+
+  factory TrackingSession.fromEntity({
+    required TrackingSessionsTableData sessionRow,
+    List<LocationPointsTableData> pointsRows = const [],
+    List<MissionInstancesTableData> missionsRows = const [],
+  }) {
+    return TrackingSession(
+      id: sessionRow.id,
+      userId: sessionRow.userId,
+      activityType: sessionRow.activityType,
+      status: sessionRow.status,
+      startedAt: sessionRow.startedAt,
+      elapsedDuration: Duration(seconds: sessionRow.elapsedDurationSeconds),
+      distanceInMeters: sessionRow.distanceInMeters,
+      caloriesBurned: sessionRow.caloriesBurned,
+      averagePaceInSeconds: sessionRow.averagePaceInSeconds,
+      averageSpeedKmh: sessionRow.averageSpeedKmh,
+      pathPoints: pointsRows.map(LocationPoint.fromEntity).toList(),
+      missions: missionsRows.map(MissionInstance.fromEntity).toList(),
+    );
+  }
+
 
   LocationPoint _calculateFurthestWaypoint() {
     assert(isValidSession, '유효하지 않은 세션에서는 경유지를 계산할 수 없습니다.');

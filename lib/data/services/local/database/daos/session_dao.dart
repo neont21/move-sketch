@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import '../../../../domain/models/enums/session_status.dart';
+import '../../../../../domain/models/enums/session_status.dart';
 import '../app_database.dart';
 import '../tables/tracking_sessions_table.dart';
 import '../tables/location_points_table.dart';
@@ -25,10 +25,16 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
     });
   }
 
+  Future<TrackingSessionsTableData?> getActiveSession() =>
+      (select(trackingSessionsTable)..where(
+            (t) => t.status.equals('active') | t.status.equals('paused'),
+      ))
+          .getSingleOrNull();
+
+
   Future<void> insertPoint(LocationPointsTableCompanion point) =>
       into(locationPointsTable).insert(point);
 
-  /// 세션 진행 상태를 업데이트한다. (실시간 반복 호출 필요)
   Future<void> updateSessionProgress({
     required String sessionId,
     required int elapsedSeconds,
@@ -54,12 +60,6 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
       (update(
         missionInstancesTable,
       )..where((t) => t.id.equals(mission.id.value))).write(mission);
-
-  Future<TrackingSessionsTableData?> getActiveSession() =>
-      (select(trackingSessionsTable)..where(
-            (t) => t.status.equals('active') | t.status.equals('paused'),
-          ))
-          .getSingleOrNull();
 
   Future<void> updateSessionStatus({
     required String sessionId,

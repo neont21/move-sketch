@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../../data/services/local/database/app_database.dart';
 import '../enums/mission_axis.dart';
 import '../fixed/mission_template.dart';
 import '../fixed/sketch_parts.dart';
@@ -65,6 +66,19 @@ class MissionInstance {
       currentValue: (map['currentValue'] as num?)?.toDouble() ?? 0.0,
       achievedTier: (map['achievedTier'] as num?)?.toInt() ?? 0,
       partId: map['partId'] as String?,
+    );
+  }
+
+  factory MissionInstance.fromEntity(MissionInstancesTableData entity) {
+    return MissionInstance(
+      id: entity.id,
+      sessionId: entity.sessionId,
+      missionTemplateId: entity.missionTemplateId,
+      axis: entity.axis,
+      baselineValue: entity.baselineValue,
+      currentValue: entity.currentValue,
+      achievedTier: entity.achievedTier,
+      partId: entity.partId,
     );
   }
 

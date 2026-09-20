@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
-import '../../../domain/models/enums/activity_type.dart';
-import '../../../domain/models/enums/session_status.dart';
-import '../../../domain/models/enums/mission_axis.dart';
+import '../../../../domain/models/enums/activity_type.dart';
+import '../../../../domain/models/enums/session_status.dart';
+import '../../../../domain/models/enums/mission_axis.dart';
 import 'tables/tracking_sessions_table.dart';
 import 'tables/location_points_table.dart';
 import 'tables/mission_instances_table.dart';

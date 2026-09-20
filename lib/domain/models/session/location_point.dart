@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../data/services/local/database/app_database.dart';
 import '../../../utils/date_time_utils.dart';
 
 @immutable
@@ -47,6 +48,16 @@ class LocationPoint {
       heading: (map['heading'] as num?)?.toDouble(),
       accuracy: (map['accuracy'] as num?)?.toDouble(),
       timestamp: parseDateTime(map['timestamp']).toLocal(),
+    );
+  }
+
+  factory LocationPoint.fromEntity(LocationPointsTableData entity) {
+    return LocationPoint(
+      latitude: entity.latitude,
+      longitude: entity.longitude,
+      timestamp: entity.timestamp,
+      altitude: entity.altitude,
+      speed: entity.speed,
     );
   }
 

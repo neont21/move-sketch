@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import '../../../../domain/models/enums/mission_axis.dart';
+import '../../../../../domain/models/enums/mission_axis.dart';
 import 'tracking_sessions_table.dart';
 
 class MissionInstancesTable extends Table {
