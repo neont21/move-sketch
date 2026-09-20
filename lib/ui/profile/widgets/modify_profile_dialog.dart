@@ -33,7 +33,16 @@ class _ModifyProfileDialogState extends State<ModifyProfileDialog> {
         });
       }
     } catch (e) {
-      throw Exception(e);
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('이미지를 불러오지 못했습니다. 다시 시도해 주세요.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
 

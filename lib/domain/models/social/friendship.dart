@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../../utils/date_time_utils.dart';
+import '../../../utils/exceptions.dart';
 import '../enums/friendship_status.dart';
 
 @immutable
@@ -54,7 +55,7 @@ class Friendship {
   String getOtherUserId(String myUid) {
     if (requesterId == myUid) return receiverId;
     if (receiverId == myUid) return requesterId;
-    throw ArgumentError('해당 유저는 본 친구 관계에 속해있지 않습니다: $myUid');
+    throw ValidationException('해당 유저는 본 친구 관계에 속해있지 않습니다: $myUid');
   }
 
   bool involves(String userId) => members.contains(userId);

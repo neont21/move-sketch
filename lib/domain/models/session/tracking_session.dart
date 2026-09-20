@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
 import '../../../data/services/local/database/app_database.dart';
+import '../../../utils/exceptions.dart';
 import '../enums/activity_type.dart';
 import '../enums/session_status.dart';
 import '../fixed/sketch_parts.dart';
@@ -43,12 +44,14 @@ class TrackingSession {
   factory TrackingSession.start({
     required String userId,
     required ActivityType activityType,
+    required List<MissionInstance> missions,
     String? customId,
   }) {
     return TrackingSession(
       id: customId ?? const Uuid().v7(),
       userId: userId,
       activityType: activityType,
+      missions: missions,
       startedAt: DateTime.now(),
       status: SessionStatus.active,
     );
@@ -89,9 +92,10 @@ class TrackingSession {
     );
   }
 
-
   LocationPoint _calculateFurthestWaypoint() {
-    assert(isValidSession, '유효하지 않은 세션에서는 경유지를 계산할 수 없습니다.');
+    if (!isValidSession) {
+      throw const SessionException('유효하지 않은 세션에서는 경유지를 계산할 수 없습니다.');
+    }
 
     final start = pathPoints.first.toLatLng();
     final end = pathPoints.last.toLatLng();
@@ -118,7 +122,7 @@ class TrackingSession {
     String? routeImageUrl,
   }) {
     if (!isValidSession) {
-      throw StateError('위치 좌표가 없어 결과를 생성할 수 없습니다.');
+      throw const SessionException('위치 좌표가 없어 결과를 생성할 수 없습니다.');
     }
     return SessionResult(
       id: id,

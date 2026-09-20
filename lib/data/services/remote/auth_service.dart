@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../utils/exceptions.dart';
+
 class AuthService {
   final FirebaseAuth _auth;
 
@@ -43,7 +45,7 @@ class AuthService {
       );
     }
     if (user.emailVerified) {
-      throw StateError('이미 이메일 인증이 완료된 계정입니다.');
+      throw const AuthException('이미 이메일 인증이 완료된 계정입니다.');
     }
     await user.sendEmailVerification();
   }

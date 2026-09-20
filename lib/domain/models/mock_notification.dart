@@ -1,3 +1,4 @@
+import '../../utils/exceptions.dart';
 import 'mock_user.dart';
 
 enum ActionType {
@@ -38,7 +39,7 @@ class MockNotification {
       case 'acceptFriend':
         this.action = ActionType.acceptFriend;
       default:
-        throw Exception('action error');
+        throw ValidationException('지원하지 않는 알림 액션 타입입니다: $action');
     }
   }
 }
