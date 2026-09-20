@@ -6,7 +6,7 @@ import '../../../domain/models/mock_session_data.dart';
 import '../../../routing/routes.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
 import '../../core/widgets/system_alert_dialog.dart';
-import 'session_tracking_page.dart';
+import 'session_tracking_screen.dart';
 
 class SessionPauseDialog extends StatelessWidget {
   SessionPauseDialog({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../domain/models/mock_mission_data.dart';
 import '../../../domain/models/mock_session_data.dart';
-import 'session_tracking_page.dart';
+import 'session_tracking_screen.dart';
 
 class ResultStatsView extends StatelessWidget {
   ResultStatsView({super.key});
