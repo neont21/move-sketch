@@ -1,0 +1,169 @@
+import 'package:flutter/material.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
+import '../../../domain/models/mock_monthly_history.dart';
+import '../../core/theme/activity_colors.dart';
+import 'diagonal_painter.dart';
+
+class SessionCalendar extends StatelessWidget {
+  final DateTime focusedDay;
+  final MockMonthlyHistory monthlyHistory;
+  final ValueChanged<DateTime> onMonthChanged;
+
+  const SessionCalendar({
+    super.key,
+    required this.focusedDay,
+    required this.monthlyHistory,
+    required this.onMonthChanged,
+  });
+
+  /// 원하는 연/월의 기록을 확인하기 위한 helper function
+  Future<void> _pickYearMonth(BuildContext context) async {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final selected = await showMonthPicker(
+      context: context,
+      initialDate: focusedDay,
+      firstDate: DateTime(2026),
+      lastDate: DateTime(DateTime.now().year + 1),
+      monthPickerDialogSettings: MonthPickerDialogSettings(
+        dialogSettings: PickerDialogSettings(locale: Locale('ko')),
+        dateButtonsSettings: PickerDateButtonsSettings(
+          selectedMonthBackgroundColor: colorScheme.primary,
+          selectedMonthTextColor: colorScheme.onPrimary,
+          currentMonthTextColor: colorScheme.secondary,
+          buttonBorder: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        actionBarSettings: PickerActionBarSettings(),
+      ),
+    );
+    if (selected != null) {
+      onMonthChanged(selected);
+    }
+  }
+
+  /// 기록에 따라 날짜에 표시하기 위한 helper function
+  Widget _buildCellBackground(BuildContext context, int day) {
+    ActivityColors activityColors = context.activityColors;
+
+    if (monthlyHistory.dayJogging.contains(day) &&
+        monthlyHistory.dayRiding.contains(day)) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: CustomPaint(
+          painter: DiagonalPainter(
+            topLeftColor: activityColors.joggingFill,
+            bottomRightColor: activityColors.ridingFill,
+          ),
+        ),
+      );
+    } else if (monthlyHistory.dayJogging.contains(day)) {
+      return Container(
+        decoration: BoxDecoration(
+          color: activityColors.joggingFill,
+          shape: BoxShape.circle,
+        ),
+      );
+    } else if (monthlyHistory.dayRiding.contains(day)) {
+      return Container(
+        decoration: BoxDecoration(
+          color: activityColors.ridingFill,
+          shape: BoxShape.circle,
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  /// 날짜를 꾸며주는 helper function
+  Widget? decorateDayCell(
+    BuildContext context,
+    DateTime day,
+    DateTime currentFocus,
+  ) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    if (day.month != currentFocus.month) {
+      return Center(
+        child: Text(
+          '${day.day}',
+          style: TextStyle(color: colorScheme.outlineVariant),
+        ),
+      );
+    }
+
+    final isToday = isSameDay(day, DateTime.now());
+
+    return Center(
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: isToday
+            ? BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: colorScheme.outlineVariant, width: 2),
+              )
+            : null,
+        alignment: Alignment.center,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox(
+              width: 32,
+              height: 32,
+              child: _buildCellBackground(context, day.day),
+            ),
+            Text(
+              '${day.day}',
+              style: TextStyle(
+                fontWeight:
+                    isToday ||
+                        monthlyHistory.dayJogging.contains(day.day) ||
+                        monthlyHistory.dayRiding.contains(day.day)
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return TableCalendar(
+      locale: 'ko_KR',
+      firstDay: DateTime.utc(2026),
+      lastDay: DateTime.utc(DateTime.now().year + 1),
+      focusedDay: focusedDay,
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      selectedDayPredicate: (day) => false,
+      onDaySelected: null,
+      onPageChanged: (date) => onMonthChanged(date),
+      headerStyle: const HeaderStyle(
+        formatButtonVisible: false,
+        titleCentered: true,
+      ),
+      daysOfWeekStyle: DaysOfWeekStyle(
+        weekdayStyle: TextStyle(height: 1.0),
+        weekendStyle: TextStyle(height: 1.0, color: colorScheme.primary)
+      ),
+      calendarBuilders: CalendarBuilders(
+        headerTitleBuilder: (context, date) => InkWell(
+          onTap: () => _pickYearMonth(context),
+          child: Text(
+            '${date.year}년 ${date.month}월',
+            style: textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        prioritizedBuilder: decorateDayCell,
+      ),
+    );
+  }
+}
