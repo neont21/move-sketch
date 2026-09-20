@@ -1,4 +1,4 @@
-import '../../../domain/models/enums/block.dart';
+import '../../../domain/models/enums/block_status.dart';
 import '../../../domain/models/social/friendship.dart';
 import '../../../domain/models/social/user.dart';
 

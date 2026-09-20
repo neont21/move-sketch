@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/widgets/simple_binary_toggle.dart';
-import 'reminder_time.dart';
-import 'reminder_weekday.dart';
+import 'reminder_time_picker.dart';
+import 'reminder_weekday_selector.dart';
 
 class SettingNotificationsPage extends StatefulWidget {
   const SettingNotificationsPage({super.key});

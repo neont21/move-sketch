@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../domain/models/mock_sketch.dart';
 import '../../../domain/models/mock_user.dart';
 import '../../../routing/routes.dart';
-import 'feed_post.dart';
+import 'feed_post_card.dart';
 
 class FeedPage extends StatelessWidget {
   FeedPage({super.key});

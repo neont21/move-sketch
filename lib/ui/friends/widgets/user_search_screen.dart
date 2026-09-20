@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'recommend_friend_list.dart';
-import 'searched_friend_list.dart';
+import 'recommend_friend_list_view.dart';
+import 'searched_friend_list_view.dart';
 
 class UserSearchPage extends StatefulWidget {
   const UserSearchPage({super.key});

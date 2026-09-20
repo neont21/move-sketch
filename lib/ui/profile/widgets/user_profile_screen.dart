@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../domain/models/mock_sketch_list.dart';
 import '../../../domain/models/mock_user.dart';
 import '../../../routing/routes.dart';
-import '../../friends/widgets/mutual_friends.dart';
+import '../../friends/widgets/mutual_friends_section.dart';
 import 'profile_grid.dart';
 import 'user_sheet_button.dart';
 

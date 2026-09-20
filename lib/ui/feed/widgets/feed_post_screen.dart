@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:move_sketch/ui/feed/widgets/user_comment.dart';
+import 'package:move_sketch/ui/feed/widgets/user_comment_tile.dart';
 import '../../../domain/models/mock_sketch.dart';
 import '../../../domain/models/mock_user.dart';
 import 'cheer_button.dart';
-import 'feed_post.dart';
+import 'feed_post_card.dart';
 
 class FeedPostPage extends StatefulWidget {
   final String sketchId;

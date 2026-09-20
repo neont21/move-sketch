@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
-import 'my_friend_list.dart';
-import 'requested_friend_list.dart';
+import 'my_friend_list_view.dart';
+import 'requested_friend_list_view.dart';
 
 class FriendsListPage extends StatefulWidget {
   const FriendsListPage({super.key});
