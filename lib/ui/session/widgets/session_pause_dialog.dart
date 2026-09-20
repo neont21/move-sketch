@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../domain/models/mock_mission_data.dart';
 import '../../../domain/models/mock_session_data.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
 import '../../core/widgets/system_alert_dialog.dart';
 import 'session_tracking_page.dart';
@@ -76,7 +77,7 @@ class SessionPauseDialog extends StatelessWidget {
             },
             cancelText: '여기서 종료',
             onCancel: () {
-              context.go('/session-result/${_sessionData.id}');
+              context.go(Routes.sessionResult(_sessionData.id));
             },
           ),
           GestureDetector(
@@ -90,7 +91,7 @@ class SessionPauseDialog extends StatelessWidget {
                     confirmText: '그래도 종료',
                     onConfirm: () {
                       context.pop();
-                      context.go('/home');
+                      context.go(Routes.home);
                     },
                   ),
                 ),

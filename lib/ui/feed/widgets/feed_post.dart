@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../domain/models/mock_sketch.dart';
 import '../../../domain/models/mock_user.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/activity_badge.dart';
 import '../../core/widgets/bottom_sheet_button.dart';
 import '../../session/widgets/sketch_card.dart';
@@ -52,7 +53,7 @@ class FeedPost extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                context.go('/feed/profile/${sketch.author.id}');
+                context.go(Routes.feedProfile(sketch.author.id));
               },
               child: CircleAvatar(
                 radius: 20,
@@ -67,7 +68,7 @@ class FeedPost extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        context.go('/feed/profile/${sketch.author.id}');
+                        context.go(Routes.feedProfile(sketch.author.id));
                       },
                       child: Text(
                         sketch.author.name,
@@ -92,7 +93,7 @@ class FeedPost extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            context.go('/feed/post/${sketch.sketchId}');
+            context.go(Routes.feedPost(sketch.sketchId));
           },
           child: Transform.rotate(
             angle: 0.03,

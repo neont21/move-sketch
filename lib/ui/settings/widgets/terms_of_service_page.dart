@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class TermOfServicePage extends StatelessWidget {
-  const TermOfServicePage({super.key});
+class TermsOfServicePage extends StatelessWidget {
+  const TermsOfServicePage({super.key});
 
   @override
   Widget build(BuildContext context) {

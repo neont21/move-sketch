@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 
 class ModifyPasswordPage extends StatefulWidget {
@@ -73,7 +74,7 @@ class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
                           duration: Duration(seconds: 3),
                         ),
                       );
-                      context.go('/auth/login');
+                      context.go(Routes.login);
                     },
                     child: Text('비밀번호 변경'),
                   ),

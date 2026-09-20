@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../domain/models/mock_mission_data.dart';
 import '../../../domain/models/mock_session_data.dart';
 import '../../../domain/models/mock_session_history.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/activity_badge.dart';
 import '../../session/widgets/path_tracker_view.dart';
 import '../../session/widgets/sketch_card.dart';
@@ -65,7 +66,7 @@ class HistoryDetailsPage extends StatelessWidget {
         child: SafeArea(
           child: ElevatedButton(
             onPressed: () {
-              context.go('/history/post/$sessionId');
+              context.go(Routes.historyPost(sessionId));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.surfaceContainer,
@@ -83,7 +84,7 @@ class HistoryDetailsPage extends StatelessWidget {
         child: SafeArea(
           child: ElevatedButton(
             onPressed: () {
-              context.go('/history/share/$sessionId');
+              context.go(Routes.historyShare(sessionId));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,

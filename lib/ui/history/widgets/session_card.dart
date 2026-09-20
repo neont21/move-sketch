@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../domain/models/mock_session_history.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/activity_badge.dart';
 import 'delete_history_dialog.dart';
 
@@ -32,7 +33,7 @@ class SessionCard extends StatelessWidget {
     return Card(
       child: ListTile(
         onTap: () {
-          context.go('/history/details/${history.sessionId}');
+          context.go(Routes.historyDetails(history.sessionId));
         },
         onLongPress: () {
           showDialog(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 
 class LoginPage extends StatefulWidget {
@@ -123,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       // FIXME: only if login success
-                      context.go('/home');
+                      context.go(Routes.home);
                     },
                     child: Text('로그인'),
                   ),
@@ -136,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                     Text('아직 계정이 없나요?', style: textTheme.labelMedium),
                     GestureDetector(
                       onTap: () {
-                        context.push('/auth/signup');
+                        context.push(Routes.signup);
                       },
                       child: Text(
                         '회원가입',
@@ -150,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    context.push('/auth/password');
+                    context.push(Routes.resetPassword);
                   },
                   child: Text('비밀번호를 잊으셨나요?', style: textTheme.labelMedium),
                 ),

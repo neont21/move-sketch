@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import '../../../domain/models/mock_mission.dart';
+import '../../../routing/routes.dart';
 import 'mission_card.dart';
 
 class SessionStartPage extends StatefulWidget {
@@ -60,7 +61,7 @@ class _SessionStartPageState extends State<SessionStartPage> {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            context.go('/home');
+            context.go(Routes.home);
           },
           icon: Icon(Icons.chevron_left),
         ),
@@ -136,7 +137,7 @@ class _SessionStartPageState extends State<SessionStartPage> {
                 height: 60,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.go('/session-tracking');
+                    context.go(Routes.sessionTracking);
                   },
                   child: Text(_isJogging ? '조깅 시작' : '라이딩 시작'),
                 ),

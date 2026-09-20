@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 import 'my_friend_list.dart';
 import 'requested_friend_list.dart';
 
@@ -19,7 +20,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
         actions: [
           IconButton(
             onPressed: () {
-              context.go('/me/friends/search');
+              context.go(Routes.meFriendsSearch);
             },
             icon: Icon(Icons.search),
           ),

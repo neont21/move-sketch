@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../domain/models/mock_user.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/system_alert_dialog.dart';
 
 class UserCard extends StatelessWidget {
@@ -141,7 +142,7 @@ class UserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        context.push('/profile/${user.id}');
+        context.push(Routes.userProfile(user.id));
       },
       leading: CircleAvatar(
         radius: 24,

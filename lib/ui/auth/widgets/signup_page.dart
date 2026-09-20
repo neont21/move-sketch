@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 
 class SignupPage extends StatefulWidget {
@@ -76,7 +77,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      context.push('/tos');
+                      context.push(Routes.tos);
                     },
                     child: Text(
                       '이용약관',
@@ -86,10 +87,10 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                   ),
-                  Text('과', style: textTheme.labelMedium),
+                  Text('과 ', style: textTheme.labelMedium),
                   GestureDetector(
                     onTap: () {
-                      context.push('/privacy');
+                      context.push(Routes.privacy);
                     },
                     child: Text(
                       '개인정보 처리 방침',
@@ -110,7 +111,7 @@ class _SignupPageState extends State<SignupPage> {
                   onPressed: _agree
                       ? () {
                           // FIXME: only if signup complete
-                          context.go('/auth/signup/complete');
+                          context.go(Routes.signupComplete);
                         }
                       : null,
                   child: Text('가입하기'),

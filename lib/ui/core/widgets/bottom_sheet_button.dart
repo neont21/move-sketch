@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:move_sketch/ui/feed/widgets/report_dialog.dart';
 import '../../../domain/models/mock_user.dart';
+import '../../../routing/routes.dart';
 import 'system_alert_dialog.dart';
 
 // final MockUser user = MockUser(id: '@daniil_a_np', name: '다닐루쉬카');
@@ -32,7 +33,7 @@ class BottomSheetButton extends StatelessWidget {
             title: Text('편집하기'),
             onTap: () {
               context.pop();
-              context.push('/edit/$sketchIdIfPost');
+              context.push(Routes.sessionEdit(sketchIdIfPost!));
             },
           ),
         );

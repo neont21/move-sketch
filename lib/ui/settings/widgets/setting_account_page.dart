@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/system_alert_dialog.dart';
 import 'delete_account_dialog.dart';
 
@@ -150,7 +151,7 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
               _email
                   ? ListTile(
                       onTap: () {
-                        context.go('/me/settings/account/password');
+                        context.go(Routes.meSettingsPassword);
                       },
                       title: Text('비밀번호 변경', style: textTheme.bodyLarge),
                       trailing: Icon(
@@ -170,7 +171,7 @@ class _SettingAccountPageState extends State<SettingAccountPage> {
                         confirmText: '로그아웃',
                         onConfirm: () {
                           context.pop();
-                          context.go('/auth/login');
+                          context.go(Routes.login);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('로그아웃 되었습니다.'),

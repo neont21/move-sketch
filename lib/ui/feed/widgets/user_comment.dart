@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../domain/models/mock_comment.dart';
 import '../../../domain/models/mock_user.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/bottom_sheet_button.dart';
 
 class UserComment extends StatelessWidget {
@@ -43,7 +44,7 @@ class UserComment extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              context.go('/feed/profile/${_comment.user.id}');
+              context.go(Routes.feedProfile(_comment.user.id));
             },
             child: CircleAvatar(
               radius: 20,
@@ -59,7 +60,7 @@ class UserComment extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        context.go('/feed/profile/${_comment.user.id}');
+                        context.go(Routes.feedProfile(_comment.user.id));
                       },
                     child: Text(_comment.user.name, style: textTheme.bodyLarge)),
                     Text(

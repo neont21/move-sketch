@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 
 class LandingPage extends StatelessWidget {
   const LandingPage({super.key});
@@ -40,7 +41,7 @@ class LandingPage extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.go('/auth/login');
+                    context.go(Routes.login);
                   },
                   child: Text('시작하기'),
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../domain/models/mock_user.dart';
+import '../../../routing/routes.dart';
 
 class UserListDialog extends StatelessWidget {
   final String title;
@@ -27,7 +28,7 @@ class UserListDialog extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return ListTile(
                       onTap: () {
-                        context.push('/profile/${userList[index].id}');
+                        context.push(Routes.userProfile(userList[index].id));
                       },
                       leading: CircleAvatar(
                         radius: 20,

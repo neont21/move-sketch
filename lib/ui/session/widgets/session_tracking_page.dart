@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../../domain/models/mock_session_data.dart';
+import '../../../routing/routes.dart';
 import 'hold_button.dart';
 import 'path_tracker_view.dart';
 import 'session_pause_dialog.dart';
@@ -112,7 +113,7 @@ class _SessionTrackingPageState extends State<SessionTrackingPage> {
                     child: SizedBox(
                       height: 60,
                       child: HoldButton(title: '종료', onActionTriggered: () {
-                        context.go('/session-result/${_sessionData.id}');
+                        context.go(Routes.sessionResult(_sessionData.id));
                       }),
                     ),
                   ),

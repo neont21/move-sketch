@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../domain/models/mock_sketch_list.dart';
 import '../../../domain/models/mock_user.dart';
+import '../../../routing/routes.dart';
 import 'profile_grid.dart';
 import 'modify_profile_dialog.dart';
 
@@ -31,7 +32,7 @@ class _MyPageState extends State<MyPage> {
         actions: [
           IconButton(
             onPressed: () {
-              context.go('/me/settings');
+              context.go(Routes.meSettings);
             },
             icon: Icon(Icons.settings),
           ),
@@ -98,7 +99,7 @@ class _MyPageState extends State<MyPage> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {
-                      context.go('/me/friends');
+                      context.go(Routes.meFriends);
                     },
                     child: Text(
                       '친구 ${friends.length}명',
@@ -111,7 +112,7 @@ class _MyPageState extends State<MyPage> {
             const SizedBox(height: 16),
             Divider(),
             Expanded(child: ProfileGrid(userId: user.id, sketchList: _sketchList, onTap: (index) {
-            context.go('/me/post/${_sketchList.sketches[index].sketchId}');
+            context.go(Routes.mePost(_sketchList.sketches[index].sketchId));
             }, )),
           ],
         ),

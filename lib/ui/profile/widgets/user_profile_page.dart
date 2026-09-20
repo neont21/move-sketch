@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../domain/models/mock_sketch_list.dart';
 import '../../../domain/models/mock_user.dart';
+import '../../../routing/routes.dart';
 import '../../friends/widgets/mutual_friends.dart';
 import 'profile_grid.dart';
 import 'user_sheet_button.dart';
@@ -136,7 +137,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       sketchList: _sketchList,
                       onTap: (index) {
                         context.go(
-                          '/feed/post/${_sketchList.sketches[index].sketchId}',
+                          Routes.feedPost(_sketchList.sketches[index].sketchId)
                         );
                       },
                     )

@@ -1,6 +1,7 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 import 'sketch_card.dart';
 
 class SessionSharePage extends StatefulWidget {
@@ -35,7 +36,7 @@ class _SessionSharePageState extends State<SessionSharePage> {
               if (widget.edit) {
                 context.pop();
               } else {
-                context.go('/feed/post/${widget.sessionId}');
+                context.go(Routes.feedPost(widget.sessionId));
               }
             },
             icon: Icon(Icons.check),

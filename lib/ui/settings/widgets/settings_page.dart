@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../../../routing/routes.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -23,7 +24,7 @@ class SettingsPage extends StatelessWidget {
               Text('기본 설정', style: textTheme.labelLarge),
               ListTile(
                 onTap: () {
-                  context.go('/me/settings/account');
+                  context.go(Routes.meSettingsAccount);
                 },
                 leading: Icon(
                   Icons.perm_identity,
@@ -37,7 +38,7 @@ class SettingsPage extends StatelessWidget {
               ),
               ListTile(
                 onTap: () {
-                  context.go('/me/settings/character');
+                  context.go(Routes.meSettingsCharacter);
                 },
                 leading: Icon(Icons.pets, color: colorScheme.tertiaryContainer),
                 title: Text('내 캐릭터', style: textTheme.bodyLarge),
@@ -60,7 +61,7 @@ class SettingsPage extends StatelessWidget {
               ),
               ListTile(
                 onTap: () {
-                  context.go('/me/settings/notifications');
+                  context.go(Routes.meSettingsNotifications);
                 },
                 leading: Icon(
                   Icons.notifications_outlined,
@@ -74,7 +75,7 @@ class SettingsPage extends StatelessWidget {
               ),
               ListTile(
                 onTap: () {
-                  context.go('/me/settings/blocked');
+                  context.go(Routes.meSettingsBlocked);
                 },
                 leading: Icon(
                   Icons.block,
@@ -90,7 +91,7 @@ class SettingsPage extends StatelessWidget {
               Text('앱 정보', style: textTheme.labelLarge),
               ListTile(
                 onTap: () {
-                  context.push('/privacy');
+                  context.push(Routes.privacy);
                 },
                 title: Text('개인정보처리방침', style: textTheme.bodyMedium),
                 trailing: Icon(
@@ -100,7 +101,7 @@ class SettingsPage extends StatelessWidget {
               ),
               ListTile(
                 onTap: () {
-                  context.push('/tos');
+                  context.push(Routes.tos);
                 },
                 title: Text('이용약관', style: textTheme.bodyMedium),
                 trailing: Icon(
@@ -110,7 +111,7 @@ class SettingsPage extends StatelessWidget {
               ),
               ListTile(
                 onTap: () {
-                  context.push('/license');
+                  context.push(Routes.license);
                 },
                 title: Text('오픈소스 라이선스', style: textTheme.bodyMedium),
                 trailing: Icon(

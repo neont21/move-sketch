@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../domain/models/mock_sketch.dart';
 import '../../../domain/models/mock_user.dart';
+import '../../../routing/routes.dart';
 import 'feed_post.dart';
 
 class FeedPage extends StatelessWidget {
@@ -95,7 +96,7 @@ class FeedPage extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-              context.go('/feed/notifications');
+              context.go(Routes.feedNotifications);
             },
             icon: Icon(Icons.notifications_outlined),
           ),

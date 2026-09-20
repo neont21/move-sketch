@@ -1,35 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'ui/auth/widgets/landing_page.dart';
-import 'ui/auth/widgets/login_page.dart';
-import 'ui/auth/widgets/reset_password_page.dart';
-import 'ui/auth/widgets/signup_complete_page.dart';
-import 'ui/auth/widgets/signup_page.dart';
-import 'ui/feed/widgets/feed_notifications_page.dart';
-import 'ui/feed/widgets/feed_page.dart';
-import 'ui/feed/widgets/feed_post_page.dart';
-import 'ui/friends/widgets/friends_list_page.dart';
-import 'ui/friends/widgets/user_search_page.dart';
-import 'ui/history/widgets/history_details_page.dart';
-import 'ui/history/widgets/history_page.dart';
-import 'ui/home/widgets/home_page.dart';
-import 'ui/profile/widgets/my_page.dart';
-import 'ui/profile/widgets/user_profile_page.dart';
-import 'ui/session/widgets/session_result_page.dart';
-import 'ui/session/widgets/session_share_page.dart';
-import 'ui/session/widgets/session_start_page.dart';
-import 'ui/session/widgets/session_tracking_page.dart';
-import 'ui/settings/widgets/change_character_page.dart';
-import 'ui/settings/widgets/modify_password_page.dart';
-import 'ui/settings/widgets/oss_licenses_page.dart';
-import 'ui/settings/widgets/privacy_page.dart';
-import 'ui/settings/widgets/setting_account_page.dart';
-import 'ui/settings/widgets/setting_blocked_user.dart';
-import 'ui/settings/widgets/setting_notifications_page.dart';
-import 'ui/settings/widgets/settings_page.dart';
-import 'ui/settings/widgets/term_of_service_page.dart';
-import 'ui/shell/widgets/move_sketch_shell.dart';
+import '../ui/auth/widgets/landing_page.dart';
+import '../ui/auth/widgets/login_page.dart';
+import '../ui/auth/widgets/reset_password_page.dart';
+import '../ui/auth/widgets/signup_complete_page.dart';
+import '../ui/auth/widgets/signup_page.dart';
+import '../ui/feed/widgets/feed_notifications_page.dart';
+import '../ui/feed/widgets/feed_page.dart';
+import '../ui/feed/widgets/feed_post_page.dart';
+import '../ui/friends/widgets/friends_list_page.dart';
+import '../ui/friends/widgets/user_search_page.dart';
+import '../ui/history/widgets/history_details_page.dart';
+import '../ui/history/widgets/history_page.dart';
+import '../ui/home/widgets/home_page.dart';
+import '../ui/profile/widgets/my_page.dart';
+import '../ui/profile/widgets/user_profile_page.dart';
+import '../ui/session/widgets/session_result_page.dart';
+import '../ui/session/widgets/session_share_page.dart';
+import '../ui/session/widgets/session_start_page.dart';
+import '../ui/session/widgets/session_tracking_page.dart';
+import '../ui/settings/widgets/change_character_page.dart';
+import '../ui/settings/widgets/modify_password_page.dart';
+import '../ui/settings/widgets/oss_licenses_page.dart';
+import '../ui/settings/widgets/privacy_page.dart';
+import '../ui/settings/widgets/setting_account_page.dart';
+import '../ui/settings/widgets/setting_blocked_user.dart';
+import '../ui/settings/widgets/setting_notifications_page.dart';
+import '../ui/settings/widgets/settings_page.dart';
+import '../ui/settings/widgets/terms_of_service_page.dart';
+import '../ui/shell/widgets/move_sketch_shell.dart';
+import 'routes.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -49,7 +50,7 @@ final GlobalKey<NavigatorState> _meNavigatorKey = GlobalKey<NavigatorState>(
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   routes: [
-    GoRoute(path: '/', builder: (context, state) => LandingPage()),
+    GoRoute(path: Routes.landing, builder: (context, state) => LandingPage()),
     StatefulShellRoute.indexedStack(
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state, navigationShell) =>
@@ -59,7 +60,7 @@ final router = GoRouter(
         StatefulShellBranch(
           navigatorKey: _homeNavigatorKey,
           routes: [
-            GoRoute(path: '/home', builder: (context, state) => HomePage()),
+            GoRoute(path: Routes.home, builder: (context, state) => HomePage()),
           ],
         ),
         // tap: Feed
@@ -67,29 +68,29 @@ final router = GoRouter(
           navigatorKey: _feedNavigatorKey,
           routes: [
             GoRoute(
-              path: '/feed',
+              path: Routes.feed,
               builder: (context, state) => FeedPage(),
               routes: [
                 GoRoute(
-                  path: 'post/:sketch_id',
+                  path: Routes.postRelative,
                   builder: (context, state) {
                     String sketchId = state.pathParameters['sketch_id']!;
                     return FeedPostPage(sketchId: sketchId);
                   },
                 ),
                 GoRoute(
-                  path: 'notifications',
+                  path: Routes.feedNotificationsRelative,
                   builder: (context, state) => FeedNotificationsPage(),
                   routes: [
                     GoRoute(
-                      path: 'post/:sketch_id',
+                      path: Routes.postRelative,
                       builder: (context, state) {
                         String sketchId = state.pathParameters['sketch_id']!;
                         return FeedPostPage(sketchId: sketchId);
                       },
                     ),
                     GoRoute(
-                      path: 'profile/:user_id',
+                      path: Routes.profileRelative,
                       builder: (context, state) {
                         String userId = state.pathParameters['user_id']!;
                         return UserProfilePage(userId: userId);
@@ -98,7 +99,7 @@ final router = GoRouter(
                   ],
                 ),
                 GoRoute(
-                  path: 'profile/:user_id',
+                  path: Routes.profileRelative,
                   builder: (context, state) {
                     String userId = state.pathParameters['user_id']!;
                     return UserProfilePage(userId: userId);
@@ -113,25 +114,25 @@ final router = GoRouter(
           navigatorKey: _historyNavigatorKey,
           routes: [
             GoRoute(
-              path: '/history',
+              path: Routes.history,
               builder: (context, state) => HistoryPage(),
               routes: [
                 GoRoute(
-                  path: 'details/:session_id',
+                  path: Routes.historyDetailsRelative,
                   builder: (context, state) {
                     String sessionId = state.pathParameters['session_id']!;
                     return HistoryDetailsPage(sessionId: sessionId);
                   },
                 ),
                 GoRoute(
-                  path: 'post/:sketch_id',
+                  path: Routes.postRelative,
                   builder: (context, state) {
                     String sketchId = state.pathParameters['sketch_id']!;
                     return FeedPostPage(sketchId: sketchId);
                   },
                 ),
                 GoRoute(
-                  path: 'share/:sketch_id',
+                  path: Routes.historyShareRelative,
                   builder: (context, state) {
                     String sessionId = state.pathParameters['sketch_id']!;
                     return SessionSharePage(sessionId: sessionId);
@@ -146,50 +147,50 @@ final router = GoRouter(
           navigatorKey: _meNavigatorKey,
           routes: [
             GoRoute(
-              path: '/me',
+              path: Routes.me,
               builder: (context, state) => MyPage(),
               routes: [
                 GoRoute(
-                  path: 'friends',
+                  path: Routes.meFriendsRelative,
                   builder: (context, state) => FriendsListPage(),
                   routes: [
                     GoRoute(
-                      path: 'search',
+                      path: Routes.meFriendsSearchRelative,
                       builder: (context, state) => UserSearchPage(),
                     ),
                   ],
                 ),
                 GoRoute(
-                  path: 'post/:sketch_id',
+                  path: Routes.postRelative,
                   builder: (context, state) {
                     String sketchId = state.pathParameters['sketch_id']!;
                     return FeedPostPage(sketchId: sketchId);
                   },
                 ),
                 GoRoute(
-                  path: 'settings',
+                  path: Routes.meSettingsRelative,
                   builder: (context, state) => SettingsPage(),
                   routes: [
                     GoRoute(
-                      path: 'account',
+                      path: Routes.meSettingsAccountRelative,
                       builder: (context, state) => SettingAccountPage(),
                       routes: [
                         GoRoute(
-                          path: 'password',
+                          path: Routes.meSettingsPasswordRelative,
                           builder: (context, state) => ModifyPasswordPage(),
                         ),
                       ],
                     ),
                     GoRoute(
-                      path: 'character',
+                      path: Routes.meSettingsCharacterRelative,
                       builder: (context, state) => ChangeCharacterPage(),
                     ),
                     GoRoute(
-                      path: 'notifications',
+                      path: Routes.meSettingsNotificationsRelative,
                       builder: (context, state) => SettingNotificationsPage(),
                     ),
                     GoRoute(
-                      path: 'blocked',
+                      path: Routes.meSettingsBlockedRelative,
                       builder: (context, state) => SettingBlockedUser(),
                     ),
                   ],
@@ -201,22 +202,22 @@ final router = GoRouter(
       ],
     ),
     GoRoute(
-      path: '/session-start',
+      path: Routes.sessionStart,
       builder: (context, state) => SessionStartPage(),
     ),
     GoRoute(
-      path: '/session-tracking',
+      path: Routes.sessionTracking,
       builder: (context, state) => SessionTrackingPage(),
     ),
     GoRoute(
-      path: '/session-result/:session_id',
+      path: Routes.sessionResultPath,
       builder: (context, state) {
         String sessionId = state.pathParameters['session_id']!;
         return SessionResultPage(sessionId: sessionId);
       },
       routes: [
         GoRoute(
-          path: 'share',
+          path: Routes.sessionResultShareRelative,
           builder: (context, state) {
             String sessionId = state.pathParameters['session_id']!;
             return SessionSharePage(sessionId: sessionId);
@@ -225,40 +226,40 @@ final router = GoRouter(
       ],
     ),
     GoRoute(
-      path: '/edit/:sketch_id',
+      path: Routes.sessionEditPath,
       builder: (context, state) {
         String sketchId = state.pathParameters['sketch_id']!;
         return SessionSharePage(sessionId: sketchId, edit: true);
       },
     ),
-    GoRoute(path: '/license', builder: (context, state) => OSSLicensesPage()),
-    GoRoute(path: '/privacy', builder: (context, state) => PrivacyPage()),
-    GoRoute(path: '/tos', builder: (context, state) => TermOfServicePage()),
+    GoRoute(path: Routes.license, builder: (context, state) => OSSLicensesPage()),
+    GoRoute(path: Routes.privacy, builder: (context, state) => PrivacyPage()),
+    GoRoute(path: Routes.tos, builder: (context, state) => TermsOfServicePage()),
     GoRoute(
-      path: '/profile/:user_id',
+      path: Routes.userProfilePath,
       builder: (context, state) {
         String userId = state.pathParameters['user_id']!;
         return UserProfilePage(userId: userId);
       },
     ),
     GoRoute(
-      path: '/auth',
+      path: Routes.auth,
       redirect: (context, state) =>
           state.uri.path == '/auth' ? '/auth/login' : null,
       routes: [
-        GoRoute(path: 'login', builder: (context, state) => LoginPage()),
+        GoRoute(path: Routes.loginRelative, builder: (context, state) => LoginPage()),
         GoRoute(
-          path: 'signup',
+          path: Routes.signupRelative,
           builder: (context, state) => SignupPage(),
           routes: [
             GoRoute(
-              path: 'complete',
+              path: Routes.signupCompleteRelative,
               builder: (context, state) => SignupCompletePage(),
             ),
           ],
         ),
         GoRoute(
-          path: 'password',
+          path: Routes.resetPasswordRelative,
           builder: (context, state) => ResetPasswordPage(),
         ),
       ],

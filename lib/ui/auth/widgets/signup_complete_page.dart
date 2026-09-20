@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 
 class SignupCompletePage extends StatelessWidget {
   const SignupCompletePage({super.key});
@@ -49,7 +50,7 @@ class SignupCompletePage extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.go('/auth/login');
+                    context.go(Routes.login);
                   },
                   child: Text('로그인 하러 가기'),
                 ),

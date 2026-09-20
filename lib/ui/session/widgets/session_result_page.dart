@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../routing/routes.dart';
 import 'path_tracker_view.dart';
 import 'sketch_card.dart';
 import 'result_stats_view.dart';
@@ -85,7 +86,7 @@ class SessionResultPage extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.go('/home');
+                    context.go(Routes.home);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.outline,
@@ -105,7 +106,7 @@ class SessionResultPage extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.go('/session-result/$sessionId/share');
+                    context.go(Routes.sessionResultShare(sessionId));
                   },
                   child: Text('기록하기'),
                 ),

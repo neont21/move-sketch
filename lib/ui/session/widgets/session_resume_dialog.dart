@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../domain/models/mock_mission_data.dart';
 import '../../../domain/models/mock_session_data.dart';
+import '../../../routing/routes.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
 import '../../core/widgets/system_alert_dialog.dart';
 
@@ -72,11 +73,11 @@ class SessionResumeDialog extends StatelessWidget {
           DialogActionButtons(
             confirmText: '이어하기',
             onConfirm: () {
-              context.go('/session-tracking');
+              context.go(Routes.sessionTracking);
             },
             cancelText: '이대로 저장',
             onCancel: () {
-              context.go('/session-result/${sessionData.id}');
+              context.go(Routes.sessionResult(sessionData.id));
             },
           ),
           GestureDetector(

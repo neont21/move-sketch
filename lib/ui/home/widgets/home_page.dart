@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../domain/models/mock_mission_data.dart';
 import '../../../domain/models/mock_session_data.dart';
+import '../../../routing/routes.dart';
 import '../../history/widgets/weekly_indicator.dart';
 import '../../session/widgets/session_resume_dialog.dart';
 import '../../session/widgets/sketch_card.dart';
@@ -82,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      context.go('/me');
+                      context.go(Routes.me);
                     },
                     child: CircleAvatar(
                       radius: 36,
@@ -115,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                 height: 60,
                 child: ElevatedButton(
                   onPressed: () {
-                    context.go('/session-start');
+                    context.go(Routes.sessionStart);
                   },
                   child: Text('세션 시작하기'),
                 ),
