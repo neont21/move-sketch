@@ -27,10 +27,12 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
 
   Future<TrackingSessionsTableData?> getActiveSession() =>
       (select(trackingSessionsTable)..where(
-            (t) => t.status.equals('active') | t.status.equals('paused'),
-      ))
+            (t) =>
+                t.status.equalsValue(SessionStatus.active) |
+                t.status.equalsValue(SessionStatus.pausedAuto) |
+                t.status.equalsValue(SessionStatus.pausedManual),
+          ))
           .getSingleOrNull();
-
 
   Future<void> insertPoint(LocationPointsTableCompanion point) =>
       into(locationPointsTable).insert(point);

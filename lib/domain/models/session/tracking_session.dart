@@ -1,14 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
 import '../../../data/services/local/database/app_database.dart';
-import '../../../utils/exceptions.dart';
 import '../enums/activity_type.dart';
 import '../enums/session_status.dart';
-import '../fixed/sketch_parts.dart';
 import 'location_point.dart';
 import 'mission_instance.dart';
-import 'session_result.dart';
 
 @immutable
 class TrackingSession {
@@ -47,11 +43,15 @@ class TrackingSession {
     required List<MissionInstance> missions,
     String? customId,
   }) {
+    final sessionId = customId ?? const Uuid().v7();
     return TrackingSession(
-      id: customId ?? const Uuid().v7(),
+      id: sessionId,
       userId: userId,
       activityType: activityType,
-      missions: missions,
+      missions: missions.map((m) => m.sessionId == sessionId
+          ? m
+          : m.copyWith(sessionId: sessionId))
+          .toList(),
       startedAt: DateTime.now(),
       status: SessionStatus.active,
     );
@@ -89,62 +89,6 @@ class TrackingSession {
       averageSpeedKmh: sessionRow.averageSpeedKmh,
       pathPoints: pointsRows.map(LocationPoint.fromEntity).toList(),
       missions: missionsRows.map(MissionInstance.fromEntity).toList(),
-    );
-  }
-
-  LocationPoint _calculateFurthestWaypoint() {
-    if (!isValidSession) {
-      throw const SessionException('유효하지 않은 세션에서는 경유지를 계산할 수 없습니다.');
-    }
-
-    final start = pathPoints.first.toLatLng();
-    final end = pathPoints.last.toLatLng();
-    const distance = Distance();
-    LocationPoint waypoint = pathPoints[1];
-    double maxDistanceSum = -1.0;
-    for (int i = 1; i < pathPoints.length - 1; i++) {
-      final p = pathPoints[i];
-      final current = p.toLatLng();
-      final total =
-          distance.as(LengthUnit.Meter, start, current) +
-          distance.as(LengthUnit.Meter, end, current);
-      if (total > maxDistanceSum) {
-        maxDistanceSum = total;
-        waypoint = p;
-      }
-    }
-    return waypoint;
-  }
-
-  SessionResult toResult({
-    required SketchComposition sketchComposition,
-    String? routePolyline,
-    String? routeImageUrl,
-  }) {
-    if (!isValidSession) {
-      throw const SessionException('위치 좌표가 없어 결과를 생성할 수 없습니다.');
-    }
-    return SessionResult(
-      id: id,
-      userId: userId,
-      activityType: activityType,
-      startedAt: startedAt,
-      endedAt: DateTime.now(),
-      elapsedDuration: elapsedDuration,
-      distanceInMeters: distanceInMeters,
-      caloriesBurned: caloriesBurned,
-      averagePaceInSeconds: averagePaceInSeconds,
-      averageSpeedKmh: averageSpeedKmh,
-      sketchComposition: sketchComposition,
-      startLocation: pathPoints.first,
-      waypoint: _calculateFurthestWaypoint(),
-      endLocation: pathPoints.last,
-
-      routePolyline: routePolyline,
-      routeImageUrl: routeImageUrl,
-      missions: List.unmodifiable(missions),
-      createdAt: DateTime.now(),
-      isShared: false,
     );
   }
 
