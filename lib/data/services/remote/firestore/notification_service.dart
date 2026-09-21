@@ -53,9 +53,11 @@ class NotificationService {
         .limit(limit)
         .get();
 
-    return snapshot.docs
-        .map((doc) => AppNotification.fromMap(doc.data()))
-        .toList();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return AppNotification.fromMap(data);
+    }).toList();
   }
 
   Future<void> markAsRead(String notificationId) async {

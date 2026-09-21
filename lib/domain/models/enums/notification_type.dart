@@ -1,10 +1,10 @@
 enum NotificationType {
   comment(
-    notification: '님이 내 기록에 댓글을 달았어요.',
+    notification: '님이 내 스케치에 댓글을 달았어요.',
     base: '/feed/notifications/post/',
   ),
   reply(notification: '님이 내 댓글에 답글을 달았어요.', base: '/feed/notifications/post/'),
-  cheer(notification: '님이 내 기록에 응원을 보냈어요.', base: '/feed/notifications/post/'),
+  cheer(notification: '님이 내 스케치에 응원을 보냈어요.', base: '/feed/notifications/post/'),
   requestFriend(
     notification: '님이 친구 요청을 보냈어요.',
     base: '/feed/notifications/profile/',
