@@ -98,13 +98,37 @@ class UserService {
       return null;
     }
     final doc = querySnapshot.docs.first;
-    final user =  User.fromMap(doc.data(), uid: doc.id);
+    final user = User.fromMap(doc.data(), uid: doc.id);
 
     if (user.isDeleted) {
       return null;
     }
 
     return user;
+  }
+
+  Future<List<UserSummary>> getUserSummaries(List<String> uids) async {
+    final uniqueUids = uids.toSet().toList();
+    if (uniqueUids.isEmpty) return [];
+    final chunks = <List<String>>[];
+    for (var i = 0; i < uniqueUids.length; i += 30) {
+      chunks.add(
+        uniqueUids.sublist(
+          i,
+          i + 30 > uniqueUids.length ? uniqueUids.length : i + 30,
+        ),
+      );
+    }
+    final futures = chunks.map((chunk) {
+      return _usersRef.where(FieldPath.documentId, whereIn: chunk).get();
+    });
+    final snapshots = await Future.wait(futures);
+    return snapshots
+        .expand((s) => s.docs)
+        .map((doc) => User.fromMap(doc.data(), uid: doc.id))
+        .where((user) => !user.isDeleted)
+        .map((user) => user.toSummary())
+        .toList();
   }
 
   Future<void> updateUserProfile({
