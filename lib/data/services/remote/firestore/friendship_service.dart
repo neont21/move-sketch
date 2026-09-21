@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../../domain/models/enums/block_status.dart';
+import '../../../../domain/models/social/block_status.dart';
 import '../../../../domain/models/enums/friendship_status.dart';
 import '../../../../domain/models/social/friendship.dart';
 
@@ -96,18 +96,15 @@ class FriendshipService {
     return Friendship.fromMap(doc.data()!);
   }
 
-  Future<List<Friendship>> getAcceptedFriendships(String userId) async {
+  Future<List<String>> getFriendUserIds(String userId) async {
     final snapshot = await _friendshipsRef
         .where('members', arrayContains: userId)
         .where('status', isEqualTo: FriendshipStatus.accepted.name)
         .get();
 
-    return snapshot.docs.map((doc) => Friendship.fromMap(doc.data())).toList();
-  }
-
-  Future<List<String>> getFriendUserIds(String userId) async {
-    final friendships = await getAcceptedFriendships(userId);
-    return friendships.map((friend) => friend.getOtherUserId(userId)).toList();
+    return snapshot.docs
+        .map((doc) => Friendship.fromMap(doc.data()).getOtherUserId(userId))
+        .toList();
   }
 
   Future<List<Friendship>> getReceivedRequests(String userId) async {
@@ -130,7 +127,7 @@ class FriendshipService {
     return snapshot.docs.map((doc) => Friendship.fromMap(doc.data())).toList();
   }
 
-  Future<void> blockUser(Block block) async {
+  Future<void> blockUser(BlockStatus block) async {
     final batch = _firestore.batch();
 
     final blockRef = _blocksRef.doc(block.id);
@@ -152,13 +149,13 @@ class FriendshipService {
     await _blocksRef.doc(blockId).delete();
   }
 
-  Future<List<Block>> getBlockedUsers(String blockerUid) async {
+  Future<List<BlockStatus>> getBlockedUsers(String blockerUid) async {
     final snapshot = await _blocksRef
         .where('blockerUid', isEqualTo: blockerUid)
         .orderBy('createdAt', descending: true)
         .get();
 
-    return snapshot.docs.map((doc) => Block.fromMap(doc.data())).toList();
+    return snapshot.docs.map((doc) => BlockStatus.fromMap(doc.data())).toList();
   }
 
   Future<List<String>> getBlockedUserIds(String userId) async {
@@ -167,7 +164,7 @@ class FriendshipService {
       _blocksRef.where('blockedUser.uid', isEqualTo: userId).get(),
     ]);
 
-    final blockedByME = snapshots[0].docs
+    final blockedByMe = snapshots[0].docs
         .map((doc) => doc.data()['blockedUser']?['uid'] as String?)
         .whereType<String>();
 
@@ -175,6 +172,6 @@ class FriendshipService {
         .map((doc) => doc.data()['blockerUid'] as String?)
         .whereType<String>();
 
-    return {...blockedByME, ...blockingMe}.toList();
+    return {...blockedByMe, ...blockingMe}.toList();
   }
 }
