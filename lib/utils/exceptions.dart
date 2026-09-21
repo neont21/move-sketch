@@ -40,3 +40,18 @@ class NotFoundException extends AppException {
 class DatabaseException extends AppException {
   const DatabaseException(super.message, {super.cause});
 }
+
+class ApiException extends AppException {
+  final int? statusCode;
+
+  const ApiException(super.message, {this.statusCode, super.cause});
+
+  @override
+  String toString() {
+    final status = statusCode != null ? ' (HTTP $statusCode)' : '';
+    if (cause != null) {
+      return '$runtimeType: $message$status (원인: $cause)';
+    }
+    return '$runtimeType: $message$status';
+  }
+}
