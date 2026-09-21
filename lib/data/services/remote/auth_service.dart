@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../../utils/exceptions.dart';
-
 class AuthService {
   final FirebaseAuth _auth;
 
@@ -45,7 +43,10 @@ class AuthService {
       );
     }
     if (user.emailVerified) {
-      throw const AuthException('이미 이메일 인증이 완료된 계정입니다.');
+      throw FirebaseAuthException(
+        code: 'already-verified',
+        message: '이미 이메일 인증이 완료된 계정입니다.',
+      );
     }
     await user.sendEmailVerification();
   }
@@ -81,7 +82,7 @@ class AuthService {
     await user.updatePassword(newPassword);
   }
 
-  Future<void> deleteAccount({required String currentPassword}) async {
+  Future<void> reauthenticate({required String currentPassword}) async {
     final user = _auth.currentUser;
     if (user == null || user.email == null) {
       throw FirebaseAuthException(
@@ -94,11 +95,8 @@ class AuthService {
       email: user.email!,
       password: currentPassword,
     );
-
     await user.reauthenticateWithCredential(credential);
-    await user.delete();
   }
-
 
   Future<void> deleteCurrentUser() async {
     await _auth.currentUser?.delete();
