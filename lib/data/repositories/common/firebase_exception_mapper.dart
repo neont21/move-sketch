@@ -4,23 +4,22 @@ import '../../../utils/exceptions.dart';
 extension FirebaseExceptionMapper on FirebaseException {
   AppException toAppException({String? defaultMessage}) {
     return switch (code) {
-      'unavailable' || 'deadline-exceeded' => NetworkException(
-        '네트워크 연결이 불안정합니다. 인터넷 상태를 확인해 주세요.',
-        cause: this,
-      ),
-      'permission-denied' => AuthException(
-        '해당 작업에 대한 접근 권한이 없습니다.',
-        cause: this,
-      ),
+      'unavailable' || 'deadline-exceeded' || 'retry-limit-exceeded' =>
+        NetworkException('네트워크 연결이 불안정합니다. 인터넷 상태를 확인해 주세요.', cause: this),
+      'permission-denied' ||
+      'unauthorized' => AuthException('해당 작업에 대한 접근 권한이 없습니다.', cause: this),
       'unauthenticated' => AuthException(
         '인증 정보가 만료되었습니다. 다시 로그인해 주세요.',
         cause: this,
       ),
-      'resource-exhausted' => DatabaseException(
+      'resource-exhausted' || 'quota-exceeded' => DatabaseException(
         '요청 한도를 초과했습니다. 잠시 후 다시 시도해 주세요.',
         cause: this,
       ),
-      'not-found' => NotFoundException('요청한 데이터를 찾을 수 없습니다.', cause: this),
+      'not-found' || 'object-not-found' => NotFoundException(
+        '요청한 데이터를 찾을 수 없습니다.',
+        cause: this,
+      ),
       _ => DatabaseException(
         defaultMessage != null
             ? '$defaultMessage (${message ?? code})'

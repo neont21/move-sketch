@@ -6,8 +6,8 @@ abstract interface class SessionResultRepository {
   /// 이미지를 서버에 업로드하고 그 URL과 함께 세션 결과를 서버에 저장한다.
   Future<Result<SessionResult>> saveResult({
     required SessionResult result,
-    required Uint8List? sketchBytes,
-    required Uint8List? routeBytes,
+    required Uint8List sketchBytes,
+    required Uint8List routeBytes,
   });
 
   /// 특정 세션 결과를 조회한다.
