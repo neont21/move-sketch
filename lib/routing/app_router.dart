@@ -100,7 +100,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: Routes.landing, builder: (context, state) => LandingPage()),
+      GoRoute(path: Routes.landing, builder: (context, state) => LandingScreen()),
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state, navigationShell) =>
@@ -112,7 +112,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.home,
-                builder: (context, state) => HomePage(),
+                builder: (context, state) => HomeScreen(),
               ),
             ],
           ),
@@ -122,31 +122,31 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.feed,
-                builder: (context, state) => FeedPage(),
+                builder: (context, state) => FeedScreen(),
                 routes: [
                   GoRoute(
                     path: Routes.postRelative,
                     builder: (context, state) {
                       String sketchId = state.pathParameters['sketch_id']!;
-                      return FeedPostPage(sketchId: sketchId);
+                      return FeedPostScreen(sketchId: sketchId);
                     },
                   ),
                   GoRoute(
                     path: Routes.feedNotificationsRelative,
-                    builder: (context, state) => FeedNotificationsPage(),
+                    builder: (context, state) => FeedNotificationsScreen(),
                     routes: [
                       GoRoute(
                         path: Routes.postRelative,
                         builder: (context, state) {
                           String sketchId = state.pathParameters['sketch_id']!;
-                          return FeedPostPage(sketchId: sketchId);
+                          return FeedPostScreen(sketchId: sketchId);
                         },
                       ),
                       GoRoute(
                         path: Routes.profileRelative,
                         builder: (context, state) {
                           String userId = state.pathParameters['user_id']!;
-                          return UserProfilePage(userId: userId);
+                          return UserProfileScreen(userId: userId);
                         },
                       ),
                     ],
@@ -155,7 +155,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: Routes.profileRelative,
                     builder: (context, state) {
                       String userId = state.pathParameters['user_id']!;
-                      return UserProfilePage(userId: userId);
+                      return UserProfileScreen(userId: userId);
                     },
                   ),
                 ],
@@ -168,27 +168,27 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.history,
-                builder: (context, state) => HistoryPage(),
+                builder: (context, state) => HistoryScreen(),
                 routes: [
                   GoRoute(
                     path: Routes.historyDetailsRelative,
                     builder: (context, state) {
                       String sessionId = state.pathParameters['session_id']!;
-                      return HistoryDetailsPage(sessionId: sessionId);
+                      return HistoryDetailsScreen(sessionId: sessionId);
                     },
                   ),
                   GoRoute(
                     path: Routes.postRelative,
                     builder: (context, state) {
                       String sketchId = state.pathParameters['sketch_id']!;
-                      return FeedPostPage(sketchId: sketchId);
+                      return FeedPostScreen(sketchId: sketchId);
                     },
                   ),
                   GoRoute(
                     path: Routes.historyShareRelative,
                     builder: (context, state) {
                       String sessionId = state.pathParameters['sketch_id']!;
-                      return SessionSharePage(sessionId: sessionId);
+                      return SessionShareScreen(sessionId: sessionId);
                     },
                   ),
                 ],
@@ -201,15 +201,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.me,
-                builder: (context, state) => MyPage(),
+                builder: (context, state) => MyProfileScreen(),
                 routes: [
                   GoRoute(
                     path: Routes.meFriendsRelative,
-                    builder: (context, state) => FriendsListPage(),
+                    builder: (context, state) => FriendsListScreen(),
                     routes: [
                       GoRoute(
                         path: Routes.meFriendsSearchRelative,
-                        builder: (context, state) => UserSearchPage(),
+                        builder: (context, state) => UserSearchScreen(),
                       ),
                     ],
                   ),
@@ -217,34 +217,34 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: Routes.postRelative,
                     builder: (context, state) {
                       String sketchId = state.pathParameters['sketch_id']!;
-                      return FeedPostPage(sketchId: sketchId);
+                      return FeedPostScreen(sketchId: sketchId);
                     },
                   ),
                   GoRoute(
                     path: Routes.meSettingsRelative,
-                    builder: (context, state) => SettingsPage(),
+                    builder: (context, state) => SettingsScreen(),
                     routes: [
                       GoRoute(
                         path: Routes.meSettingsAccountRelative,
-                        builder: (context, state) => SettingAccountPage(),
+                        builder: (context, state) => AccountSettingsScreen(),
                         routes: [
                           GoRoute(
                             path: Routes.meSettingsPasswordRelative,
-                            builder: (context, state) => ModifyPasswordPage(),
+                            builder: (context, state) => ModifyPasswordScreen(),
                           ),
                         ],
                       ),
                       GoRoute(
                         path: Routes.meSettingsCharacterRelative,
-                        builder: (context, state) => ChangeCharacterPage(),
+                        builder: (context, state) => ChangeCharacterScreen(),
                       ),
                       GoRoute(
                         path: Routes.meSettingsNotificationsRelative,
-                        builder: (context, state) => SettingNotificationsPage(),
+                        builder: (context, state) => NotificationSettingsScreen(),
                       ),
                       GoRoute(
                         path: Routes.meSettingsBlockedRelative,
-                        builder: (context, state) => SettingBlockedUser(),
+                        builder: (context, state) => BlockedUserScreen(),
                       ),
                     ],
                   ),
@@ -256,24 +256,24 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.sessionStart,
-        builder: (context, state) => SessionStartPage(),
+        builder: (context, state) => SessionStartScreen(),
       ),
       GoRoute(
         path: Routes.sessionTracking,
-        builder: (context, state) => SessionTrackingPage(),
+        builder: (context, state) => SessionTrackingScreen(),
       ),
       GoRoute(
         path: Routes.sessionResultPath,
         builder: (context, state) {
           String sessionId = state.pathParameters['session_id']!;
-          return SessionResultPage(sessionId: sessionId);
+          return SessionResultScreen(sessionId: sessionId);
         },
         routes: [
           GoRoute(
             path: Routes.sessionResultShareRelative,
             builder: (context, state) {
               String sessionId = state.pathParameters['session_id']!;
-              return SessionSharePage(sessionId: sessionId);
+              return SessionShareScreen(sessionId: sessionId);
             },
           ),
         ],
@@ -282,23 +282,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.sessionEditPath,
         builder: (context, state) {
           String sketchId = state.pathParameters['sketch_id']!;
-          return SessionSharePage(sessionId: sketchId, edit: true);
+          return SessionShareScreen(sessionId: sketchId, edit: true);
         },
       ),
       GoRoute(
         path: Routes.license,
-        builder: (context, state) => OSSLicensesPage(),
+        builder: (context, state) => OSSLicensesScreen(),
       ),
-      GoRoute(path: Routes.privacy, builder: (context, state) => PrivacyPage()),
+      GoRoute(path: Routes.privacy, builder: (context, state) => PrivacyScreen()),
       GoRoute(
         path: Routes.tos,
-        builder: (context, state) => TermsOfServicePage(),
+        builder: (context, state) => TermsOfServiceScreen(),
       ),
       GoRoute(
         path: Routes.userProfilePath,
         builder: (context, state) {
           String userId = state.pathParameters['user_id']!;
-          return UserProfilePage(userId: userId);
+          return UserProfileScreen(userId: userId);
         },
       ),
       GoRoute(
@@ -308,21 +308,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: Routes.loginRelative,
-            builder: (context, state) => LoginPage(),
+            builder: (context, state) => LoginScreen(),
           ),
           GoRoute(
             path: Routes.signupRelative,
-            builder: (context, state) => SignupPage(),
+            builder: (context, state) => SignupScreen(),
             routes: [
               GoRoute(
                 path: Routes.signupCompleteRelative,
-                builder: (context, state) => SignupCompletePage(),
+                builder: (context, state) => SignupCompleteScreen(),
               ),
             ],
           ),
           GoRoute(
             path: Routes.resetPasswordRelative,
-            builder: (context, state) => ResetPasswordPage(),
+            builder: (context, state) => ResetPasswordScreen(),
           ),
         ],
       ),

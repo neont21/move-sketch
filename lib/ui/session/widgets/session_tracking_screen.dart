@@ -10,14 +10,14 @@ import 'session_stats_view.dart';
 
 const uuid = Uuid();
 
-class SessionTrackingPage extends StatefulWidget {
-  const SessionTrackingPage({super.key});
+class SessionTrackingScreen extends StatefulWidget {
+  const SessionTrackingScreen({super.key});
 
   @override
-  State<SessionTrackingPage> createState() => _SessionTrackingPageState();
+  State<SessionTrackingScreen> createState() => _SessionTrackingScreenState();
 }
 
-class _SessionTrackingPageState extends State<SessionTrackingPage> {
+class _SessionTrackingScreenState extends State<SessionTrackingScreen> {
   late MockSessionData _sessionData;
 
   @override

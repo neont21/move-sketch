@@ -3,14 +3,14 @@ import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 
-class ModifyPasswordPage extends StatefulWidget {
-  const ModifyPasswordPage({super.key});
+class ModifyPasswordScreen extends StatefulWidget {
+  const ModifyPasswordScreen({super.key});
 
   @override
-  State<ModifyPasswordPage> createState() => _ModifyPasswordPageState();
+  State<ModifyPasswordScreen> createState() => _ModifyPasswordScreenState();
 }
 
-class _ModifyPasswordPageState extends State<ModifyPasswordPage> {
+class _ModifyPasswordScreenState extends State<ModifyPasswordScreen> {
   bool _showPassword = false;
   bool _showNewPassword = false;
   bool _showCheckPassword = false;

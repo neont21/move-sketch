@@ -6,14 +6,14 @@ import '../../../routing/routes.dart';
 import 'profile_grid.dart';
 import 'modify_profile_dialog.dart';
 
-class MyPage extends StatefulWidget {
-  const MyPage({super.key});
+class MyProfileScreen extends StatefulWidget {
+  const MyProfileScreen({super.key});
 
   @override
-  State<MyPage> createState() => _MyPageState();
+  State<MyProfileScreen> createState() => _MyProfileScreenState();
 }
 
-class _MyPageState extends State<MyPage> {
+class _MyProfileScreenState extends State<MyProfileScreen> {
   final MockUser user = MockUser(
     id: '@daniil_a_np',
     name: '다닐루쉬카',

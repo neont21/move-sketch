@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class OSSLicensesPage extends StatefulWidget {
-  const OSSLicensesPage({super.key});
+class OSSLicensesScreen extends StatefulWidget {
+  const OSSLicensesScreen({super.key});
 
   @override
-  State<OSSLicensesPage> createState() => _OSSLicensePageState();
+  State<OSSLicensesScreen> createState() => _OSSLicensesScreenState();
 }
 
-class _OSSLicensePageState extends State<OSSLicensesPage> {
+class _OSSLicensesScreenState extends State<OSSLicensesScreen> {
   final List<Map<String, dynamic>> _ossLicenses = [];
   bool _isLoading = true;
 

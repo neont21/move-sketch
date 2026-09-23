@@ -8,14 +8,14 @@ import '../../history/widgets/weekly_indicator.dart';
 import '../../session/widgets/session_resume_dialog.dart';
 import '../../session/widgets/sketch_card.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomeScreenState extends State<HomeScreen> {
   late String _formattedDate;
 
   void _checkUncompletedSession() {

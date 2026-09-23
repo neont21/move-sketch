@@ -7,14 +7,14 @@ import '../../../utils/result.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 import '../view_models/auth_notifier.dart';
 
-class SignupPage extends ConsumerStatefulWidget {
-  const SignupPage({super.key});
+class SignupScreen extends ConsumerStatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  ConsumerState<SignupPage> createState() => _SignupPageState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupPageState extends ConsumerState<SignupPage> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController _nicknameController;
   late final TextEditingController _usernameController;

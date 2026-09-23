@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ChangeCharacterPage extends StatefulWidget {
-  const ChangeCharacterPage({super.key});
+class ChangeCharacterScreen extends StatefulWidget {
+  const ChangeCharacterScreen({super.key});
 
   @override
-  State<ChangeCharacterPage> createState() => _ChangeCharacterPageState();
+  State<ChangeCharacterScreen> createState() => _ChangeCharacterScreenState();
 }
 
-class _ChangeCharacterPageState extends State<ChangeCharacterPage> {
+class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
   final List<String> _characters = ['곰', '판다', '고양이', '강아지', '토끼', '카피바라'];
   int _selected = 0;
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class ReminderWeekday extends StatelessWidget {
+class ReminderWeekdaySelector extends StatelessWidget {
   final Set<int> selectedSet;
   final ValueChanged<Set<int>> onSelectionChanged;
-  const ReminderWeekday({
+  const ReminderWeekdaySelector({
     super.key,
     required this.selectedSet,
     required this.onSelectionChanged,

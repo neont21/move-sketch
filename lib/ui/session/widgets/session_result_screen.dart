@@ -5,9 +5,9 @@ import 'path_tracker_view.dart';
 import 'sketch_card.dart';
 import 'result_stats_view.dart';
 
-class SessionResultPage extends StatelessWidget {
+class SessionResultScreen extends StatelessWidget {
   final String sessionId;
-  const SessionResultPage({super.key, required this.sessionId});
+  const SessionResultScreen({super.key, required this.sessionId});
 
   @override
   Widget build(BuildContext context) {

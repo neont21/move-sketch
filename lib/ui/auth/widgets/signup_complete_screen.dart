@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
 
-class SignupCompletePage extends StatelessWidget {
-  const SignupCompletePage({super.key});
+class SignupCompleteScreen extends StatelessWidget {
+  const SignupCompleteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

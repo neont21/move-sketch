@@ -4,14 +4,14 @@ import '../../../routing/routes.dart';
 import '../../core/widgets/system_alert_dialog.dart';
 import 'delete_account_dialog.dart';
 
-class SettingAccountPage extends StatefulWidget {
-  const SettingAccountPage({super.key});
+class AccountSettingsScreen extends StatefulWidget {
+  const AccountSettingsScreen({super.key});
 
   @override
-  State<SettingAccountPage> createState() => _SettingAccountPageState();
+  State<AccountSettingsScreen> createState() => _AccountSettingsScreenState();
 }
 
-class _SettingAccountPageState extends State<SettingAccountPage> {
+class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   bool _google = true;
   bool _apple = true;
   bool _email = true;

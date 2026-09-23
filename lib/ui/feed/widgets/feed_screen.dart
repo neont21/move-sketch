@@ -5,8 +5,8 @@ import '../../../domain/models/mock_user.dart';
 import '../../../routing/routes.dart';
 import 'feed_post_card.dart';
 
-class FeedPage extends StatelessWidget {
-  FeedPage({super.key});
+class FeedScreen extends StatelessWidget {
+  FeedScreen({super.key});
 
   final List<MockSketch> _sampleData = [
     MockSketch(
@@ -107,7 +107,7 @@ class FeedPage extends StatelessWidget {
         child: ListView.builder(
           itemCount: _sampleData.length, // test
           itemBuilder: (context, index) {
-            return FeedPost(sketch: _sampleData[index]);
+            return FeedPostCard(sketch: _sampleData[index]);
           },
         ),
       ),

@@ -3,14 +3,14 @@ import '../../../domain/models/mock_notification.dart';
 import '../../../domain/models/mock_user.dart';
 import 'notification_card.dart';
 
-class FeedNotificationsPage extends StatefulWidget {
-  const FeedNotificationsPage({super.key});
+class FeedNotificationsScreen extends StatefulWidget {
+  const FeedNotificationsScreen({super.key});
 
   @override
-  State<FeedNotificationsPage> createState() => _FeedNotificationsPageState();
+  State<FeedNotificationsScreen> createState() => _FeedNotificationsScreenState();
 }
 
-class _FeedNotificationsPageState extends State<FeedNotificationsPage> {
+class _FeedNotificationsScreenState extends State<FeedNotificationsScreen> {
   final List<MockNotification> _recentNotifications = [
     MockNotification(
       user: MockUser(id: '@edenjint3927', name: '후이'),

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../domain/models/mock_user.dart';
 import 'user_card.dart';
 
-class SearchedFriendList extends StatefulWidget {
-  const SearchedFriendList({super.key});
+class SearchedFriendListView extends StatefulWidget {
+  const SearchedFriendListView({super.key});
 
   @override
-  State<SearchedFriendList> createState() => _RequestedFriendListState();
+  State<SearchedFriendListView> createState() => _SearchedFriendListViewState();
 }
 
-class _RequestedFriendListState extends State<SearchedFriendList> {
+class _SearchedFriendListViewState extends State<SearchedFriendListView> {
   final List<MockUser> _resultList = [
     MockUser(id: '@result1', name: '사용자1'),
     MockUser(id: '@result2', name: '사용자2'),

@@ -5,14 +5,14 @@ import '../../../domain/models/mock_mission.dart';
 import '../../../routing/routes.dart';
 import 'mission_card.dart';
 
-class SessionStartPage extends StatefulWidget {
-  const SessionStartPage({super.key});
+class SessionStartScreen extends StatefulWidget {
+  const SessionStartScreen({super.key});
 
   @override
-  State<SessionStartPage> createState() => _SessionStartPageState();
+  State<SessionStartScreen> createState() => _SessionStartScreenState();
 }
 
-class _SessionStartPageState extends State<SessionStartPage> {
+class _SessionStartScreenState extends State<SessionStartScreen> {
   bool _isJogging = true;
 
   final List<MockMission> _joggingMissions = [

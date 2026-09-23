@@ -8,12 +8,12 @@ import '../../core/widgets/activity_badge.dart';
 import '../../core/widgets/bottom_sheet_button.dart';
 import '../../session/widgets/sketch_card.dart';
 
-class FeedPost extends StatelessWidget {
+class FeedPostCard extends StatelessWidget {
   final MockSketch sketch;
   final MockUser user = MockUser(id: '@daniil_a_np', name: '다닐루쉬카');
   final bool isDetail;
 
-  FeedPost({super.key, required this.sketch, this.isDetail = false});
+  FeedPostCard({super.key, required this.sketch, this.isDetail = false});
 
   Row? metadata(BuildContext context) {
     if (isDetail) {

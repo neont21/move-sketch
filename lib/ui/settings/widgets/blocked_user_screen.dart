@@ -7,8 +7,8 @@ List<MockUser> blockedList = [
   MockUser.byId('@blocked02'),
 ];
 
-class SettingBlockedUser extends StatelessWidget {
-  const SettingBlockedUser({super.key});
+class BlockedUserScreen extends StatelessWidget {
+  const BlockedUserScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

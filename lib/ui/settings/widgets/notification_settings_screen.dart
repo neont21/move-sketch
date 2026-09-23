@@ -3,15 +3,15 @@ import '../../core/widgets/simple_binary_toggle.dart';
 import 'reminder_time_picker.dart';
 import 'reminder_weekday_selector.dart';
 
-class SettingNotificationsPage extends StatefulWidget {
-  const SettingNotificationsPage({super.key});
+class NotificationSettingsScreen extends StatefulWidget {
+  const NotificationSettingsScreen({super.key});
 
   @override
-  State<SettingNotificationsPage> createState() =>
-      _SettingNotificationsPageState();
+  State<NotificationSettingsScreen> createState() =>
+      _NotificationSettingsScreenState();
 }
 
-class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
+class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> {
   bool _toggleAll = true;
   bool _toggleFriendNotification = true;
   bool _toggleResponseNotification = true;
@@ -79,7 +79,7 @@ class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
         children: [
           Divider(),
           Text('요일', style: textTheme.labelLarge),
-          ReminderWeekday(
+          ReminderWeekdaySelector(
             selectedSet: selectedSet,
             onSelectionChanged: (Set<int> newSelection) {
               setState(() {
@@ -88,7 +88,7 @@ class _SettingNotificationsPageState extends State<SettingNotificationsPage> {
             },
           ),
           Text('시간', style: textTheme.labelLarge),
-          ReminderTime(
+          ReminderTimePicker(
             selectedTime: selectedTime,
             timeList: times,
             onChanged: (int? newValue) {

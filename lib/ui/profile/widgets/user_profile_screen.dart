@@ -7,15 +7,15 @@ import '../../friends/widgets/mutual_friends_section.dart';
 import 'profile_grid.dart';
 import 'user_sheet_button.dart';
 
-class UserProfilePage extends StatefulWidget {
+class UserProfileScreen extends StatefulWidget {
   final String userId;
-  const UserProfilePage({super.key, required this.userId});
+  const UserProfileScreen({super.key, required this.userId});
 
   @override
-  State<UserProfilePage> createState() => _UserProfilePageState();
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
-class _UserProfilePageState extends State<UserProfilePage> {
+class _UserProfileScreenState extends State<UserProfileScreen> {
   late MockUser _user;
 
   final List<MockUser> friendsList = [MockUser.byId('@daniil_a_np')];
@@ -128,7 +128,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             const SizedBox(height: 16),
             friendsList.any((user) => user.id == widget.userId)
                 ? const SizedBox.shrink()
-                : MutualFriends(userId: widget.userId),
+                : MutualFriendsSection(userId: widget.userId),
             Divider(),
             Expanded(
               child: friendsList.any((user) => user.id == widget.userId)

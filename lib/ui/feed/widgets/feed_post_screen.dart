@@ -5,10 +5,10 @@ import '../../../domain/models/mock_user.dart';
 import 'cheer_button.dart';
 import 'feed_post_card.dart';
 
-class FeedPostPage extends StatefulWidget {
+class FeedPostScreen extends StatefulWidget {
   final String sketchId;
   late final MockSketch _sketch;
-  FeedPostPage({super.key, required this.sketchId}) {
+  FeedPostScreen({super.key, required this.sketchId}) {
     _sketch = MockSketch(
       sketchId: sketchId,
       author: MockUser(id: '@user_id', name: '테스트'),
@@ -26,10 +26,10 @@ class FeedPostPage extends StatefulWidget {
   }
 
   @override
-  State<FeedPostPage> createState() => _FeedPostPageState();
+  State<FeedPostScreen> createState() => _FeedPostScreenState();
 }
 
-class _FeedPostPageState extends State<FeedPostPage> {
+class _FeedPostScreenState extends State<FeedPostScreen> {
   final MockUser user = MockUser(id: '@daniil_a_np', name: '다닐루쉬카');
   // final MockUser user = MockUser(id: '@user_id', name: '테스트');
   String? _replyTargetId;
@@ -41,8 +41,8 @@ class _FeedPostPageState extends State<FeedPostPage> {
   }
 
   Column buildComments() {
-    List<UserComment> comments = [
-      UserComment(
+    List<UserCommentTile> comments = [
+      UserCommentTile(
         user: MockUser(id: '@peeeeeter_j', name: '피터'),
         createdAt: DateTime.now(),
         sketchId: 'test1',
@@ -50,7 +50,7 @@ class _FeedPostPageState extends State<FeedPostPage> {
         text: '댓글 달고 갑니다~~ 댓글도 너무 길게 달진 않도록 할까 하는데 어떻게 생각하세요?',
         onReply: _onReply,
       ),
-      UserComment(
+      UserCommentTile(
         user: MockUser(id: '@edenjint3927', name: '후이'),
         createdAt: DateTime.now(),
         sketchId: 'test1',
@@ -58,7 +58,7 @@ class _FeedPostPageState extends State<FeedPostPage> {
         text: '어느 정도가 긴 거지...',
         parentCommentId: 'test1-1',
       ),
-      UserComment(
+      UserCommentTile(
         user: MockUser(id: '@daniil_a_np', name: '다닐루쉬카'),
         createdAt: DateTime.now(),
         sketchId: 'test1',
@@ -84,7 +84,7 @@ class _FeedPostPageState extends State<FeedPostPage> {
           child: Column(
             spacing: 20,
             children: [
-              FeedPost(sketch: widget._sketch, isDetail: true),
+              FeedPostCard(sketch: widget._sketch, isDetail: true),
               CheerButton(
                 author: widget._sketch.author,
                 user: user,

@@ -6,10 +6,10 @@ import '../../../domain/models/mock_user.dart';
 import '../../../routing/routes.dart';
 import '../../core/widgets/bottom_sheet_button.dart';
 
-class UserComment extends StatelessWidget {
+class UserCommentTile extends StatelessWidget {
   late final MockComment _comment;
   final ValueChanged<String>? onReply;
-  UserComment({
+  UserCommentTile({
     super.key,
     required MockUser user,
     required DateTime createdAt,

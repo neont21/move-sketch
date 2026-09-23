@@ -4,14 +4,14 @@ import '../../../routing/routes.dart';
 import 'my_friend_list_view.dart';
 import 'requested_friend_list_view.dart';
 
-class FriendsListPage extends StatefulWidget {
-  const FriendsListPage({super.key});
+class FriendsListScreen extends StatefulWidget {
+  const FriendsListScreen({super.key});
 
   @override
-  State<FriendsListPage> createState() => _FriendsListPageState();
+  State<FriendsListScreen> createState() => _FriendsListScreenState();
 }
 
-class _FriendsListPageState extends State<FriendsListPage> {
+class _FriendsListScreenState extends State<FriendsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +31,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [RequestedFriendList(), MyFriendList()],
+            children: [RequestedFriendListView(), MyFriendListView()],
           ),
         ),
       ),

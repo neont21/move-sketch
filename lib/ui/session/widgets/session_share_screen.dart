@@ -4,20 +4,20 @@ import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
 import 'sketch_card.dart';
 
-class SessionSharePage extends StatefulWidget {
+class SessionShareScreen extends StatefulWidget {
   final String sessionId;
   final bool edit;
-  const SessionSharePage({
+  const SessionShareScreen({
     super.key,
     required this.sessionId,
     this.edit = false,
   });
 
   @override
-  State<SessionSharePage> createState() => _SessionSharePageState();
+  State<SessionShareScreen> createState() => _SessionShareScreenState();
 }
 
-class _SessionSharePageState extends State<SessionSharePage> {
+class _SessionShareScreenState extends State<SessionShareScreen> {
   int _selectedTag = 0;
   final List<String> _locationTags = ['동대문구 휘경동', '동대문구 전농동', '성동구 용답동'];
 

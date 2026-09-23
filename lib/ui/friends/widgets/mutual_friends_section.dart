@@ -10,9 +10,9 @@ final List<MockUser> mutualsList = [
   MockUser.byId('@user5'),
 ];
 
-class MutualFriends extends StatelessWidget {
+class MutualFriendsSection extends StatelessWidget {
   final String userId;
-  const MutualFriends({super.key, required this.userId});
+  const MutualFriendsSection({super.key, required this.userId});
 
   List<Widget> _buildMutualFriendsImage(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;

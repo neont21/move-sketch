@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'recommend_friend_list_view.dart';
 import 'searched_friend_list_view.dart';
 
-class UserSearchPage extends StatefulWidget {
-  const UserSearchPage({super.key});
+class UserSearchScreen extends StatefulWidget {
+  const UserSearchScreen({super.key});
 
   @override
-  State<UserSearchPage> createState() => _UserSearchPageState();
+  State<UserSearchScreen> createState() => _UserSearchScreenState();
 }
 
-class _UserSearchPageState extends State<UserSearchPage> {
+class _UserSearchScreenState extends State<UserSearchScreen> {
   bool _isSearched = false;
 
   @override
@@ -53,8 +53,8 @@ class _UserSearchPageState extends State<UserSearchPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: _isSearched
-                    ? SearchedFriendList()
-                    : RecommendFriendList(),
+                    ? SearchedFriendListView()
+                    : RecommendFriendListView(),
               ),
             ),
           ],

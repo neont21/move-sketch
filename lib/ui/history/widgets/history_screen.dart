@@ -6,14 +6,14 @@ import '../../../domain/models/mock_session_history.dart';
 import 'session_calendar.dart';
 import 'session_card.dart';
 
-class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key});
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({super.key});
 
   @override
-  State<HistoryPage> createState() => _HistoryPageState();
+  State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryPageState extends State<HistoryPage> {
+class _HistoryScreenState extends State<HistoryScreen> {
   DateTime _focusedDay = DateTime.now();
   MockMonthlyHistory _monthlyHistory = MockMonthlyHistory(
     year: DateTime.now().year,

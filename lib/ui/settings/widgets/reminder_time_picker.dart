@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class ReminderTime extends StatelessWidget {
+class ReminderTimePicker extends StatelessWidget {
   final int selectedTime;
   final List<int> timeList;
   final ValueChanged<int?> onChanged;
-  const ReminderTime({
+  const ReminderTimePicker({
     super.key,
     required this.selectedTime,
     required this.timeList,

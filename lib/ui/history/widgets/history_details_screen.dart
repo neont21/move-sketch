@@ -9,9 +9,9 @@ import '../../core/widgets/activity_badge.dart';
 import '../../session/widgets/path_tracker_view.dart';
 import '../../session/widgets/sketch_card.dart';
 
-class HistoryDetailsPage extends StatelessWidget {
+class HistoryDetailsScreen extends StatelessWidget {
   final String sessionId;
-  HistoryDetailsPage({super.key, required this.sessionId});
+  HistoryDetailsScreen({super.key, required this.sessionId});
 
   final _history = MockSessionHistory(
     sessionId: 'test1',
