@@ -7,7 +7,7 @@ import '../../../data/repositories/user/user_repository.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/result.dart';
 
-class AuthNotifier extends AsyncNotifier<User?> {
+class AuthViewModel extends AsyncNotifier<User?> {
   AuthRepository get _authRepository => ref.read(authRepositoryProvider);
   UserRepository get _userRepository => ref.read(userRepositoryProvider);
 
@@ -261,10 +261,10 @@ class AuthNotifier extends AsyncNotifier<User?> {
   }
 }
 
-final authNotifierProvider = AsyncNotifierProvider<AuthNotifier, User?>(() {
-  return AuthNotifier();
+final authViewModelProvider = AsyncNotifierProvider<AuthViewModel, User?>(() {
+  return AuthViewModel();
 });
 
 final currentUserProvider = Provider<User?>((ref) {
-  return ref.watch(authNotifierProvider).value;
+  return ref.watch(authViewModelProvider).value;
 });

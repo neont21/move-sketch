@@ -6,7 +6,7 @@ import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
-import '../view_models/auth_notifier.dart';
+import '../view_models/auth_viewmodel.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -47,7 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     FocusScope.of(context).unfocus();
 
     final result = await ref
-        .read(authNotifierProvider.notifier)
+        .read(authViewModelProvider.notifier)
         .signIn(
           username: _usernameController.text.trim().toLowerCase(),
           password: _passwordController.text,
@@ -106,7 +106,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authViewModelProvider);
     final bool isLoading = authState.isLoading;
 
     final bool isKeyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
@@ -159,7 +159,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ? null
                         : () => _handleSocialLogin(
                             ref
-                                .read(authNotifierProvider.notifier)
+                                .read(authViewModelProvider.notifier)
                                 .signInWithGoogle,
                           ),
                     style: OutlinedButton.styleFrom(
@@ -186,7 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ? null
                         : () => _handleSocialLogin(
                             ref
-                                .read(authNotifierProvider.notifier)
+                                .read(authViewModelProvider.notifier)
                                 .signInWithApple,
                           ),
                     style: OutlinedButton.styleFrom(

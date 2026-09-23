@@ -5,7 +5,7 @@ import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
-import '../view_models/auth_notifier.dart';
+import '../view_models/auth_viewmodel.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -64,7 +64,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     FocusScope.of(context).unfocus();
 
     final result = await ref
-        .read(authNotifierProvider.notifier)
+        .read(authViewModelProvider.notifier)
         .signUp(
           username: _usernameController.text.trim().toLowerCase(),
           nickname: _nicknameController.text.trim(),
@@ -99,7 +99,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authViewModelProvider);
     final bool isLoading = authState.isLoading;
 
     return Scaffold(

@@ -6,7 +6,7 @@ import '../../../config/dependencies.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
-import '../view_models/auth_notifier.dart';
+import '../view_models/auth_viewmodel.dart';
 
 class SignupCompleteScreen extends ConsumerStatefulWidget {
   final String? email;
@@ -62,7 +62,7 @@ class _SignupCompleteScreenState extends ConsumerState<SignupCompleteScreen> {
   }
 
   Future<void> _handleGoToLogin() async {
-    await ref.read(authNotifierProvider.notifier).signOut();
+    await ref.read(authViewModelProvider.notifier).signOut();
 
     if (!mounted) {
       return;
@@ -85,7 +85,7 @@ class _SignupCompleteScreenState extends ConsumerState<SignupCompleteScreen> {
       canPop: true,
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) {
-          await ref.read(authNotifierProvider.notifier).signOut();
+          await ref.read(authViewModelProvider.notifier).signOut();
         }
       },
       child: Scaffold(

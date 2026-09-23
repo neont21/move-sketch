@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../domain/models/social/user.dart';
-import '../ui/auth/view_models/auth_notifier.dart';
+import '../ui/auth/view_models/auth_viewmodel.dart';
 import '../ui/auth/widgets/landing_screen.dart';
 import '../ui/auth/widgets/login_screen.dart';
 import '../ui/auth/widgets/reset_password_screen.dart';
@@ -52,7 +52,7 @@ final GlobalKey<NavigatorState> _meNavigatorKey = GlobalKey<NavigatorState>(
 
 class RouterRefreshListenable extends ChangeNotifier {
   RouterRefreshListenable(Ref ref) {
-    ref.listen<AsyncValue<User?>>(authNotifierProvider, (_, _) {
+    ref.listen<AsyncValue<User?>>(authViewModelProvider, (_, _) {
       notifyListeners();
     });
   }
@@ -67,7 +67,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refreshListenable,
     initialLocation: Routes.landing,
     redirect: (context, state) {
-      final authState = ref.read(authNotifierProvider);
+      final authState = ref.read(authViewModelProvider);
 
       if (authState.isLoading) {
         return null;

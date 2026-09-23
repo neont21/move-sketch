@@ -6,7 +6,7 @@ import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
-import '../view_models/auth_notifier.dart';
+import '../view_models/auth_viewmodel.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -55,7 +55,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     final email = _emailController.text.trim().toLowerCase();
 
     final result = await ref
-        .read(authNotifierProvider.notifier)
+        .read(authViewModelProvider.notifier)
         .sendPasswordResetEmail(email);
 
     if (!mounted) {
