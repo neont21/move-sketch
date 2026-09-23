@@ -108,6 +108,30 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
     };
   }
 
+  Future<void> _loadRemoteData(String userId) async {
+    unawaited(() async {
+      final (latestResult, weeklyIndicator) = await (
+      _fetchLatestResult(userId),
+      _fetchWeeklyIndicator(userId),
+      ).wait;
+      state = state.whenData(
+            (current) => current.copyWith(
+          latestResult: () => latestResult,
+          weeklyIndicator: weeklyIndicator,
+        ),
+      );
+    }());
+
+    unawaited(() async {
+      final weatherInfo = await _fetchWeather();
+      state = state.whenData(
+          (current) => current.copyWith(
+            weatherInfo: () => weatherInfo,
+          ),
+      );
+    }());
+  }
+
   @override
   Future<HomeState> build() async {
     final user = await ref.watch(authViewModelProvider.future);
@@ -116,23 +140,11 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
       throw const AuthException('로그인된 사용자 세션이 없습니다.');
     }
 
-    final (
-      weatherInfo,
-      latestResult,
-      weeklyIndicator,
-      uncompletedSession,
-    ) = await (
-      _fetchWeather(),
-      _fetchLatestResult(user.uid),
-      _fetchWeeklyIndicator(user.uid),
-      _fetchUncompletedSession(),
-    ).wait;
-    return HomeState(
-      weatherInfo: weatherInfo,
-      latestResult: latestResult,
-      weeklyIndicator: weeklyIndicator,
-      uncompletedSession: uncompletedSession,
-    );
+    final uncompletedSession = await _fetchUncompletedSession();
+
+    _loadRemoteData(user.uid);
+
+    return HomeState(uncompletedSession: uncompletedSession);
   }
 
   Future<void> discardActiveSession(String sessionId) async {

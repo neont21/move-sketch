@@ -27,11 +27,16 @@ class WeeklyIndicator extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final completedCount = isDone.where((done) => done).length;
+    final message = completedCount == 0
+        ? '최근 기록이 아직 없어요'
+        : '일주일동안 $completedCount일 움직였어요';
+
     return Row(
       spacing: 8,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text('이번 주 기록이 아직 없어요', style: textTheme.bodyLarge),
+        Text(message, style: textTheme.bodyLarge),
         ...generateIndicator(colorScheme),
       ],
     );
