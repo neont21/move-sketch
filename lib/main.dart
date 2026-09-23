@@ -16,13 +16,13 @@ void main() async {
   runApp(const ProviderScope(child: MoveSketchApp()));
 }
 
-class MoveSketchApp extends StatelessWidget {
+class MoveSketchApp extends ConsumerWidget {
   const MoveSketchApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      routerConfig: router,
+      routerConfig: ref.watch(routerProvider),
       title: '무브스케치',
       theme: MoveSketchTheme.lightTheme,
     );

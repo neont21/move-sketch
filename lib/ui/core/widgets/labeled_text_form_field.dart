@@ -9,6 +9,13 @@ class LabeledTextFormField extends StatelessWidget {
   final int? maxLength;
   final int maxLines;
   final String? initialValue;
+
+  final TextEditingController? controller;
+  final FormFieldValidator<String>? validator;
+  final ValueChanged<String>? onChanged;
+  final bool enabled;
+  final AutovalidateMode? autoValidateMode;
+
   const LabeledTextFormField({
     super.key,
     this.inputType = TextInputType.name,
@@ -19,6 +26,11 @@ class LabeledTextFormField extends StatelessWidget {
     this.maxLength,
     this.maxLines = 1,
     this.initialValue,
+    this.controller,
+    this.validator,
+    this.onChanged,
+    this.enabled = true,
+    this.autoValidateMode,
   });
 
   @override
@@ -26,11 +38,16 @@ class LabeledTextFormField extends StatelessWidget {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return TextFormField(
+      controller: controller,
       keyboardType: inputType,
       initialValue: initialValue,
       obscureText: !(showPassword ?? true),
       maxLines: maxLines,
       maxLength: maxLength,
+      enabled: enabled,
+      validator: validator,
+      onChanged: onChanged,
+      autovalidateMode: autoValidateMode,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,

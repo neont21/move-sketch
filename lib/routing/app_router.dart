@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../domain/models/social/user.dart';
+import '../ui/auth/view_models/auth_notifier.dart';
 import '../ui/auth/widgets/landing_screen.dart';
 import '../ui/auth/widgets/login_screen.dart';
 import '../ui/auth/widgets/reset_password_screen.dart';
@@ -47,222 +50,282 @@ final GlobalKey<NavigatorState> _meNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'me',
 );
 
-final router = GoRouter(
-  navigatorKey: _rootNavigatorKey,
-  routes: [
-    GoRoute(path: Routes.landing, builder: (context, state) => LandingPage()),
-    StatefulShellRoute.indexedStack(
-      parentNavigatorKey: _rootNavigatorKey,
-      builder: (context, state, navigationShell) =>
-          MoveSketchShell(navigationShell: navigationShell),
-      branches: [
-        // tap: Home
-        StatefulShellBranch(
-          navigatorKey: _homeNavigatorKey,
-          routes: [
-            GoRoute(path: Routes.home, builder: (context, state) => HomePage()),
-          ],
-        ),
-        // tap: Feed
-        StatefulShellBranch(
-          navigatorKey: _feedNavigatorKey,
-          routes: [
-            GoRoute(
-              path: Routes.feed,
-              builder: (context, state) => FeedPage(),
-              routes: [
-                GoRoute(
-                  path: Routes.postRelative,
-                  builder: (context, state) {
-                    String sketchId = state.pathParameters['sketch_id']!;
-                    return FeedPostPage(sketchId: sketchId);
-                  },
-                ),
-                GoRoute(
-                  path: Routes.feedNotificationsRelative,
-                  builder: (context, state) => FeedNotificationsPage(),
-                  routes: [
-                    GoRoute(
-                      path: Routes.postRelative,
-                      builder: (context, state) {
-                        String sketchId = state.pathParameters['sketch_id']!;
-                        return FeedPostPage(sketchId: sketchId);
-                      },
-                    ),
-                    GoRoute(
-                      path: Routes.profileRelative,
-                      builder: (context, state) {
-                        String userId = state.pathParameters['user_id']!;
-                        return UserProfilePage(userId: userId);
-                      },
-                    ),
-                  ],
-                ),
-                GoRoute(
-                  path: Routes.profileRelative,
-                  builder: (context, state) {
-                    String userId = state.pathParameters['user_id']!;
-                    return UserProfilePage(userId: userId);
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-        // tap: History
-        StatefulShellBranch(
-          navigatorKey: _historyNavigatorKey,
-          routes: [
-            GoRoute(
-              path: Routes.history,
-              builder: (context, state) => HistoryPage(),
-              routes: [
-                GoRoute(
-                  path: Routes.historyDetailsRelative,
-                  builder: (context, state) {
-                    String sessionId = state.pathParameters['session_id']!;
-                    return HistoryDetailsPage(sessionId: sessionId);
-                  },
-                ),
-                GoRoute(
-                  path: Routes.postRelative,
-                  builder: (context, state) {
-                    String sketchId = state.pathParameters['sketch_id']!;
-                    return FeedPostPage(sketchId: sketchId);
-                  },
-                ),
-                GoRoute(
-                  path: Routes.historyShareRelative,
-                  builder: (context, state) {
-                    String sessionId = state.pathParameters['sketch_id']!;
-                    return SessionSharePage(sessionId: sessionId);
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-        // tap: Me
-        StatefulShellBranch(
-          navigatorKey: _meNavigatorKey,
-          routes: [
-            GoRoute(
-              path: Routes.me,
-              builder: (context, state) => MyPage(),
-              routes: [
-                GoRoute(
-                  path: Routes.meFriendsRelative,
-                  builder: (context, state) => FriendsListPage(),
-                  routes: [
-                    GoRoute(
-                      path: Routes.meFriendsSearchRelative,
-                      builder: (context, state) => UserSearchPage(),
-                    ),
-                  ],
-                ),
-                GoRoute(
-                  path: Routes.postRelative,
-                  builder: (context, state) {
-                    String sketchId = state.pathParameters['sketch_id']!;
-                    return FeedPostPage(sketchId: sketchId);
-                  },
-                ),
-                GoRoute(
-                  path: Routes.meSettingsRelative,
-                  builder: (context, state) => SettingsPage(),
-                  routes: [
-                    GoRoute(
-                      path: Routes.meSettingsAccountRelative,
-                      builder: (context, state) => SettingAccountPage(),
-                      routes: [
-                        GoRoute(
-                          path: Routes.meSettingsPasswordRelative,
-                          builder: (context, state) => ModifyPasswordPage(),
-                        ),
-                      ],
-                    ),
-                    GoRoute(
-                      path: Routes.meSettingsCharacterRelative,
-                      builder: (context, state) => ChangeCharacterPage(),
-                    ),
-                    GoRoute(
-                      path: Routes.meSettingsNotificationsRelative,
-                      builder: (context, state) => SettingNotificationsPage(),
-                    ),
-                    GoRoute(
-                      path: Routes.meSettingsBlockedRelative,
-                      builder: (context, state) => SettingBlockedUser(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    ),
-    GoRoute(
-      path: Routes.sessionStart,
-      builder: (context, state) => SessionStartPage(),
-    ),
-    GoRoute(
-      path: Routes.sessionTracking,
-      builder: (context, state) => SessionTrackingPage(),
-    ),
-    GoRoute(
-      path: Routes.sessionResultPath,
-      builder: (context, state) {
-        String sessionId = state.pathParameters['session_id']!;
-        return SessionResultPage(sessionId: sessionId);
-      },
-      routes: [
-        GoRoute(
-          path: Routes.sessionResultShareRelative,
-          builder: (context, state) {
-            String sessionId = state.pathParameters['session_id']!;
-            return SessionSharePage(sessionId: sessionId);
-          },
-        ),
-      ],
-    ),
-    GoRoute(
-      path: Routes.sessionEditPath,
-      builder: (context, state) {
-        String sketchId = state.pathParameters['sketch_id']!;
-        return SessionSharePage(sessionId: sketchId, edit: true);
-      },
-    ),
-    GoRoute(path: Routes.license, builder: (context, state) => OSSLicensesPage()),
-    GoRoute(path: Routes.privacy, builder: (context, state) => PrivacyPage()),
-    GoRoute(path: Routes.tos, builder: (context, state) => TermsOfServicePage()),
-    GoRoute(
-      path: Routes.userProfilePath,
-      builder: (context, state) {
-        String userId = state.pathParameters['user_id']!;
-        return UserProfilePage(userId: userId);
-      },
-    ),
-    GoRoute(
-      path: Routes.auth,
-      redirect: (context, state) =>
-          state.uri.path == '/auth' ? '/auth/login' : null,
-      routes: [
-        GoRoute(path: Routes.loginRelative, builder: (context, state) => LoginPage()),
-        GoRoute(
-          path: Routes.signupRelative,
-          builder: (context, state) => SignupPage(),
-          routes: [
-            GoRoute(
-              path: Routes.signupCompleteRelative,
-              builder: (context, state) => SignupCompletePage(),
-            ),
-          ],
-        ),
-        GoRoute(
-          path: Routes.resetPasswordRelative,
-          builder: (context, state) => ResetPasswordPage(),
-        ),
-      ],
-    ),
-  ],
-);
+class RouterRefreshListenable extends ChangeNotifier {
+  RouterRefreshListenable(Ref ref) {
+    ref.listen<AsyncValue<User?>>(authNotifierProvider, (_, _) {
+      notifyListeners();
+    });
+  }
+}
+
+final routerProvider = Provider<GoRouter>((ref) {
+  final refreshListenable = RouterRefreshListenable(ref);
+  ref.onDispose(refreshListenable.dispose);
+
+  return GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    refreshListenable: refreshListenable,
+    initialLocation: Routes.landing,
+    redirect: (context, state) {
+      final authState = ref.read(authNotifierProvider);
+
+      if (authState.isLoading) {
+        return null;
+      }
+
+      final user = authState.value;
+      final location = state.matchedLocation;
+
+      final isPublicRoute =
+          location == Routes.landing ||
+          location.startsWith(Routes.auth) ||
+          location == Routes.privacy ||
+          location == Routes.tos ||
+          location == Routes.license;
+
+      if (user == null) {
+        return isPublicRoute ? null : Routes.login;
+      }
+
+      final isAuthRoute =
+          location == Routes.landing ||
+          location == Routes.auth ||
+          location == Routes.login ||
+          location == Routes.resetPassword;
+
+      if (isAuthRoute) {
+        return Routes.home;
+      }
+
+      return null;
+    },
+    routes: [
+      GoRoute(path: Routes.landing, builder: (context, state) => LandingPage()),
+      StatefulShellRoute.indexedStack(
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state, navigationShell) =>
+            MoveSketchShell(navigationShell: navigationShell),
+        branches: [
+          // tap: Home
+          StatefulShellBranch(
+            navigatorKey: _homeNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.home,
+                builder: (context, state) => HomePage(),
+              ),
+            ],
+          ),
+          // tap: Feed
+          StatefulShellBranch(
+            navigatorKey: _feedNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.feed,
+                builder: (context, state) => FeedPage(),
+                routes: [
+                  GoRoute(
+                    path: Routes.postRelative,
+                    builder: (context, state) {
+                      String sketchId = state.pathParameters['sketch_id']!;
+                      return FeedPostPage(sketchId: sketchId);
+                    },
+                  ),
+                  GoRoute(
+                    path: Routes.feedNotificationsRelative,
+                    builder: (context, state) => FeedNotificationsPage(),
+                    routes: [
+                      GoRoute(
+                        path: Routes.postRelative,
+                        builder: (context, state) {
+                          String sketchId = state.pathParameters['sketch_id']!;
+                          return FeedPostPage(sketchId: sketchId);
+                        },
+                      ),
+                      GoRoute(
+                        path: Routes.profileRelative,
+                        builder: (context, state) {
+                          String userId = state.pathParameters['user_id']!;
+                          return UserProfilePage(userId: userId);
+                        },
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: Routes.profileRelative,
+                    builder: (context, state) {
+                      String userId = state.pathParameters['user_id']!;
+                      return UserProfilePage(userId: userId);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // tap: History
+          StatefulShellBranch(
+            navigatorKey: _historyNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.history,
+                builder: (context, state) => HistoryPage(),
+                routes: [
+                  GoRoute(
+                    path: Routes.historyDetailsRelative,
+                    builder: (context, state) {
+                      String sessionId = state.pathParameters['session_id']!;
+                      return HistoryDetailsPage(sessionId: sessionId);
+                    },
+                  ),
+                  GoRoute(
+                    path: Routes.postRelative,
+                    builder: (context, state) {
+                      String sketchId = state.pathParameters['sketch_id']!;
+                      return FeedPostPage(sketchId: sketchId);
+                    },
+                  ),
+                  GoRoute(
+                    path: Routes.historyShareRelative,
+                    builder: (context, state) {
+                      String sessionId = state.pathParameters['sketch_id']!;
+                      return SessionSharePage(sessionId: sessionId);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // tap: Me
+          StatefulShellBranch(
+            navigatorKey: _meNavigatorKey,
+            routes: [
+              GoRoute(
+                path: Routes.me,
+                builder: (context, state) => MyPage(),
+                routes: [
+                  GoRoute(
+                    path: Routes.meFriendsRelative,
+                    builder: (context, state) => FriendsListPage(),
+                    routes: [
+                      GoRoute(
+                        path: Routes.meFriendsSearchRelative,
+                        builder: (context, state) => UserSearchPage(),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: Routes.postRelative,
+                    builder: (context, state) {
+                      String sketchId = state.pathParameters['sketch_id']!;
+                      return FeedPostPage(sketchId: sketchId);
+                    },
+                  ),
+                  GoRoute(
+                    path: Routes.meSettingsRelative,
+                    builder: (context, state) => SettingsPage(),
+                    routes: [
+                      GoRoute(
+                        path: Routes.meSettingsAccountRelative,
+                        builder: (context, state) => SettingAccountPage(),
+                        routes: [
+                          GoRoute(
+                            path: Routes.meSettingsPasswordRelative,
+                            builder: (context, state) => ModifyPasswordPage(),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: Routes.meSettingsCharacterRelative,
+                        builder: (context, state) => ChangeCharacterPage(),
+                      ),
+                      GoRoute(
+                        path: Routes.meSettingsNotificationsRelative,
+                        builder: (context, state) => SettingNotificationsPage(),
+                      ),
+                      GoRoute(
+                        path: Routes.meSettingsBlockedRelative,
+                        builder: (context, state) => SettingBlockedUser(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Routes.sessionStart,
+        builder: (context, state) => SessionStartPage(),
+      ),
+      GoRoute(
+        path: Routes.sessionTracking,
+        builder: (context, state) => SessionTrackingPage(),
+      ),
+      GoRoute(
+        path: Routes.sessionResultPath,
+        builder: (context, state) {
+          String sessionId = state.pathParameters['session_id']!;
+          return SessionResultPage(sessionId: sessionId);
+        },
+        routes: [
+          GoRoute(
+            path: Routes.sessionResultShareRelative,
+            builder: (context, state) {
+              String sessionId = state.pathParameters['session_id']!;
+              return SessionSharePage(sessionId: sessionId);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Routes.sessionEditPath,
+        builder: (context, state) {
+          String sketchId = state.pathParameters['sketch_id']!;
+          return SessionSharePage(sessionId: sketchId, edit: true);
+        },
+      ),
+      GoRoute(
+        path: Routes.license,
+        builder: (context, state) => OSSLicensesPage(),
+      ),
+      GoRoute(path: Routes.privacy, builder: (context, state) => PrivacyPage()),
+      GoRoute(
+        path: Routes.tos,
+        builder: (context, state) => TermsOfServicePage(),
+      ),
+      GoRoute(
+        path: Routes.userProfilePath,
+        builder: (context, state) {
+          String userId = state.pathParameters['user_id']!;
+          return UserProfilePage(userId: userId);
+        },
+      ),
+      GoRoute(
+        path: Routes.auth,
+        redirect: (context, state) =>
+            state.uri.path == Routes.auth ? Routes.login : null,
+        routes: [
+          GoRoute(
+            path: Routes.loginRelative,
+            builder: (context, state) => LoginPage(),
+          ),
+          GoRoute(
+            path: Routes.signupRelative,
+            builder: (context, state) => SignupPage(),
+            routes: [
+              GoRoute(
+                path: Routes.signupCompleteRelative,
+                builder: (context, state) => SignupCompletePage(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: Routes.resetPasswordRelative,
+            builder: (context, state) => ResetPasswordPage(),
+          ),
+        ],
+      ),
+    ],
+  );
+});
