@@ -26,7 +26,7 @@ abstract interface class AuthRepository {
     String selectedCharacterId = 'bear',
   });
 
-  /// 아이디를 사용하여 내부적으로 이메일 기반 로그인을 한다.
+  /// 아이디 또는 이메일을 사용하여 내부적으로 이메일 기반 로그인을 한다.
   Future<Result<User>> signInWithUsername({
     required String username,
     required String password,

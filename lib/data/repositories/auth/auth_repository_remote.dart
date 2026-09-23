@@ -11,10 +11,7 @@ final class AuthRepositoryRemote implements AuthRepository {
   final AuthService authService;
   final UserService userService;
 
-  AuthRepositoryRemote({
-    required this.authService,
-    required this.userService,
-  });
+  AuthRepositoryRemote({required this.authService, required this.userService});
 
   @override
   String? get currentUid {
@@ -152,12 +149,20 @@ final class AuthRepositoryRemote implements AuthRepository {
   }) async {
     final trimmed = username.trim();
     if (trimmed.isEmpty) {
-      return const Result.error(ValidationException('아이디를 입력해 주세요.'));
+      return const Result.error(ValidationException('아이디 또는 이메일을 입력해 주세요.'));
     }
     try {
-      final email = await userService.getEmailByUsername(username);
-      if (email == null) {
-        return const Result.error(NotFoundException('존재하지 않는 아이디입니다.'));
+      final String email;
+      if (trimmed.contains('@')) {
+        email = trimmed.toLowerCase();
+      } else {
+        final resolvedEmail = await userService.getEmailByUsername(
+          trimmed.toLowerCase(),
+        );
+        if (resolvedEmail == null) {
+          return const Result.error(NotFoundException('존재하지 않는 아이디입니다.'));
+        }
+        email = resolvedEmail;
       }
 
       final credential = await authService.signInWithEmailAndPassword(
@@ -170,7 +175,7 @@ final class AuthRepositoryRemote implements AuthRepository {
       }
 
       if (!credential.user!.emailVerified) {
-        await authService.resendVerificationEmail().catchError((_){});
+        await authService.resendVerificationEmail().catchError((_) {});
         await authService.signOut();
         return const Result.error(
           AuthException('이메일 인증이 완료되지 않았습니다. 메일함의 인증 링크를 먼저 확인해 주세요.'),
@@ -201,13 +206,11 @@ final class AuthRepositoryRemote implements AuthRepository {
 
   @override
   Future<Result<User>> signInWithGoogle() async {
-    // TODO: implement signInWithGoogle
     return const Result.error(AuthException('Google 로그인은 준비 중입니다.'));
   }
 
   @override
   Future<Result<User>> signInWithApple() async {
-    // TODO: implement signInWithApple
     return const Result.error(AuthException('Apple 로그인은 준비 중입니다.'));
   }
 

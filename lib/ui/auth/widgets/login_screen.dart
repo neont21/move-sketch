@@ -220,14 +220,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                   LabeledTextFormField(
-                    labelText: '아이디',
-                    hintText: '아이디',
+                    inputType: TextInputType.emailAddress,
+                    labelText: '아이디/이메일',
+                    hintText: '아이디/이메일',
                     controller: _usernameController,
                     enabled: !isLoading,
                     autoValidateMode: AutovalidateMode.onUserInteraction,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return '아이디를 입력해 주세요.';
+                        return '아이디 또는 이메일을 입력해 주세요.';
                       }
                       return null;
                     },
