@@ -29,7 +29,7 @@ class SessionResultService {
       return null;
     }
 
-    final result =  SessionResult.fromMap(doc.data()!, id: doc.id);
+    final result = SessionResult.fromMap(doc.data()!, id: doc.id);
     if (result.isDeleted) {
       return null;
     }
@@ -50,6 +50,26 @@ class SessionResultService {
 
     final doc = querySnapshot.docs.first;
     return SessionResult.fromMap(doc.data(), id: doc.id);
+  }
+
+  Future<List<DateTime>> getCompletedDatesSince({
+    required String userId,
+    required DateTime since,
+  }) async {
+    final querySnapshot = await _resultsRef
+        .where('userId', isEqualTo: userId)
+        .where(
+          'endedAt',
+          isGreaterThanOrEqualTo: since.toUtc().toIso8601String(),
+        )
+        .orderBy('endedAt', descending: true)
+        .get();
+    return querySnapshot.docs
+        .where((doc) => doc.data()['deletedAt'] == null)
+        .map(
+          (doc) => DateTime.parse(doc.data()['startedAt'] as String).toLocal(),
+        )
+        .toList();
   }
 
   Future<List<SessionResult>> getResultsByMonth({

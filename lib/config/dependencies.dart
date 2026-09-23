@@ -5,6 +5,8 @@ import '../data/repositories/auth/auth_repository.dart';
 import '../data/repositories/auth/auth_repository_remote.dart';
 import '../data/repositories/friendship/friendship_repository.dart';
 import '../data/repositories/friendship/friendship_repository_remote.dart';
+import '../data/repositories/location/location_repository.dart';
+import '../data/repositories/location/location_repository_local.dart';
 import '../data/repositories/notification/notification_repository.dart';
 import '../data/repositories/notification/notification_repository_remote.dart';
 import '../data/repositories/session/session_repository.dart';
@@ -18,6 +20,7 @@ import '../data/repositories/user/user_repository_remote.dart';
 import '../data/repositories/weather/weather_repository.dart';
 import '../data/repositories/weather/weather_repository_remote.dart';
 
+import '../data/services/hardware/location_service.dart';
 import '../data/services/local/database/app_database.dart';
 import '../data/services/local/session_service.dart';
 import '../data/services/remote/auth_service.dart';
@@ -85,6 +88,11 @@ final weatherServiceProvider = Provider<WeatherService>((ref) {
   return WeatherService(client: ref.watch(httpClientProvider));
 });
 
+/// LocationService Provider: 위치 권한 및 GPS 좌표 수집
+final locationServiceProvider = Provider<LocationService>((ref) {
+  return LocationService();
+});
+
 /// SketchPostService Provider: Firestore 기반 스케치와 응원 및 댓글 관리
 final sketchPostServiceProvider = Provider<SketchPostService>((ref) {
   return SketchPostService();
@@ -139,6 +147,14 @@ final sessionResultRepositoryProvider = Provider<SessionResultRepository>((ref) 
 final weatherRepositoryProvider = Provider<WeatherRepository>((ref) {
   return WeatherRepositoryRemote(
     weatherService: ref.watch(weatherServiceProvider),
+  );
+});
+
+/// LocationRepository Provider: 기기 위치 센서 및 GPS 좌표 관리 저장소
+/// 위치 권한 검증 및 1회성 현재 좌표 조회, 실시간 조깅 경로 추적 스트림 제공
+final locationRepositoryProvider = Provider<LocationRepository>((ref) {
+  return LocationRepositoryLocal(
+    locationService: ref.watch(locationServiceProvider),
   );
 });
 

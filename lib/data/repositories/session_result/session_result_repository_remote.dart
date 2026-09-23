@@ -93,6 +93,39 @@ final class SessionResultRepositoryRemote implements SessionResultRepository {
   }
 
   @override
+  Future<Result<List<bool>>> getWeeklyCompletionStatus(String userId) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final dMinus6 = today.subtract(const Duration(days: 6));
+
+    try {
+      final dates = await sessionResultService.getCompletedDatesSince(
+        userId: userId,
+        since: dMinus6,
+      );
+
+      final finishedDateSet = dates
+          .map((d) => DateTime(d.year, d.month, d.day))
+          .toSet();
+
+      final weeklyDone = List<bool>.generate(7, (i) {
+        final targetDate = today.subtract(Duration(days: 6 - i));
+        return finishedDateSet.contains(targetDate);
+      });
+
+      return Result.ok(weeklyDone);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '주간 운동 기록 조회 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('주간 운동 기록 조회 중 오류가 발생했습니다.', cause: e),
+      );
+    }
+  }
+
+  @override
   Future<Result<List<SessionResult>>> getResultsByMonth({
     required String userId,
     required int year,
