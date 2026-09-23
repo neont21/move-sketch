@@ -52,7 +52,7 @@ extension FirebaseAuthExceptionMapper on FirebaseAuthException {
       'weak-password' => AuthException('비밀번호는 6자리 이상이어야 합니다.', cause: this),
       'user-disabled' => AuthException('이용이 정지된 계정입니다.', cause: this),
       'too-many-requests' => AuthException(
-        '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+        '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
         cause: this,
       ),
       'requires-recent-login' => AuthException(

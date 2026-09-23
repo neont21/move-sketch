@@ -50,7 +50,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         .read(authNotifierProvider.notifier)
         .signIn(
           username: _usernameController.text.trim().toLowerCase(),
-          password: _passwordController.text.trim(),
+          password: _passwordController.text,
         );
 
     if (!mounted) {

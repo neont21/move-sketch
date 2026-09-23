@@ -17,7 +17,13 @@ final class AuthRepositoryRemote implements AuthRepository {
   });
 
   @override
-  String? get currentUid => authService.currentUid;
+  String? get currentUid {
+    final user = authService.currentUser;
+    if (user == null || !user.emailVerified) {
+      return null;
+    }
+    return user.uid;
+  }
 
   @override
   Stream<String?> get authStateChanges =>
@@ -161,6 +167,14 @@ final class AuthRepositoryRemote implements AuthRepository {
       final uid = credential.user?.uid;
       if (uid == null) {
         return const Result.error(AuthException('로그인에 실패하였습니다.'));
+      }
+
+      if (!credential.user!.emailVerified) {
+        await authService.resendVerificationEmail().catchError((_){});
+        await authService.signOut();
+        return const Result.error(
+          AuthException('이메일 인증이 완료되지 않았습니다. 메일함의 인증 링크를 먼저 확인해 주세요.'),
+        );
       }
 
       final user = await userService.getUserProfile(uid);
