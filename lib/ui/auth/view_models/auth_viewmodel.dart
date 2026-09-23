@@ -99,8 +99,8 @@ class AuthViewModel extends AsyncNotifier<User?> {
       case Ok(:final value):
         state = AsyncData(value);
         return result;
-      case Error(:final error):
-        state = AsyncError(error, StackTrace.current);
+      case Error():
+        state = AsyncData(null);
         return result;
     }
   }

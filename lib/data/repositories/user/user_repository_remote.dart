@@ -28,10 +28,12 @@ final class UserRepositoryRemote implements UserRepository {
 
   @override
   Future<Result<User?>> getCurrentUserProfile() async {
-    final uid = authService.currentUid;
-    if (uid == null) {
+    final user = authService.currentUser;
+    if (user == null || !user.emailVerified) {
       return const Result.error(AuthException('로그인된 사용자가 없습니다.'));
     }
+
+    final uid = user.uid;
     try {
       final user = await userService.getUserProfile(uid);
       return Result.ok(user);

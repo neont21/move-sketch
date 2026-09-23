@@ -23,8 +23,9 @@ final class AuthRepositoryRemote implements AuthRepository {
   }
 
   @override
-  Stream<String?> get authStateChanges =>
-      authService.authStateChanges.map((user) => user?.uid);
+  Stream<String?> get authStateChanges => authService.authStateChanges
+      .map((user) => (user == null || !user.emailVerified) ? null : user.uid)
+      .distinct();
 
   @override
   bool get isEmailVerified => authService.isEmailVerified;
