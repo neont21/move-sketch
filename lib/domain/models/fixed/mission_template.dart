@@ -67,12 +67,12 @@ class MissionTemplate {
       axis: MissionAxis.pace,
       activityType: ActivityType.jogging,
       title: '페이스',
-      unit: '분/km',
+      unit: '/km',
       partsSlot: SketchSlot.expression,
       tiers: const [
-        MissionTier(tier: 1, threshold: 8.0, description: '기분 좋은 가벼운 조깅'),
-        MissionTier(tier: 2, threshold: 7.0, description: '활력 넘치는 리듬 페이스'),
-        MissionTier(tier: 3, threshold: 6.0, description: '엄청난 속도'),
+        MissionTier(tier: 1, threshold: 480.0, description: '기분 좋은 가벼운 조깅'),
+        MissionTier(tier: 2, threshold: 420.0, description: '활력 넘치는 리듬 페이스'),
+        MissionTier(tier: 3, threshold: 360.0, description: '엄청난 속도'),
       ],
     ),
     MissionTemplate(
