@@ -18,6 +18,14 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
     required List<MissionInstancesTableCompanion> missions,
   }) {
     return transaction(() async {
+      await (delete(trackingSessionsTable)..where(
+            (t) =>
+                t.status.equalsValue(SessionStatus.active) |
+                t.status.equalsValue(SessionStatus.pausedAuto) |
+                t.status.equalsValue(SessionStatus.pausedManual),
+          ))
+          .go();
+
       await into(trackingSessionsTable).insert(session);
       for (final mission in missions) {
         await into(missionInstancesTable).insert(mission);
@@ -26,12 +34,15 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
   }
 
   Future<TrackingSessionsTableData?> getActiveSession() =>
-      (select(trackingSessionsTable)..where(
-            (t) =>
-                t.status.equalsValue(SessionStatus.active) |
-                t.status.equalsValue(SessionStatus.pausedAuto) |
-                t.status.equalsValue(SessionStatus.pausedManual),
-          ))
+      (select(trackingSessionsTable)
+            ..where(
+              (t) =>
+                  t.status.equalsValue(SessionStatus.active) |
+                  t.status.equalsValue(SessionStatus.pausedAuto) |
+                  t.status.equalsValue(SessionStatus.pausedManual),
+            )
+            ..orderBy([(t) => OrderingTerm.desc(t.startedAt)])
+            ..limit(1))
           .getSingleOrNull();
 
   Future<void> insertPoint(LocationPointsTableCompanion point) =>

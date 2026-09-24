@@ -58,10 +58,11 @@ class SessionPauseDialog extends ConsumerWidget {
           DialogActionButtons(
             confirmText: '계속하기',
             onConfirm: () {
-              context.pop();
+              context.pop(true);
             },
             cancelText: '여기서 종료',
             onCancel: () {
+              context.pop(false);
               context.go(Routes.sessionResult(trackingState.session.id));
             },
           ),
@@ -89,6 +90,7 @@ class SessionPauseDialog extends ConsumerWidget {
                       if (!context.mounted) {
                         return;
                       }
+                      context.pop(false);
                       context.go(Routes.home);
 
                       messenger.showSnackBar(

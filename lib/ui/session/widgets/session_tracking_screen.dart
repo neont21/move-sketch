@@ -51,7 +51,10 @@ class SessionTrackingScreen extends ConsumerWidget {
               child: Column(
                 spacing: 20,
                 children: [
-                  PathTrackerView.fromLocationPoints(points: state.pathPoints, isTracking: true,),
+                  PathTrackerView.fromLocationPoints(
+                    points: state.pathPoints,
+                    isTracking: true,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -119,11 +122,15 @@ class SessionTrackingScreen extends ConsumerWidget {
                             if (!context.mounted) {
                               return;
                             }
-                            await showDialog(
+                            final shouldResume = await showDialog<bool>(
                               context: context,
-                              builder: (context) =>
-                                  Dialog(child: SessionPauseDialog(trackingState: state)),
+                              builder: (context) => Dialog(
+                                child: SessionPauseDialog(trackingState: state),
+                              ),
                             );
+                            if (shouldResume != true) {
+                              return;
+                            }
                             if (!context.mounted) {
                               return;
                             }
@@ -142,7 +149,9 @@ class SessionTrackingScreen extends ConsumerWidget {
                           child: HoldButton(
                             title: '종료',
                             onActionTriggered: () {
-                              context.go(Routes.sessionResult(state.session.id));
+                              context.go(
+                                Routes.sessionResult(state.session.id),
+                              );
                             },
                           ),
                         ),
