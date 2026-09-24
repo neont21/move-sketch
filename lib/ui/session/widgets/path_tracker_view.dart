@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -9,6 +11,7 @@ class PathTrackerView extends StatefulWidget {
   final LatLng? initialCenter;
   final double initialZoom;
   final bool isTracking;
+  final double? heading;
 
   const PathTrackerView({
     super.key,
@@ -16,6 +19,7 @@ class PathTrackerView extends StatefulWidget {
     this.initialCenter,
     this.initialZoom = 15.0,
     this.isTracking = false,
+    this.heading,
   });
 
   factory PathTrackerView.fromLocationPoints({
@@ -33,6 +37,7 @@ class PathTrackerView extends StatefulWidget {
       initialCenter: initialCenter,
       initialZoom: initialZoom,
       isTracking: isTracking,
+      heading: points.lastOrNull?.heading,
     );
   }
 
@@ -43,14 +48,41 @@ class PathTrackerView extends StatefulWidget {
 class _PathTrackerViewState extends State<PathTrackerView> {
   late MapController _mapController;
   bool _isMapReady = false;
+  double _currentBearing = 0.0;
 
   static const LatLng _defaultCenterSeoul = LatLng(37.5665, 126.9780);
+
+  double _calculateBearing(LatLng start, LatLng end) {
+    const degToRad = math.pi / 180.0;
+    final lat1 = start.latitude * degToRad;
+    final lat2 = end.latitude * degToRad;
+    final dLon = (end.longitude - start.longitude) * degToRad;
+    final y = math.sin(dLon) * math.cos(lat2);
+    final x = math.cos(lat1) * math.sin(lat2) -
+        math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
+    return math.atan2(y, x);
+  }
+
+  void _updateBearing() {
+    if (widget.heading != null && widget.heading! > 0) {
+      _currentBearing = widget.heading! * (math.pi / 180.0);
+      return;
+    }
+    if (widget.gpsPoints.length >= 2) {
+      final last = widget.gpsPoints.last;
+      final prev = widget.gpsPoints[widget.gpsPoints.length - 2];
+      if (last.latitude != prev.latitude || last.longitude != prev.longitude) {
+        _currentBearing = _calculateBearing(prev, last);
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
     _mapController = MapController();
+    _updateBearing();
   }
 
   @override
@@ -64,6 +96,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
   void didUpdateWidget(covariant PathTrackerView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    _updateBearing();
     if (_isMapReady && widget.isTracking && widget.gpsPoints.isNotEmpty) {
       final lastestPoint = widget.gpsPoints.last;
       final oldLastPoint = oldWidget.gpsPoints.lastOrNull;
@@ -101,7 +134,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
           point: widget.gpsPoints.last,
           child: widget.isTracking
               ? Transform.rotate(
-                  angle: 0,
+                  angle: _currentBearing,
                   child: Icon(
                     Icons.navigation,
                     color: colorScheme.primary,
