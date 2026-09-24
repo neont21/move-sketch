@@ -13,7 +13,7 @@ enum MissionAxis {
     unit: '/km',
     slot: SketchSlot.expression,
     description: '조깅 중 1km를 이동하는 데 걸린 평균 시간',
-      lowerIsBetter: true
+    lowerIsBetter: true,
   ),
   speed(
     label: '속도',
@@ -67,7 +67,7 @@ enum MissionAxis {
     required this.unit,
     required this.slot,
     required this.description,
-    this.lowerIsBetter=false,
+    this.lowerIsBetter = false,
   });
 
   bool isAchieved({required double value, required double threshold}) {
@@ -76,6 +76,19 @@ enum MissionAxis {
 
   int compareThresholds(double a, double b) {
     return lowerIsBetter ? a.compareTo(b) : b.compareTo(a);
+  }
+
+  String formatValue(double value) {
+    return switch (this) {
+      MissionAxis.distance ||
+      MissionAxis.routeExploration => value.toStringAsFixed(2),
+      MissionAxis.pace =>
+        value <= 0
+            ? '-\' --\'\''
+            : '${value.round() ~/ 60}\' ${(value.round() % 60).toString().padLeft(2, '0')}\'\'',
+      MissionAxis.speed => value.toStringAsFixed(1),
+      _ => value.round().toString(),
+    };
   }
 
   static MissionAxis fromString(String? value) {

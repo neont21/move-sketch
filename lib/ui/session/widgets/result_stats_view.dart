@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import '../../../domain/models/mock_mission_data.dart';
 import '../../../domain/models/mock_session_data.dart';
-import 'session_tracking_screen.dart';
+
+const uuid = Uuid();
 
 class ResultStatsView extends StatelessWidget {
   ResultStatsView({super.key});

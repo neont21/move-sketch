@@ -1,29 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../domain/models/mock_mission_data.dart';
-import '../../../domain/models/mock_session_data.dart';
 import '../../../routing/routes.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
 import '../../core/widgets/system_alert_dialog.dart';
-import 'session_tracking_screen.dart';
+import '../view_models/session_tracking_viewmodel.dart';
 
-class SessionPauseDialog extends StatelessWidget {
-  SessionPauseDialog({super.key});
-  final _sessionData = MockSessionData(
-    id: uuid.v7(),
-    minutes: 18,
-    seconds: 42,
-    km: 3.1,
-    kcal: 186,
-  );
-  final List<MockMissionData> _missionStats = [
-    MockMissionData(title: '페이스', data: '6\' 17\'\'', unit: '/km'),
-    MockMissionData(title: '지속 시간', data: '18', unit: '분'),
-  ];
+class SessionPauseDialog extends ConsumerWidget {
+  final SessionTrackingState trackingState;
+
+  const SessionPauseDialog({super.key, required this.trackingState});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     TextTheme textTheme = Theme.of(context).textTheme;
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -34,41 +23,37 @@ class SessionPauseDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('여기까지 ${_sessionData.km}km 왔어요', style: textTheme.headlineSmall),
+          Text(
+            '여기까지 ${trackingState.distanceInKm.toStringAsFixed(2)}km 왔어요',
+            style: textTheme.headlineSmall,
+          ),
           Text('잠시 쉬었다 가도 괜찮아요.', style: textTheme.labelMedium),
           Divider(),
-          Text(
-            '지금 종료하면',
-            style: textTheme.labelSmall?.copyWith(color: colorScheme.secondary),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${_missionStats[0].title} · 충분히 해냈어요',
-                style: textTheme.labelMedium,
+          if (trackingState.missions.isNotEmpty) ...[
+            Text(
+              '지금 종료하면',
+              style: textTheme.labelSmall?.copyWith(
+                color: colorScheme.secondary,
               ),
-              Text(
-                '${_missionStats[0].data}${_missionStats[0].unit}',
-                style: textTheme.labelLarge,
+            ),
+            ...trackingState.missions.map(
+              (mission) => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '${mission.axis.label} · ${mission.tierComment}',
+                    style: textTheme.labelMedium,
+                  ),
+                  Text(
+                    '${mission.formattedValue}${mission.axis.unit}',
+                    style: textTheme.labelLarge,
+                  ),
+                ],
               ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${_missionStats[1].title} · 무난히 해냈어요',
-                style: textTheme.labelMedium,
-              ),
-              Text(
-                '${_missionStats[1].data}${_missionStats[1].unit}',
-                style: textTheme.labelLarge,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 8),
+          ],
           const SizedBox(height: 16),
           DialogActionButtons(
             confirmText: '계속하기',
@@ -77,21 +62,41 @@ class SessionPauseDialog extends StatelessWidget {
             },
             cancelText: '여기서 종료',
             onCancel: () {
-              context.go(Routes.sessionResult(_sessionData.id));
+              context.go(Routes.sessionResult(trackingState.session.id));
             },
           ),
           GestureDetector(
             onTap: () {
               showDialog(
                 context: context,
-                builder: (context) => Dialog(
+                builder: (dialogContext) => Dialog(
                   child: SystemAlertDialog(
                     title: '정말 기록을 남기지 않나요?',
                     description: '기록을 남기지 않고 종료하면 되돌릴 수 없어요.',
                     confirmText: '그래도 종료',
-                    onConfirm: () {
-                      context.pop();
+                    onConfirm: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+
+                      await ref
+                          .read(sessionTrackingViewModelProvider.notifier)
+                          .discardSession();
+
+                      if (!dialogContext.mounted) {
+                        return;
+                      }
+                      dialogContext.pop();
+
+                      if (!context.mounted) {
+                        return;
+                      }
                       context.go(Routes.home);
+
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('세션 기록을 저장하지 않고 종료했습니다.'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
                     },
                   ),
                 ),

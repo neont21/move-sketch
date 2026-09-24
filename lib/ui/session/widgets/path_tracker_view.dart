@@ -2,33 +2,116 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../domain/models/session/location_point.dart';
+
 class PathTrackerView extends StatefulWidget {
-  const PathTrackerView({super.key});
+  final List<LatLng> gpsPoints;
+  final LatLng? initialCenter;
+  final double initialZoom;
+  final bool isTracking;
+
+  const PathTrackerView({
+    super.key,
+    this.gpsPoints = const [],
+    this.initialCenter,
+    this.initialZoom = 15.0,
+    this.isTracking = false,
+  });
+
+  factory PathTrackerView.fromLocationPoints({
+    Key? key,
+    required List<LocationPoint> points,
+    LatLng? initialCenter,
+    double initialZoom = 15.0,
+    bool isTracking = true,
+  }) {
+    return PathTrackerView(
+      key: key,
+      gpsPoints: points
+          .map((point) => LatLng(point.latitude, point.longitude))
+          .toList(),
+      initialCenter: initialCenter,
+      initialZoom: initialZoom,
+      isTracking: isTracking,
+    );
+  }
 
   @override
   State<PathTrackerView> createState() => _PathTrackerViewState();
 }
 
 class _PathTrackerViewState extends State<PathTrackerView> {
-  final List<LatLng> _gpsRoute = [
-    // sample data
-    LatLng(37.5285, 126.9330),
-    LatLng(37.5290, 126.9350),
-    LatLng(37.5298, 126.9372),
-    LatLng(37.5305, 126.9395),
-    LatLng(37.5312, 126.9418),
-    LatLng(37.5320, 126.9440),
-    LatLng(37.5332, 126.9465),
-    LatLng(37.5340, 126.9490),
-    LatLng(37.5348, 126.9515),
-    LatLng(37.5352, 126.9540),
-    LatLng(37.5358, 126.9568),
-    LatLng(37.5362, 126.9595),
-  ];
+  late MapController _mapController;
+  bool _isMapReady = false;
+
+  static const LatLng _defaultCenterSeoul = LatLng(37.5665, 126.9780);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _mapController = MapController();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant PathTrackerView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_isMapReady && widget.isTracking && widget.gpsPoints.isNotEmpty) {
+      final lastestPoint = widget.gpsPoints.last;
+      final oldLastPoint = oldWidget.gpsPoints.lastOrNull;
+      if (oldLastPoint == null || lastestPoint != oldLastPoint) {
+        _mapController.move(lastestPoint, _mapController.camera.zoom);
+      }
+    }
+  }
+
+  LatLng get _resolvedCenter {
+    if (widget.gpsPoints.isNotEmpty) {
+      return widget.gpsPoints.last;
+    }
+    return widget.initialCenter ?? _defaultCenterSeoul;
+  }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final markers = <Marker>[];
+    if (widget.gpsPoints.isNotEmpty) {
+      markers.add(
+        Marker(
+          point: widget.gpsPoints.first,
+          width: 14,
+          height: 14,
+          child: Icon(Icons.circle, color: colorScheme.primary, size: 12),
+        ),
+      );
+    }
+    if (widget.gpsPoints.length > 1) {
+      markers.add(
+        Marker(
+          point: widget.gpsPoints.last,
+          child: widget.isTracking
+              ? Transform.rotate(
+                  angle: 0,
+                  child: Icon(
+                    Icons.navigation,
+                    color: colorScheme.primary,
+                    size: 24,
+                  ),
+                )
+              : Icon(Icons.location_on, color: colorScheme.secondary, size: 24),
+        ),
+      );
+    }
 
     return FractionallySizedBox(
       widthFactor: 1,
@@ -41,56 +124,32 @@ class _PathTrackerViewState extends State<PathTrackerView> {
           ),
           clipBehavior: Clip.hardEdge,
           child: FlutterMap(
+            mapController: _mapController,
             options: MapOptions(
-              initialCenter: _gpsRoute.last,
-              initialZoom: 13,
+              initialCenter: _resolvedCenter,
+              initialZoom: widget.initialZoom,
+              onMapReady: () {
+                _isMapReady = true;
+              },
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.none,
               ),
             ),
-              children: [
+            children: [
+              if (widget.gpsPoints.isNotEmpty)
                 PolylineLayer(
                   polylines: [
                     Polyline(
-                      points: _gpsRoute,
+                      points: widget.gpsPoints,
                       color: colorScheme.primary,
                       strokeWidth: 2,
                     ),
                   ],
                 ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: _gpsRoute.first,
-                      width: 14,
-                      height: 14,
-                      child: Icon(
-                        Icons.circle,
-                        color: colorScheme.primary,
-                        size: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: _gpsRoute.last,
-                      width: 26,
-                      height: 26,
-                      child: Transform.rotate(
-                        angle: 1,
-                        child: Icon(
-                          Icons.navigation,
-                          color: colorScheme.primary,
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ]),
-        )
+              if (markers.isNotEmpty) MarkerLayer(markers: markers),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -122,6 +122,17 @@ class MissionInstance {
     );
   }
 
+  String get formattedValue => axis.formatValue(currentValue);
+
+  String get tierComment {
+    return switch (achievedTier) {
+      1 => '무난히 해냈어요',
+      2 => '충분히 해냈어요',
+      3 => '완벽히 해냈어요',
+      _ => '좋은 시작이에요',
+    };
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
