@@ -244,6 +244,6 @@ class SessionStartViewModel extends Notifier<SessionStartState> {
 }
 
 final sessionStartViewModelProvider =
-    NotifierProvider<SessionStartViewModel, SessionStartState>(() {
+    NotifierProvider.autoDispose<SessionStartViewModel, SessionStartState>(() {
       return SessionStartViewModel();
     });
