@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 import '../../../data/services/local/database/app_database.dart';
 import '../enums/mission_axis.dart';
 import '../fixed/mission_template.dart';
@@ -25,6 +26,23 @@ class MissionInstance {
     this.achievedTier = 0,
     this.partId,
   });
+
+  factory MissionInstance.fromTemplate({
+    required MissionTemplate template,
+    String? id,
+    String sessionId = '',
+    double? baselineValue,
+  }) {
+    return MissionInstance(
+      id: id ?? const Uuid().v7(),
+      sessionId: sessionId,
+      missionTemplateId: template.id,
+      axis: template.axis,
+      baselineValue: baselineValue,
+      currentValue: 0.0,
+      achievedTier: 0,
+    );
+  }
 
   MissionInstance evaluateWith(double newValue, MissionTemplate template) {
     final tier = template.evaluateTier(newValue);

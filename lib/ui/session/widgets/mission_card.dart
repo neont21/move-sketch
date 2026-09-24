@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../domain/models/mock_mission.dart';
+import '../../../domain/models/fixed/mission_template.dart';
 
 class MissionCard extends StatelessWidget {
-  final MockMission mission;
+  final MissionTemplate mission;
+  final String description;
   final bool isSelected;
   final VoidCallback onTap;
+
   const MissionCard({
     super.key,
     required this.mission,
+    required this.description,
     required this.isSelected,
     required this.onTap,
   });
@@ -21,7 +24,7 @@ class MissionCard extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
         title: Text(mission.title, style: textTheme.bodyLarge),
-        subtitle: Text(mission.description, style: textTheme.bodyMedium),
+        subtitle: Text(description, style: textTheme.bodyMedium),
         trailing: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
@@ -30,7 +33,7 @@ class MissionCard extends StatelessWidget {
           width: 60,
           height: 28,
           child: Center(
-            child: Text(mission.parts, style: textTheme.bodyMedium),
+            child: Text(mission.partsSlot.label, style: textTheme.bodyMedium),
           ),
         ),
         shape: RoundedRectangleBorder(

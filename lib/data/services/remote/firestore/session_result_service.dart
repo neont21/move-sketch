@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../../domain/models/enums/activity_type.dart';
 import '../../../../domain/models/session/session_result.dart';
 
 class SessionResultService {
@@ -123,5 +124,23 @@ class SessionResultService {
       'deletedAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  Future<List<SessionResult>> getRecentResults({
+    required String userId,
+    required ActivityType activityType,
+    int limit = 5,
+  }) async {
+    final querySnapshot = await _resultsRef
+        .where('userId', isEqualTo: userId)
+        .where('activityType', isEqualTo: activityType.name)
+        .orderBy('endedAt', descending: true)
+        .limit(limit)
+        .get();
+
+    return querySnapshot.docs
+        .map((doc) => SessionResult.fromMap(doc.data(), id: doc.id))
+        .where((result) => !result.isDeleted)
+        .toList();
   }
 }

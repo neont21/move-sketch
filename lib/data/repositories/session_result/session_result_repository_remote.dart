@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:firebase_core/firebase_core.dart';
+import '../../../domain/models/enums/activity_type.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -81,6 +82,31 @@ final class SessionResultRepositoryRemote implements SessionResultRepository {
     try {
       final result = await sessionResultService.getLatestResult(userId);
       return Result.ok(result);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '세션 결과 조회 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('세션 결과 조회 중 오류가 발생했습니다.', cause: e),
+      );
+    }
+  }
+
+  @override
+  Future<Result<List<SessionResult>>> getRecentResults({
+    required String userId,
+    required ActivityType activityType,
+    int limit = 5,
+  }) async {
+    try {
+      final results = await sessionResultService.getRecentResults(
+        userId: userId,
+        activityType: activityType,
+        limit: limit,
+      );
+
+      return Result.ok(results);
     } on FirebaseException catch (e) {
       return Result.error(
         e.toAppException(defaultMessage: '세션 결과 조회 중 오류가 발생했습니다.'),

@@ -1,61 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
-import '../../../domain/models/mock_mission.dart';
+import '../../../domain/models/enums/activity_type.dart';
 import '../../../routing/routes.dart';
+import '../../../utils/exceptions.dart';
+import '../../../utils/result.dart';
+import '../../auth/view_models/auth_viewmodel.dart';
+import '../view_models/session_start_viewmodel.dart';
 import 'mission_card.dart';
 
-class SessionStartScreen extends StatefulWidget {
+class SessionStartScreen extends ConsumerWidget {
   const SessionStartScreen({super.key});
 
   @override
-  State<SessionStartScreen> createState() => _SessionStartScreenState();
-}
-
-class _SessionStartScreenState extends State<SessionStartScreen> {
-  bool _isJogging = true;
-
-  final List<MockMission> _joggingMissions = [
-    MockMission(title: '거리', description: '최근 평균 3.2km', parts: '배경'),
-    MockMission(title: '페이스', description: '최근 평균 7분 20초/km', parts: '표정'),
-    MockMission(title: '지속 시간', description: '최근 평균 22분', parts: '의상'),
-    MockMission(title: '경로 탐색', description: '최근 평균 새 도로 0.8km', parts: '소품'),
-    MockMission(title: '인터벌', description: '최근 평균 2회 반복', parts: '이펙트'),
-  ];
-
-  final List<MockMission> _ridingMissions = [
-    MockMission(title: '거리', description: '최근 평균 6.5km', parts: '배경'),
-    MockMission(title: '속도', description: '최근 평균 18km/h', parts: '표정'),
-    MockMission(title: '지속 시간', description: '최근 평균 25분', parts: '의상'),
-    MockMission(title: '경로 탐색', description: '최근 평균 새 도로 1.4km', parts: '소품'),
-    MockMission(title: '스프린트', description: '최근 평균 1.6회 반복', parts: '이펙트'),
-  ];
-
-  late List<MockMission> _currentMissions;
-  final List<int> _selectedIndices = [];
-  void _handleCardTapped(int index) {
-    setState(() {
-      if (_selectedIndices.contains(index)) {
-        _selectedIndices.remove(index);
-      } else {
-        if (_selectedIndices.length >= 2) {
-          _selectedIndices.removeAt(0);
-        }
-        _selectedIndices.add(index);
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _currentMissions = _isJogging ? _joggingMissions : _ridingMissions;
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final state = ref.watch(sessionStartViewModelProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -72,16 +34,13 @@ class _SessionStartScreenState extends State<SessionStartScreen> {
           child: Column(
             spacing: 20,
             children: [
-              AnimatedToggleSwitch<bool>.size(
-                current: _isJogging,
-                values: const [true, false],
-                onChanged: (val) {
-                  setState(() {
-                    _isJogging = val;
-                    _currentMissions = _isJogging
-                        ? _joggingMissions
-                        : _ridingMissions;
-                  });
+              AnimatedToggleSwitch<ActivityType>.size(
+                current: state.activityType,
+                values: ActivityType.values,
+                onChanged: (type) {
+                  ref
+                      .read(sessionStartViewModelProvider.notifier)
+                      .setActivityType(type);
                 },
                 selectedIconScale: 1.0,
                 height: 48,
@@ -94,12 +53,11 @@ class _SessionStartScreenState extends State<SessionStartScreen> {
                 ),
                 borderWidth: 4,
                 iconBuilder: (value) {
-                  final text = value ? '조깅' : '라이딩';
                   return Center(
                     child: Text(
-                      text,
+                      value.label,
                       style: textTheme.bodyLarge?.copyWith(
-                        color: (value == _isJogging)
+                        color: (value == state.activityType)
                             ? colorScheme.onPrimary
                             : colorScheme.tertiaryFixed,
                       ),
@@ -109,25 +67,30 @@ class _SessionStartScreenState extends State<SessionStartScreen> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: _currentMissions.length + 1,
+                  itemCount: state.missions.length + 1,
                   itemBuilder: (context, index) {
                     if (index == 0) {
                       return ListTile(
                         title: Text('오늘의 미션', style: textTheme.headlineSmall),
                         trailing: Text(
-                          '최대 두 개까지 선택 가능 (${_selectedIndices.length}/2)',
+                          '최대 두 개까지 선택 가능 (${state.selectedMissionIds.length}/2)',
                           style: textTheme.bodySmall,
                         ),
                       );
                     }
-                    final mission = _currentMissions[index - 1];
-                    final bool isSelected = _selectedIndices.contains(
-                      index - 1,
+                    final mission = state.missions[index - 1];
+                    final bool isSelected = state.selectedMissionIds.contains(
+                      mission.id,
                     );
                     return MissionCard(
                       mission: mission,
+                      description: state.getMissionDescription(mission),
                       isSelected: isSelected,
-                      onTap: () => _handleCardTapped(index - 1),
+                      onTap: () {
+                        ref
+                            .read(sessionStartViewModelProvider.notifier)
+                            .toggleMission(mission.id);
+                      },
                     );
                   },
                 ),
@@ -136,10 +99,43 @@ class _SessionStartScreenState extends State<SessionStartScreen> {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () {
-                    context.go(Routes.sessionTracking);
-                  },
-                  child: Text(_isJogging ? '조깅 시작' : '라이딩 시작'),
+                  onPressed: state.isLoading
+                      ? null
+                      : () async {
+                          final user = await ref.read(
+                            authViewModelProvider.future,
+                          );
+                          if (user == null) {
+                            return;
+                          }
+
+                          final result = await ref
+                              .read(sessionStartViewModelProvider.notifier)
+                              .startSession(user.uid);
+
+                          if (!context.mounted) {
+                            return;
+                          }
+
+                          switch (result) {
+                            case Ok():
+                              context.go(Routes.sessionTracking);
+                            case Error(:final error):
+                              final errorMessage = error is AppException
+                                  ? error.message
+                                  : '세션 시작 중 오류가 발생했습니다.';
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(errorMessage)),
+                              );
+                          }
+                        },
+                  child: state.isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text('${state.activityType.label} 시작'),
                 ),
               ),
             ],
