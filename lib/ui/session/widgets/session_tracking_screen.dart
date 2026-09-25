@@ -29,140 +29,147 @@ class SessionTrackingScreen extends ConsumerWidget {
 
     final trackingState = ref.watch(sessionTrackingViewModelProvider);
 
-    return Scaffold(
-      body: SafeArea(
-        child: trackingState.when(
-          loading: () => Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Text(
-                error is AppException
-                    ? error.message
-                    : '세션 데이터를 불러오는 중 오류가 발생했습니다.',
-                style: textTheme.bodyMedium,
-                textAlign: TextAlign.center,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: SafeArea(
+          child: trackingState.when(
+            loading: () => Center(child: CircularProgressIndicator()),
+            error: (error, _) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  error is AppException
+                      ? error.message
+                      : '세션 데이터를 불러오는 중 오류가 발생했습니다.',
+                  style: textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
-          ),
-          data: (state) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                spacing: 20,
-                children: [
-                  PathTrackerView.fromLocationPoints(
-                    points: state.pathPoints,
-                    isTracking: true,
-                    isPaused: state.isPaused,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '움직인 시간\n',
-                              style: textTheme.bodyMedium,
-                            ),
-                            TextSpan(
-                              text: _formatDuration(state.elapsedDuration),
-                              style: textTheme.headlineLarge,
-                            ),
-                          ],
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '이동 거리\n',
-                              style: textTheme.bodyMedium,
-                            ),
-                            TextSpan(
-                              text:
-                                  '${state.distanceInKm.toStringAsFixed(2)}km',
-                              style: textTheme.headlineLarge,
-                            ),
-                          ],
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '소모 칼로리\n',
-                              style: textTheme.bodyMedium,
-                            ),
-                            TextSpan(
-                              text: '${state.caloriesBurned}kcal',
-                              style: textTheme.headlineLarge,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Divider(),
-                  Row(children: [Text('오늘의 미션', style: textTheme.bodySmall)]),
-                  SessionStatsView(missions: state.missions),
-                  Spacer(),
-                  Row(
-                    spacing: 20,
-                    children: [
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: IconButton(
-                          onPressed: () async {
-                            final notifier = ref.read(
-                              sessionTrackingViewModelProvider.notifier,
-                            );
-                            await notifier.pauseSession();
-                            if (!context.mounted) {
-                              return;
-                            }
-                            final shouldResume = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => Dialog(
-                                child: SessionPauseDialog(trackingState: state),
+            data: (state) {
+              return Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  spacing: 20,
+                  children: [
+                    PathTrackerView.fromLocationPoints(
+                      points: state.pathPoints,
+                      isTracking: true,
+                      isPaused: state.isPaused,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '움직인 시간\n',
+                                style: textTheme.bodyMedium,
                               ),
-                            );
-                            if (shouldResume != true) {
-                              return;
-                            }
-                            if (!context.mounted) {
-                              return;
-                            }
-                            await notifier.resumeSession();
-                          },
-                          icon: Icon(Icons.pause),
-                          color: colorScheme.tertiaryContainer,
-                          style: IconButton.styleFrom(
-                            backgroundColor: colorScheme.outline,
+                              TextSpan(
+                                text: _formatDuration(state.elapsedDuration),
+                                style: textTheme.headlineLarge,
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: SizedBox(
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '이동 거리\n',
+                                style: textTheme.bodyMedium,
+                              ),
+                              TextSpan(
+                                text:
+                                    '${state.distanceInKm.toStringAsFixed(2)}km',
+                                style: textTheme.headlineLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '소모 칼로리\n',
+                                style: textTheme.bodyMedium,
+                              ),
+                              TextSpan(
+                                text: '${state.caloriesBurned}kcal',
+                                style: textTheme.headlineLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+                    Row(children: [Text('오늘의 미션', style: textTheme.bodySmall)]),
+                    SessionStatsView(missions: state.missions),
+                    Spacer(),
+                    Row(
+                      spacing: 20,
+                      children: [
+                        SizedBox(
+                          width: 60,
                           height: 60,
-                          child: HoldButton(
-                            title: '종료',
-                            onActionTriggered: () {
-                              context.go(
-                                Routes.sessionResult(state.session.id),
+                          child: IconButton(
+                            onPressed: () async {
+                              final notifier = ref.read(
+                                sessionTrackingViewModelProvider.notifier,
                               );
+                              await notifier.pauseSession();
+                              if (!context.mounted) {
+                                return;
+                              }
+                              final shouldResume = await showDialog<bool>(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => PopScope(
+                                  canPop: false,
+                                  child: Dialog(
+                                    child: SessionPauseDialog(trackingState: state),
+                                  ),
+                                ),
+                              );
+                              if (shouldResume != true) {
+                                return;
+                              }
+                              if (!context.mounted) {
+                                return;
+                              }
+                              await notifier.resumeSession();
                             },
+                            icon: Icon(Icons.pause),
+                            color: colorScheme.tertiaryContainer,
+                            style: IconButton.styleFrom(
+                              backgroundColor: colorScheme.outline,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
+                        Expanded(
+                          child: SizedBox(
+                            height: 60,
+                            child: HoldButton(
+                              title: '종료',
+                              onActionTriggered: () {
+                                context.go(
+                                  Routes.sessionResult(state.session.id),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
