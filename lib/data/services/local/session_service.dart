@@ -61,6 +61,22 @@ class SessionService {
     );
   }
 
+  Future<TrackingSession?> getSessionById(String sessionId) async {
+    final sessionRow = await _dao.getSessionById(sessionId);
+    if (sessionRow == null) {
+      return null;
+    }
+
+    final pointsRows = await _dao.getPoints(sessionId);
+    final missionRows = await _dao.getMissions(sessionId);
+
+    return TrackingSession.fromEntity(
+      sessionRow: sessionRow,
+      pointsRows: pointsRows,
+      missionsRows: missionRows,
+    );
+  }
+
   Future<void> insertPoint({
     required String sessionId,
     required LocationPoint point,

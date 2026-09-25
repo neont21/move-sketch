@@ -30,6 +30,16 @@ final class SessionRepositoryLocal implements SessionRepository {
   }
 
   @override
+  Future<Result<TrackingSession?>> getSession(String sessionId) async {
+    try {
+      final session = await sessionService.getSessionById(sessionId);
+      return Result.ok(session);
+    } catch (e) {
+      return Result.error(SessionException('세션 조회에 실패했습니다.', cause: e));
+    }
+  }
+
+  @override
   Future<Result<TrackingSession>> startSession({
     required String userId,
     required ActivityType activityType,
@@ -130,8 +140,8 @@ final class SessionRepositoryLocal implements SessionRepository {
     String? resultSketchImageUrl,
   }) async {
     try {
-      final session = await sessionService.getActiveSession();
-      if (session == null || session.id != sessionId) {
+      final session = await sessionService.getSessionById(sessionId);
+      if (session == null) {
         return Result.error(
           NotFoundException('완료할 활성 세션(id: $sessionId)을 찾을 수 없습니다.'),
         );

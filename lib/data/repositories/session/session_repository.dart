@@ -7,8 +7,11 @@ import '../../../domain/models/session/tracking_session.dart';
 import '../../../utils/result.dart';
 
 abstract interface class SessionRepository {
-  /// 진행 중인 세션이 있는지 조회한다. (세션 종료 또는 세션 복구 시 1회 호출)
+  /// 진행 중인 세션이 있는지 조회한다. (앱 실행 시 세션 복구)
   Future<Result<TrackingSession?>> getActiveSession();
+
+  /// 특정 세션 데이터를 조회한다. (세션 결과 화면)
+  Future<Result<TrackingSession?>> getSession(String sessionId);
 
   /// 세션 항목을 추가하고 선택한 미션 항목들도 선택한 만큼 추가한다. (세션 시작 시점 1회 호출)
   Future<Result<TrackingSession>> startSession({

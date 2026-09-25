@@ -45,6 +45,11 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
             ..limit(1))
           .getSingleOrNull();
 
+  Future<TrackingSessionsTableData?> getSessionById(String sessionId) =>
+      (select(
+        trackingSessionsTable,
+      )..where((session) => session.id.equals(sessionId))).getSingleOrNull();
+
   Future<void> insertPoint(LocationPointsTableCompanion point) =>
       into(locationPointsTable).insert(point);
 

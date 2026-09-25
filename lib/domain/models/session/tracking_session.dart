@@ -65,6 +65,8 @@ class TrackingSession {
   LocationPoint? get lastLocation =>
       pathPoints.isNotEmpty ? pathPoints.last : null;
 
+  DateTime get endedAt => lastLocation?.timestamp ?? startedAt.add(elapsedDuration);
+
   bool get isValidSession => distanceInMeters >= 10.0 && pathPoints.length >= 3;
 
   TrackingSession addPoint(LocationPoint point) {

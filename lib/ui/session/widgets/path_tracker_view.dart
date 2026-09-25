@@ -102,20 +102,38 @@ class _PathTrackerViewState extends State<PathTrackerView> {
     super.didUpdateWidget(oldWidget);
 
     _updateBearing();
-    if (_isMapReady && widget.isTracking && widget.gpsPoints.isNotEmpty) {
-      final lastestPoint = widget.gpsPoints.last;
-      final oldLastPoint = oldWidget.gpsPoints.lastOrNull;
-      if (oldLastPoint == null || lastestPoint != oldLastPoint) {
-        _mapController.move(lastestPoint, _mapController.camera.zoom);
+    if (_isMapReady) {
+      if (widget.isTracking && widget.gpsPoints.isNotEmpty) {
+        final lastestPoint = widget.gpsPoints.last;
+        final oldLastPoint = oldWidget.gpsPoints.lastOrNull;
+
+        if (oldLastPoint == null || lastestPoint != oldLastPoint) {
+          _mapController.move(lastestPoint, _mapController.camera.zoom);
+        }
+      } else if (!widget.isTracking && widget.gpsPoints.length >= 2) {
+        if (oldWidget.gpsPoints != widget.gpsPoints) {
+          _mapController.fitCamera(
+            CameraFit.bounds(
+              bounds: LatLngBounds.fromPoints(widget.gpsPoints),
+              padding: const EdgeInsets.all(28.0),
+              maxZoom: 17.0,
+            ),
+          );
+        }
       }
     }
   }
 
   LatLng get _resolvedCenter {
-    if (widget.gpsPoints.isNotEmpty) {
+    if (widget.gpsPoints.isEmpty) {
+      return widget.initialCenter ?? _defaultCenterSeoul;
+    }
+    if (widget.isTracking) {
       return widget.gpsPoints.last;
     }
-    return widget.initialCenter ?? _defaultCenterSeoul;
+
+    final bounds = LatLngBounds.fromPoints(widget.gpsPoints);
+    return bounds.center;
   }
 
   @override
@@ -164,6 +182,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
         aspectRatio: 1.2,
         child: Container(
           decoration: BoxDecoration(
+            color: colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: colorScheme.outline),
           ),
@@ -175,12 +194,32 @@ class _PathTrackerViewState extends State<PathTrackerView> {
               initialZoom: widget.initialZoom,
               onMapReady: () {
                 _isMapReady = true;
+                if (!widget.isTracking && widget.gpsPoints.length >= 2) {
+                  _mapController.fitCamera(
+                    CameraFit.bounds(
+                      bounds: LatLngBounds.fromPoints(widget.gpsPoints),
+                      padding: const EdgeInsets.all(28.0),
+                      maxZoom: 17.0,
+                    ),
+                  );
+                }
               },
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.none,
               ),
             ),
             children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.move_sketch.app',
+                maxZoom: 19,
+                tileBuilder: (context, tileWidget, tile) {
+                  return Opacity(
+                    opacity: 0.48,
+                    child: tileWidget,
+                  );
+                },
+              ),
               if (widget.gpsPoints.isNotEmpty)
                 PolylineLayer(
                   polylines: [
