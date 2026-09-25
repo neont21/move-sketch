@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../utils/date_time_utils.dart';
 import '../enums/activity_type.dart';
+import '../weather/weather_info.dart';
 import 'user.dart';
 
 @immutable
@@ -10,8 +11,9 @@ class SketchPost {
   final UserSummary author;
   final String sketchUrl;
   final String? caption;
-  final String locationTag;
-  final String? weather;
+  final List<String> locationTags;
+  final int locationIndex;
+  final WeatherInfo? weather;
   final ActivityType activityType;
   final Set<String> cheeredUserIds;
   final int commentCount;
@@ -24,7 +26,8 @@ class SketchPost {
     required this.authorId,
     required this.author,
     required this.sketchUrl,
-    required this.locationTag,
+    required this.locationTags,
+    required this.locationIndex,
     required this.activityType,
     required this.createdAt,
     this.updatedAt,
@@ -38,6 +41,10 @@ class SketchPost {
   String get sessionId => id;
   int get cheerCount => cheeredUserIds.length;
   bool get isDeleted => deletedAt != null;
+
+  String get locationTag => locationTags.length > locationIndex
+      ? locationTags[locationIndex]
+      : (locationTags.firstOrNull ?? '');
 
   bool isCheeredBy(String userId) => cheeredUserIds.contains(userId);
 
@@ -58,8 +65,9 @@ class SketchPost {
       'author': author.toMap(),
       'sketchUrl': sketchUrl,
       'caption': caption,
-      'locationTag': locationTag,
-      'weather': weather,
+      'locationTags': locationTags,
+      'locationIndex': locationIndex,
+      'weather': weather?.toMap(),
       'activityType': activityType.name,
       'cheeredUserIds': cheeredUserIds.toList(),
       'commentCount': commentCount,
@@ -82,8 +90,14 @@ class SketchPost {
       author: UserSummary.fromMap(map['author'] as Map<String, dynamic>),
       sketchUrl: map['sketchUrl'] as String,
       caption: map['caption'] as String?,
-      locationTag: map['locationTag'] as String? ?? '',
-      weather: map['weather'] as String?,
+      locationTags: (map['locationTags'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+          (map['locationTag'] != null ? [map['locationTag'] as String] : const []),
+      locationIndex: (map['locationIndex'] as num?)?.toInt() ?? 0,
+      weather: map['weather'] != null
+          ? WeatherInfo.fromMap(map['weather'] as Map<String, dynamic>)
+          : null,
       activityType: ActivityType.fromString(map['activityType'] as String?),
       cheeredUserIds: cheeredList.toSet(),
       commentCount: (map['commentCount'] as num?)?.toInt() ?? 0,
@@ -99,8 +113,9 @@ class SketchPost {
     UserSummary? author,
     String? sketchUrl,
     ValueGetter<String?>? caption,
-    String? locationTag,
-    ValueGetter<String?>? weather,
+    List<String>? locationTags,
+    int? locationIndex,
+    ValueGetter<WeatherInfo?>? weather,
     ActivityType? activityType,
     Set<String>? cheeredUserIds,
     int? commentCount,
@@ -114,7 +129,8 @@ class SketchPost {
       author: author ?? this.author,
       sketchUrl: sketchUrl ?? this.sketchUrl,
       caption: caption != null ? caption() : this.caption,
-      locationTag: locationTag ?? this.locationTag,
+      locationTags: locationTags ?? this.locationTags,
+      locationIndex: locationIndex ?? this.locationIndex,
       weather: weather != null ? weather() : this.weather,
       activityType: activityType ?? this.activityType,
       cheeredUserIds: cheeredUserIds ?? this.cheeredUserIds,

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../domain/models/social/comment.dart';
 import '../../../../domain/models/social/sketch_post.dart';
+import '../../../../domain/models/weather/weather_info.dart';
 
 class SketchPostService {
   final FirebaseFirestore _firestore;
@@ -8,18 +9,18 @@ class SketchPostService {
   SketchPostService({FirebaseFirestore? firestore})
     : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  CollectionReference<Map<String, dynamic>> get _sketchsRef =>
+  CollectionReference<Map<String, dynamic>> get _sketchesRef =>
       _firestore.collection('sketch_posts');
 
   CollectionReference<Map<String, dynamic>> _commentsRef(String sketchId) =>
-      _sketchsRef.doc(sketchId).collection('comments');
+      _sketchesRef.doc(sketchId).collection('comments');
 
   Future<SketchPost> createPost(SketchPost sketch) async {
     final data = sketch.toMap();
     data['createdAt'] = FieldValue.serverTimestamp();
     data.remove('updatedAt');
 
-    final postRef = _sketchsRef.doc(sketch.id);
+    final postRef = _sketchesRef.doc(sketch.id);
     await postRef.set(data);
 
     final savedDoc = await postRef.get();
@@ -29,8 +30,8 @@ class SketchPostService {
   Future<SketchPost> updatePost({
     required String sketchId,
     String? caption,
-    String? locationTag,
-    String? weather,
+    int? locationIndex,
+    WeatherInfo? weather,
   }) async {
     final updates = <String, dynamic>{
       'updatedAt': FieldValue.serverTimestamp(),
@@ -39,14 +40,14 @@ class SketchPostService {
     if (caption != null) {
       updates['caption'] = caption;
     }
-    if (locationTag != null) {
-      updates['locationTag'] = locationTag;
+    if (locationIndex != null) {
+      updates['locationIndex'] = locationIndex;
     }
     if (weather != null) {
-      updates['weather'] = weather;
+      updates['weather'] = weather.toMap();
     }
 
-    final postRef = _sketchsRef.doc(sketchId);
+    final postRef = _sketchesRef.doc(sketchId);
     await postRef.update(updates);
 
     final savedDoc = await postRef.get();
@@ -54,7 +55,7 @@ class SketchPostService {
   }
 
   Future<SketchPost?> getPostById(String sketchId) async {
-    final doc = await _sketchsRef.doc(sketchId).get();
+    final doc = await _sketchesRef.doc(sketchId).get();
     if (!doc.exists || doc.data() == null) {
       return null;
     }
@@ -76,7 +77,7 @@ class SketchPostService {
     }
 
     if (authorIds.length <= 30) {
-      Query<Map<String, dynamic>> query = _sketchsRef
+      Query<Map<String, dynamic>> query = _sketchesRef
           .where('authorId', whereIn: authorIds)
           .where('deletedAt', isNull: true);
 
@@ -107,7 +108,7 @@ class SketchPostService {
       }
 
       final futures = chunks.map((chunk) {
-        Query<Map<String, dynamic>> query = _sketchsRef
+        Query<Map<String, dynamic>> query = _sketchesRef
             .where('authorId', whereIn: chunk)
             .where('deletedAt', isNull: true);
 
@@ -138,7 +139,7 @@ class SketchPostService {
     int limit = 18,
     DateTime? lastCreatedAt,
   }) async {
-    Query<Map<String, dynamic>> query = _sketchsRef
+    Query<Map<String, dynamic>> query = _sketchesRef
         .where('authorId', isEqualTo: userId)
         .where('deletedAt', isNull: true);
 
@@ -158,7 +159,7 @@ class SketchPostService {
   }
 
   Future<void> deletePost(String sketchId) async {
-    await _sketchsRef.doc(sketchId).update({
+    await _sketchesRef.doc(sketchId).update({
       'deletedAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -169,7 +170,7 @@ class SketchPostService {
     required String userId,
     required bool isCheered,
   }) async {
-    final sketchRef = _sketchsRef.doc(sketchId);
+    final sketchRef = _sketchesRef.doc(sketchId);
 
     await sketchRef.update({
       'cheeredUserIds': isCheered
@@ -185,7 +186,7 @@ class SketchPostService {
   }) async {
     final batch = _firestore.batch();
 
-    final postRef = _sketchsRef.doc(sketchId);
+    final postRef = _sketchesRef.doc(sketchId);
     final commentRef = _commentsRef(sketchId).doc(comment.id);
 
     final commentData = comment.toMap();
@@ -261,7 +262,7 @@ class SketchPostService {
   }) async {
     final batch = _firestore.batch();
 
-    final postRef = _sketchsRef.doc(sketchId);
+    final postRef = _sketchesRef.doc(sketchId);
     final commentRef = _commentsRef(sketchId).doc(commentId);
 
     batch.update(commentRef, {'deletedAt': FieldValue.serverTimestamp()});

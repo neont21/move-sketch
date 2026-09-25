@@ -5,6 +5,8 @@ import '../data/repositories/auth/auth_repository.dart';
 import '../data/repositories/auth/auth_repository_remote.dart';
 import '../data/repositories/friendship/friendship_repository.dart';
 import '../data/repositories/friendship/friendship_repository_remote.dart';
+import '../data/repositories/geocoding/geocoding_repository.dart';
+import '../data/repositories/geocoding/geocoding_repository_remote.dart';
 import '../data/repositories/location/location_repository.dart';
 import '../data/repositories/location/location_repository_local.dart';
 import '../data/repositories/notification/notification_repository.dart';
@@ -29,6 +31,7 @@ import '../data/services/remote/firestore/notification_service.dart';
 import '../data/services/remote/firestore/session_result_service.dart';
 import '../data/services/remote/firestore/sketch_post_service.dart';
 import '../data/services/remote/firestore/user_service.dart';
+import '../data/services/remote/geocoding_service.dart';
 import '../data/services/remote/storage_service.dart';
 import '../data/services/remote/weather_service.dart';
 
@@ -113,6 +116,11 @@ final sketchPostServiceProvider = Provider<SketchPostService>((ref) {
 /// NotificationService Provider: Firestore 기반 알림 소셜 활동 알림 관리
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
+});
+
+/// GeocodingService Provider: OpenStreetMap Nominatim 기반 한글 행정구역 역지오코딩
+final geocodingServiceProvider = Provider<GeocodingService>((ref) {
+  return GeocodingService(client: ref.watch(httpClientProvider));
 });
 
 
@@ -203,5 +211,13 @@ final completeSessionUseCaseProvider = Provider<CompleteSessionUseCase>((ref) {
   return CompleteSessionUseCase(
     sessionRepository: ref.watch(sessionRepositoryProvider),
     sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
+  );
+});
+
+/// GeocodingRepository Provider: 위/경도 기반 한국 행정구역 주소 변환 저장소
+/// 출발지/경유지/도착지 좌표를 통해 주소 표기
+final geocodingRepositoryProvider = Provider<GeocodingRepository>((ref) {
+  return GeocodingRepositoryRemote(
+    geocodingService: ref.watch(geocodingServiceProvider),
   );
 });

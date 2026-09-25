@@ -282,7 +282,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.sessionEditPath,
         builder: (context, state) {
           String sketchId = state.pathParameters['sketch_id']!;
-          return SessionShareScreen(sessionId: sketchId, edit: true);
+          return SessionShareScreen(sessionId: sketchId);
         },
       ),
       GoRoute(

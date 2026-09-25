@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import '../../../domain/models/social/comment.dart';
 import '../../../domain/models/social/sketch_post.dart';
 import '../../../domain/models/social/user.dart';
+import '../../../domain/models/weather/weather_info.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../services/remote/firestore/friendship_service.dart';
@@ -100,14 +101,14 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
   Future<Result<SketchPost>> updatePost({
     required String sketchId,
     String? caption,
-    String? locationTag,
-    String? weather,
+    int? locationIndex,
+    WeatherInfo? weather,
   }) async {
     try {
       final sketchPost = await sketchPostService.updatePost(
         sketchId: sketchId,
         caption: caption?.trim(),
-        locationTag: locationTag,
+        locationIndex: locationIndex,
         weather: weather,
       );
 

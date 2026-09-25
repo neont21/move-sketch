@@ -1,6 +1,7 @@
 import '../../../domain/models/social/comment.dart';
 import '../../../domain/models/social/sketch_post.dart';
 import '../../../domain/models/social/user.dart';
+import '../../../domain/models/weather/weather_info.dart';
 import '../../../utils/result.dart';
 
 abstract interface class SketchPostRepository {
@@ -28,8 +29,8 @@ abstract interface class SketchPostRepository {
   Future<Result<SketchPost>> updatePost({
     required String sketchId,
     String? caption,
-    String? locationTag,
-    String? weather,
+    int? locationIndex,
+    WeatherInfo? weather,
   });
 
   /// 게시물을 삭제한다. (게시물 상세 화면 혹은 피드 탭)
