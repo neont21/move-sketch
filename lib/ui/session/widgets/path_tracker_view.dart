@@ -11,6 +11,7 @@ class PathTrackerView extends StatefulWidget {
   final LatLng? initialCenter;
   final double initialZoom;
   final bool isTracking;
+  final bool isPaused;
   final double? heading;
 
   const PathTrackerView({
@@ -19,6 +20,7 @@ class PathTrackerView extends StatefulWidget {
     this.initialCenter,
     this.initialZoom = 15.0,
     this.isTracking = false,
+    this.isPaused = false,
     this.heading,
   });
 
@@ -28,6 +30,7 @@ class PathTrackerView extends StatefulWidget {
     LatLng? initialCenter,
     double initialZoom = 15.0,
     bool isTracking = true,
+    bool isPaused = false,
   }) {
     return PathTrackerView(
       key: key,
@@ -37,6 +40,7 @@ class PathTrackerView extends StatefulWidget {
       initialCenter: initialCenter,
       initialZoom: initialZoom,
       isTracking: isTracking,
+      isPaused: isPaused,
       heading: points.lastOrNull?.heading,
     );
   }
@@ -58,7 +62,8 @@ class _PathTrackerViewState extends State<PathTrackerView> {
     final lat2 = end.latitude * degToRad;
     final dLon = (end.longitude - start.longitude) * degToRad;
     final y = math.sin(dLon) * math.cos(lat2);
-    final x = math.cos(lat1) * math.sin(lat2) -
+    final x =
+        math.cos(lat1) * math.sin(lat2) -
         math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
     return math.atan2(y, x);
   }
@@ -129,21 +134,28 @@ class _PathTrackerViewState extends State<PathTrackerView> {
       );
     }
     if (widget.gpsPoints.length > 1) {
-      markers.add(
-        Marker(
-          point: widget.gpsPoints.last,
-          child: widget.isTracking
-              ? Transform.rotate(
-                  angle: _currentBearing,
-                  child: Icon(
-                    Icons.navigation,
-                    color: colorScheme.primary,
-                    size: 24,
-                  ),
-                )
-              : Icon(Icons.location_on, color: colorScheme.secondary, size: 24),
-        ),
-      );
+      Widget markerIcon;
+
+      if (!widget.isTracking) {
+        markerIcon = Icon(
+          Icons.location_on,
+          color: colorScheme.primary,
+          size: 24,
+        );
+      } else if (widget.isPaused) {
+        markerIcon = Icon(
+          Icons.radio_button_checked,
+          color: colorScheme.primary,
+          size: 24,
+        );
+      } else {
+        markerIcon = Transform.rotate(
+          angle: _currentBearing,
+          child: Icon(Icons.navigation, color: colorScheme.primary, size: 24),
+        );
+      }
+
+      markers.add(Marker(point: widget.gpsPoints.last, child: markerIcon));
     }
 
     return FractionallySizedBox(

@@ -54,6 +54,7 @@ class SessionTrackingScreen extends ConsumerWidget {
                   PathTrackerView.fromLocationPoints(
                     points: state.pathPoints,
                     isTracking: true,
+                    isPaused: state.isPaused,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
