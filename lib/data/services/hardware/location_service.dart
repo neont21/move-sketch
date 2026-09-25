@@ -48,6 +48,19 @@ class LocationService {
     return _toLocationPoint(pos);
   }
 
+  Future<LocationPoint?> getLastKnownLocation({
+    Duration maxAge = const Duration(minutes: 5),
+  }) async {
+    final pos = await Geolocator.getLastKnownPosition();
+    if (pos == null) {
+      return null;
+    }
+    if (DateTime.now().difference(pos.timestamp) > maxAge) {
+      return null;
+    }
+    return _toLocationPoint(pos);
+  }
+
   Stream<LocationPoint> getPositionStream({int distanceFilterMeters = 0}) {
     late final LocationSettings locationSettings;
     if (defaultTargetPlatform == TargetPlatform.android) {

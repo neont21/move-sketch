@@ -49,4 +49,5 @@ extension DateTimeFormatting on DateTime {
       DateFormat('M월 d일 EEEE', 'ko').format(this);
   String get formattedYearMonth =>
       DateFormat('yyyy년 M월', 'ko').format(this);
+  String get formattedFileTimestamp => DateFormat('yyyyMMdd_HHmmss').format(this);
 }

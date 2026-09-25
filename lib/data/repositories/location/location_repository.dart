@@ -11,6 +11,9 @@ abstract interface class LocationRepository {
   /// 현재 좌표를 조회한다. (홈 탭 날씨 조회)
   Future<Result<LocationPoint>> getCurrentLocation();
 
+  /// 캐시된 최근 위치를 즉시 조회한다. (세션 경로 시작점)
+  Future<LocationPoint?> getLastKnownLocation();
+
   /// 실시간 좌표 스트림을 구독한다. (세션 경로 추적)
   Stream<LocationPoint> getPositionStream({int distanceFilterMeters = 0});
 

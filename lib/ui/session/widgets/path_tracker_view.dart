@@ -141,10 +141,11 @@ class _PathTrackerViewState extends State<PathTrackerView> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final markers = <Marker>[];
-    if (widget.gpsPoints.isNotEmpty) {
+    final startPoint = widget.gpsPoints.firstOrNull ?? widget.initialCenter;
+    if (startPoint != null) {
       markers.add(
         Marker(
-          point: widget.gpsPoints.first,
+          point: startPoint,
           width: 14,
           height: 14,
           child: Icon(Icons.circle, color: colorScheme.primary, size: 12),

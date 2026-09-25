@@ -115,9 +115,7 @@ class SessionResult {
       startLocation: LocationPoint.fromMap(
         map['startLocation'] as Map<String, dynamic>,
       ),
-      waypoint: LocationPoint.fromMap(
-        map['waypoint'] as Map<String, dynamic>,
-      ),
+      waypoint: LocationPoint.fromMap(map['waypoint'] as Map<String, dynamic>),
       endLocation: LocationPoint.fromMap(
         map['endLocation'] as Map<String, dynamic>,
       ),
@@ -188,10 +186,12 @@ class SessionResult {
       endLocation: endLocation ?? this.endLocation,
       sketchComposition: sketchComposition ?? this.sketchComposition,
       missions: missions ?? this.missions,
-      routePolyline:
-      routePolyline != null ? routePolyline() : this.routePolyline,
-      routeImageUrl:
-      routeImageUrl != null ? routeImageUrl() : this.routeImageUrl,
+      routePolyline: routePolyline != null
+          ? routePolyline()
+          : this.routePolyline,
+      routeImageUrl: routeImageUrl != null
+          ? routeImageUrl()
+          : this.routeImageUrl,
       resultSketchImageUrl: resultSketchImageUrl != null
           ? resultSketchImageUrl()
           : this.resultSketchImageUrl,

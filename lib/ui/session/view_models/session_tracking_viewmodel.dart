@@ -26,6 +26,7 @@ class SessionTrackingState {
   final List<LocationPoint> pathPoints;
   final List<MissionInstance> missions;
   final bool isPaused;
+  final LocationPoint? initialLocation;
 
   const SessionTrackingState({
     required this.session,
@@ -39,11 +40,13 @@ class SessionTrackingState {
     this.pathPoints = const [],
     this.missions = const [],
     this.isPaused = false,
+    this.initialLocation,
   });
 
   double get distanceInKm => distanceInMeters / 1000.0;
+  bool get isValidSession => distanceInMeters >= 10.0 && pathPoints.length >= 3;
 
-  factory SessionTrackingState.fromSession(TrackingSession session) {
+  factory SessionTrackingState.fromSession(TrackingSession session, {LocationPoint? initialLocation}) {
     return SessionTrackingState(
       session: session,
       elapsedDuration: session.elapsedDuration,
@@ -54,6 +57,7 @@ class SessionTrackingState {
       pathPoints: session.pathPoints,
       missions: session.missions,
       isPaused: session.isPaused,
+      initialLocation: initialLocation,
     );
   }
 
@@ -69,6 +73,7 @@ class SessionTrackingState {
     List<LocationPoint>? pathPoints,
     List<MissionInstance>? missions,
     bool? isPaused,
+    LocationPoint? initialLocation,
   }) {
     return SessionTrackingState(
       session: session ?? this.session,
@@ -90,6 +95,7 @@ class SessionTrackingState {
       pathPoints: pathPoints ?? this.pathPoints,
       missions: missions ?? this.missions,
       isPaused: isPaused ?? this.isPaused,
+      initialLocation: initialLocation ?? this.initialLocation,
     );
   }
 }
@@ -272,11 +278,14 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
     _locationSubscription = locationRepository
         .getPositionStream(distanceFilterMeters: 2)
-        .listen((point) {
-          _onNewLocationPoint(point);
-        }, onError: (error) {
-          // TODO: Firebase Crashlytics: GPS Stream Error
-    });
+        .listen(
+          (point) {
+            _onNewLocationPoint(point);
+          },
+          onError: (error) {
+            // TODO: Firebase Crashlytics: GPS Stream Error
+          },
+        );
   }
 
   @override
@@ -304,7 +313,14 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     _startTimer();
     _startLocationTracking();
 
-    return SessionTrackingState.fromSession(session);
+    final initialLoc = await ref
+        .read(locationRepositoryProvider)
+        .getLastKnownLocation();
+
+    return SessionTrackingState.fromSession(
+      session,
+      initialLocation: initialLoc,
+    );
   }
 
   Future<void> pauseSession() async {

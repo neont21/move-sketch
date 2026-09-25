@@ -3,6 +3,7 @@ import '../../../data/repositories/session/session_repository.dart';
 import '../../../data/repositories/session_result/session_result_repository.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../models/enums/sync_status.dart';
 import '../../models/fixed/sketch_parts.dart';
 import '../../models/session/session_result.dart';
 
@@ -15,7 +16,6 @@ final class CompleteSessionUseCase {
     required this.sessionResultRepository,
   });
 
-  /// 세션 종료 및 스케치 결과 정산 오케스트레이션
   Future<Result<SessionResult>> execute({
     required String sessionId,
     required SketchComposition sketchComposition,
@@ -43,18 +43,27 @@ final class CompleteSessionUseCase {
         return Result.error(error);
     }
 
-    final remoteResult = await sessionResultRepository.saveResult(
-      result: sessionResult,
-      sketchBytes: sketchBytes,
-      routeBytes: routeBytes,
-    );
+    Result<SessionResult> remoteResult;
+    try {
+      remoteResult = await sessionResultRepository
+          .saveResult(
+        result: sessionResult,
+        sketchBytes: sketchBytes,
+        routeBytes: routeBytes,
+      )
+          .timeout(const Duration(seconds: 10));
+    } catch (_) {
+      remoteResult = const Result.error(NetworkException('서버 연결 시간 초과'));
+    }
 
     switch (remoteResult) {
       case Ok():
         await sessionRepository.discardSession(sessionId);
         return remoteResult;
-      case Error(:final error):
-        return Result.error(error);
+      case Error():
+        return Result.ok(
+          sessionResult.copyWith(syncStatus: SyncStatus.syncFailed),
+        );
     }
   }
 }

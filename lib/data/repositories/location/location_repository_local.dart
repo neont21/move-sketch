@@ -54,6 +54,11 @@ final class LocationRepositoryLocal implements LocationRepository {
   }
 
   @override
+  Future<LocationPoint?> getLastKnownLocation() {
+    return locationService.getLastKnownLocation();
+  }
+
+  @override
   Stream<LocationPoint> getPositionStream({int distanceFilterMeters = 0}) {
     return locationService.getPositionStream(
       distanceFilterMeters: distanceFilterMeters,

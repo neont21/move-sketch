@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../view_models/session_tracking_viewmodel.dart';
@@ -55,6 +56,12 @@ class SessionTrackingScreen extends ConsumerWidget {
                   children: [
                     PathTrackerView.fromLocationPoints(
                       points: state.pathPoints,
+                      initialCenter: state.initialLocation != null
+                          ? LatLng(
+                              state.initialLocation!.latitude,
+                              state.initialLocation!.longitude,
+                            )
+                          : null,
                       isTracking: true,
                       isPaused: state.isPaused,
                     ),
@@ -131,7 +138,9 @@ class SessionTrackingScreen extends ConsumerWidget {
                                 builder: (context) => PopScope(
                                   canPop: false,
                                   child: Dialog(
-                                    child: SessionPauseDialog(trackingState: state),
+                                    child: SessionPauseDialog(
+                                      trackingState: state,
+                                    ),
                                   ),
                                 ),
                               );
@@ -155,7 +164,32 @@ class SessionTrackingScreen extends ConsumerWidget {
                             height: 60,
                             child: HoldButton(
                               title: '종료',
-                              onActionTriggered: () {
+                              onActionTriggered: () async {
+                                if (!state.isValidSession) {
+                                  final messenger = ScaffoldMessenger.of(
+                                    context,
+                                  );
+                                  final colorScheme = Theme.of(
+                                    context,
+                                  ).colorScheme;
+                                  await ref
+                                      .read(
+                                        sessionTrackingViewModelProvider
+                                            .notifier,
+                                      )
+                                      .discardSession();
+                                  if (!context.mounted) return;
+                                  context.go(Routes.home);
+                                  messenger.showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                        '운동 기록이 너무 짧아 저장되지 않았습니다.',
+                                      ),
+                                      backgroundColor: colorScheme.secondary,
+                                    ),
+                                  );
+                                  return;
+                                }
                                 context.go(
                                   Routes.sessionResult(state.session.id),
                                 );

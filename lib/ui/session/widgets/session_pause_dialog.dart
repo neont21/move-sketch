@@ -61,7 +61,24 @@ class SessionPauseDialog extends ConsumerWidget {
               context.pop(true);
             },
             cancelText: '여기서 종료',
-            onCancel: () {
+            onCancel: () async {
+              if (!trackingState.isValidSession) {
+                final messenger = ScaffoldMessenger.of(context);
+                final colorScheme = Theme.of(context).colorScheme;
+                context.pop(false);
+                await ref
+                    .read(sessionTrackingViewModelProvider.notifier)
+                    .discardSession();
+                if (!context.mounted) return;
+                context.go(Routes.home);
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: const Text('운동 기록이 너무 짧아 저장되지 않았습니다.'),
+                    backgroundColor: colorScheme.secondary,
+                  ),
+                );
+                return;
+              }
               context.pop(false);
               context.go(Routes.sessionResult(trackingState.session.id));
             },
