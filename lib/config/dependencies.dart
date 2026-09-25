@@ -33,6 +33,7 @@ import '../data/services/remote/storage_service.dart';
 import '../data/services/remote/weather_service.dart';
 
 import '../domain/use_cases/session/complete_session_use_case.dart';
+import '../ui/session/render/route_image_renderer.dart';
 
 /// 외부 REST API 통신을 위한 Provider
 final httpClientProvider = Provider<http.Client>((ref) {
@@ -48,6 +49,11 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
   ref.onDispose(database.close);
 
   return database;
+});
+
+/// RouteImageRenderer Provider: GPS 경로의 오프스크린 캔버스 PNG 렌더러
+final routeImageRendererProvider = Provider<RouteImageRenderer>((ref) {
+  return const RouteImageRenderer();
 });
 
 
