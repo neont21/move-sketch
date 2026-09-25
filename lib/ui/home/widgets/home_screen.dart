@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../routing/routes.dart';
+import '../../../utils/date_time_utils.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../view_models/home_viewmodel.dart';
@@ -46,7 +46,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
 
-    _formattedDate = DateFormat('M월 d일 EEEE', 'ko').format(DateTime.now());
+    _formattedDate = DateTime.now().formattedHeaderDate;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final session = ref.read(homeViewModelProvider).value?.uncompletedSession;
@@ -138,7 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ? NetworkImage(latestResult.resultSketchImageUrl!)
                         : const AssetImage('assets/sample_sketch.png'),
                     caption: latestResult != null
-                        ? DateFormat('yyyy.MM.dd').format(latestResult.endedAt)
+                        ? latestResult.endedAt.formattedDateDot
                         : '첫 장을 기다리는 중',
                     isHome: true,
                   ),
