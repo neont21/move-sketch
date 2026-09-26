@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import '../../../domain/models/mock_monthly_history.dart';
 import '../../core/theme/activity_colors.dart';
 import 'diagonal_painter.dart';
 
 class SessionCalendar extends StatelessWidget {
   final DateTime focusedDay;
-  final MockMonthlyHistory monthlyHistory;
+  final Set<int> dayJogging;
+  final Set<int> dayRiding;
   final ValueChanged<DateTime> onMonthChanged;
 
   const SessionCalendar({
     super.key,
     required this.focusedDay,
-    required this.monthlyHistory,
+    required this.dayJogging,
+    required this.dayRiding,
     required this.onMonthChanged,
   });
 
-  /// 원하는 연/월의 기록을 확인하기 위한 helper function
   Future<void> _pickYearMonth(BuildContext context) async {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -48,8 +48,7 @@ class SessionCalendar extends StatelessWidget {
   Widget _buildCellBackground(BuildContext context, int day) {
     ActivityColors activityColors = context.activityColors;
 
-    if (monthlyHistory.dayJogging.contains(day) &&
-        monthlyHistory.dayRiding.contains(day)) {
+    if (dayJogging.contains(day) && dayRiding.contains(day)) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: CustomPaint(
@@ -59,14 +58,14 @@ class SessionCalendar extends StatelessWidget {
           ),
         ),
       );
-    } else if (monthlyHistory.dayJogging.contains(day)) {
+    } else if (dayJogging.contains(day)) {
       return Container(
         decoration: BoxDecoration(
           color: activityColors.joggingFill,
           shape: BoxShape.circle,
         ),
       );
-    } else if (monthlyHistory.dayRiding.contains(day)) {
+    } else if (dayRiding.contains(day)) {
       return Container(
         decoration: BoxDecoration(
           color: activityColors.ridingFill,
@@ -119,8 +118,8 @@ class SessionCalendar extends StatelessWidget {
               style: TextStyle(
                 fontWeight:
                     isToday ||
-                        monthlyHistory.dayJogging.contains(day.day) ||
-                        monthlyHistory.dayRiding.contains(day.day)
+                        dayJogging.contains(day.day) ||
+                        dayRiding.contains(day.day)
                     ? FontWeight.bold
                     : FontWeight.normal,
               ),
@@ -151,7 +150,7 @@ class SessionCalendar extends StatelessWidget {
       ),
       daysOfWeekStyle: DaysOfWeekStyle(
         weekdayStyle: TextStyle(height: 1.0),
-        weekendStyle: TextStyle(height: 1.0, color: colorScheme.primary)
+        weekendStyle: TextStyle(height: 1.0, color: colorScheme.primary),
       ),
       calendarBuilders: CalendarBuilders(
         headerTitleBuilder: (context, date) => InkWell(

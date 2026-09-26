@@ -1,129 +1,53 @@
 import 'package:flutter/material.dart';
-import '../../../domain/models/mock_mission_data.dart';
-import '../../../domain/models/mock_monthly_history.dart';
-import '../../../domain/models/mock_session_data.dart';
-import '../../../domain/models/mock_session_history.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../utils/exceptions.dart';
+import '../view_models/history_viewmodel.dart';
 import 'session_calendar.dart';
 import 'session_card.dart';
 
-class HistoryScreen extends StatefulWidget {
+class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
-}
-
-class _HistoryScreenState extends State<HistoryScreen> {
-  DateTime _focusedDay = DateTime.now();
-  MockMonthlyHistory _monthlyHistory = MockMonthlyHistory(
-    year: DateTime.now().year,
-    month: DateTime.now().month,
-    history: [
-      // TODO: 서버로부터 가져와야 함
-      MockSessionHistory(
-        sessionId: 'test3',
-        createdAt: DateTime(2026, 9, 7, 15, 52),
-        isJogging: false,
-        sessionData: MockSessionData(
-          minutes: 22,
-          seconds: 52,
-          km: 1.2,
-          kcal: 63,
-          id: 'test3',
-        ),
-        missionData: [],
-      ),
-      MockSessionHistory(
-        sessionId: 'test3',
-        createdAt: DateTime(2026, 9, 7, 11, 23),
-        isJogging: true,
-        sessionData: MockSessionData(
-          minutes: 32,
-          seconds: 12,
-          km: 3,
-          kcal: 123,
-          id: 'test3',
-        ),
-        missionData: [],
-        shared: true,
-      ),
-      MockSessionHistory(
-        sessionId: 'test2',
-        createdAt: DateTime(2026, 9, 5, 15, 52),
-        isJogging: false,
-        sessionData: MockSessionData(
-          minutes: 22,
-          seconds: 52,
-          km: 1.2,
-          kcal: 63,
-          id: 'test2',
-        ),
-        missionData: [
-          MockMissionData(
-            title: '페이스',
-            data: '7\'23\'\'',
-            unit: '/km',
-            comment: '무난히 해냈어요',
-          ),
-        ],
-      ),
-      MockSessionHistory(
-        sessionId: 'test1',
-        createdAt: DateTime(2026, 9, 2, 11, 23),
-        isJogging: true,
-        sessionData: MockSessionData(
-          minutes: 32,
-          seconds: 12,
-          km: 3,
-          kcal: 123,
-          id: 'test1',
-        ),
-        missionData: [
-          MockMissionData(
-            title: '거리',
-            data: '4.3',
-            unit: 'km',
-            comment: '충분히 해냈어요',
-          ),
-          MockMissionData(
-            title: '인터벌',
-            data: '2',
-            unit: '회',
-            comment: '충분히 해냈어요',
-          ),
-        ],
-      ),
-    ],
-  );
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+
+    final historyState = ref.watch(historyViewModelProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text('기록')),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SessionCalendar(
-              focusedDay: _focusedDay,
-              monthlyHistory: _monthlyHistory,
-              onMonthChanged: (newMonth) {
-                setState(() {
-                  _focusedDay = newMonth;
-                  // TODO: 서버에서 해당 월의 기록 가져오기
-                  _monthlyHistory = MockMonthlyHistory(
-                    year: _focusedDay.year,
-                    month: _focusedDay.month,
-                    history: [],
-                  );
-                });
-              },
+      body: historyState.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(
+          child: Padding(
+            padding: const EdgeInsetsGeometry.all(20),
+            child: Text(
+              error is AppException ? error.message : '기록을 불러오는 중 오류가 발생했습니다.',
+              style: textTheme.bodyMedium,
             ),
-            _monthlyHistory.history.isEmpty
-                ? Expanded(
+          ),
+        ),
+        data: (state) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                SessionCalendar(
+                  focusedDay: state.focusedMonth,
+                  dayJogging: state.dayJogging,
+                  dayRiding: state.dayRiding,
+                  onMonthChanged: (newMonth) {
+                    ref
+                        .read(historyViewModelProvider.notifier)
+                        .changeMonth(newMonth);
+                  },
+                ),
+                if (state.isLoading)
+                  const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (state.results.isEmpty)
+                  Expanded(
                     child: Center(
                       child: Text(
                         '이 달엔 기록이 없어요.',
@@ -131,15 +55,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ),
                     ),
                   )
-                : Expanded(
+                else
+                  Expanded(
                     child: ListView.builder(
-                      itemCount: _monthlyHistory.history.length,
+                      padding: const EdgeInsets.only(bottom: 20),
+                      itemCount: state.results.length,
                       itemBuilder: (context, index) =>
-                          SessionCard(history: _monthlyHistory.history[index]),
+                          SessionCard(result: state.results[index]),
                     ),
                   ),
-          ],
-        ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

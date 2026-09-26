@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import '../../../domain/models/mock_session_history.dart';
+import '../../../config/assets.dart';
+import '../../../domain/models/session/session_result.dart';
 import '../../../routing/routes.dart';
+import '../../../utils/date_time_utils.dart';
 import '../../core/widgets/activity_badge.dart';
 import 'delete_history_dialog.dart';
 
 class SessionCard extends StatelessWidget {
-  final MockSessionHistory history;
-  const SessionCard({super.key, required this.history});
+  final SessionResult result;
+
+  const SessionCard({super.key, required this.result});
 
   List<TextSpan> _buildMetadata() {
     List<TextSpan> texts = [];
 
-    for (var mission in history.missionData) {
-      texts.add(TextSpan(text: '${mission.title} · ${mission.comment}\n'));
+    for (var mission in result.missions) {
+      texts.add(
+        TextSpan(text: '${mission.axis.label} · ${mission.tierComment}\n'),
+      );
     }
+    final minutes = result.elapsedDuration.inMinutes;
+    final km = result.distanceInKm.toStringAsFixed(1);
     texts.add(
-      TextSpan(
-        text: '${history.sessionData.km}km · ${history.sessionData.minutes}분',
-      ),
+      TextSpan(text: '${km}km · $minutes분 · ${result.caloriesBurned}kcal'),
     );
 
     return texts;
@@ -33,48 +37,48 @@ class SessionCard extends StatelessWidget {
     return Card(
       child: ListTile(
         onTap: () {
-          context.go(Routes.historyDetails(history.sessionId));
+          context.go(Routes.historyDetails(result.id));
         },
         onLongPress: () {
           showDialog(
             context: context,
-            builder: (context) => Dialog(
-              child: DeleteHistoryDialog(sessionId: history.sessionId)
-              ),
+            builder: (context) =>
+                Dialog(child: DeleteHistoryDialog(sessionId: result.id, isShared: result.isShared)),
           );
-
         },
         leading: Image(
-          image: history.imageURL != null
-              ? NetworkImage(history.imageURL!)
-              : AssetImage('assets/sample_sketch.png'),
+          image:
+              result.resultSketchImageUrl != null &&
+                  result.resultSketchImageUrl!.isNotEmpty
+              ? NetworkImage(result.resultSketchImageUrl!)
+              : const AssetImage(Assets.sampleSketch),
         ),
         title: Row(
           spacing: 8,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              DateFormat('yyyy-MM-dd (E)', 'ko').format(history.createdAt),
+              result.endedAt.formattedDateWithDay,
               style: textTheme.labelLarge,
             ),
-            ActivityBadge(isJogging: history.isJogging),
-            history.shared
-                ? Container(
-                    padding: EdgeInsets.symmetric(vertical: 1, horizontal: 4),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: colorScheme.outlineVariant),
-                      color: colorScheme.outline,
-                    ),
-                    child: Text(
-                      '공유됨',
-                      style: textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.tertiaryContainer,
-                      ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
+            ActivityBadge(activityType: result.activityType),
+            if (result.isShared) ...[
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 1, horizontal: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: colorScheme.outlineVariant),
+                  color: colorScheme.outline,
+                ),
+                child: Text(
+                  '공유됨',
+                  style: textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.tertiaryContainer,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
         subtitle: RichText(

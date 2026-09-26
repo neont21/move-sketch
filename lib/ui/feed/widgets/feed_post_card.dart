@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../domain/models/enums/activity_type.dart';
 import '../../../domain/models/mock_sketch.dart';
 import '../../../domain/models/mock_user.dart';
 import '../../../routing/routes.dart';
@@ -75,7 +76,11 @@ class FeedPostCard extends StatelessWidget {
                         style: textTheme.bodyLarge,
                       ),
                     ),
-                    ActivityBadge(isJogging: sketch.isJogging),
+                    ActivityBadge(
+                      activityType: sketch.isJogging
+                          ? ActivityType.jogging
+                          : ActivityType.riding,
+                    ),
                   ],
                 ),
                 Text(
