@@ -36,6 +36,7 @@ import '../data/services/remote/storage_service.dart';
 import '../data/services/remote/weather_service.dart';
 
 import '../domain/use_cases/session/complete_session_use_case.dart';
+import '../domain/use_cases/session/compose_sketch_use_case.dart';
 import '../ui/session/render/sketch_image_renderer.dart';
 
 /// 외부 REST API 통신을 위한 Provider
@@ -200,6 +201,15 @@ final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   );
 });
 
+/// GeocodingRepository Provider: 위/경도 기반 한국 행정구역 주소 변환 저장소
+/// 출발지/경유지/도착지 좌표를 통해 주소 표기
+final geocodingRepositoryProvider = Provider<GeocodingRepository>((ref) {
+  return GeocodingRepositoryRemote(
+    geocodingService: ref.watch(geocodingServiceProvider),
+  );
+});
+
+
 /// CompleteSessionUseCase Provider: 운동 세션 완료 절차 조율하는 복합 UseCase
 /// 세션 완료 처리 후 원격 저장 성공 시 로컬 임시 세션 데이터 삭제
 final completeSessionUseCaseProvider = Provider<CompleteSessionUseCase>((ref) {
@@ -209,10 +219,9 @@ final completeSessionUseCaseProvider = Provider<CompleteSessionUseCase>((ref) {
   );
 });
 
-/// GeocodingRepository Provider: 위/경도 기반 한국 행정구역 주소 변환 저장소
-/// 출발지/경유지/도착지 좌표를 통해 주소 표기
-final geocodingRepositoryProvider = Provider<GeocodingRepository>((ref) {
-  return GeocodingRepositoryRemote(
-    geocodingService: ref.watch(geocodingServiceProvider),
-  );
+
+/// ComposeSketchUseCase Provider: 운동 미션 달성 티어에 따른 스케치 파츠 조합 UseCase
+/// 티어에 맞는 스케치 파츠에 랜덤 틴트를 묻혀 쌓아올린 결과물 생성
+final composeSketchUseCaseProvider = Provider<ComposeSketchUseCase>((ref) {
+  return const ComposeSketchUseCase();
 });

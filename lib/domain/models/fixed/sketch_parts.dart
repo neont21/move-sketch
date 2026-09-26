@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../../../config/assets.dart';
+import '../enums/activity_type.dart';
 import '../enums/character_type.dart';
 import '../enums/sketch_slot.dart';
 
@@ -13,6 +14,7 @@ class SketchPart {
   final String assetPath;
   final bool supportsTint;
   final int? defaultColorValue;
+  final ActivityType? activityType;
 
   const SketchPart({
     required this.id,
@@ -22,6 +24,7 @@ class SketchPart {
     this.tier = 0,
     this.supportsTint = false,
     this.defaultColorValue,
+    this.activityType,
   });
 
   int get zIndex => slot.zIndex;
@@ -63,6 +66,7 @@ class SketchComposition {
           'assetPath': value.assetPath,
           'supportsTint': value.supportsTint,
           'defaultColorValue': value.defaultColorValue,
+          'activityType': value.activityType?.name,
         }),
       ),
       'tintColors': tintColors.map((key, value) => MapEntry(key.name, value)),
@@ -71,10 +75,11 @@ class SketchComposition {
   }
 
   factory SketchComposition.fromMap(Map<String, dynamic> map) {
-    final rawParts = map['parts'] as Map<String, dynamic>? ?? {};
+    final rawParts = (map['parts'] as Map?)?.cast<String, dynamic>() ?? {};
     final parsedParts = <SketchSlot, SketchPart>{};
     for (final entry in rawParts.entries) {
       final slot = SketchSlot.fromString(entry.key);
+      if (entry.value is! Map) continue;
       final p = entry.value as Map<String, dynamic>;
       parsedParts[slot] = SketchPart(
         id: p['id'] as String,
@@ -84,9 +89,12 @@ class SketchComposition {
         assetPath: p['assetPath'] as String,
         supportsTint: p['supportsTint'] as bool? ?? false,
         defaultColorValue: (p['defaultColorValue'] as num?)?.toInt(),
+        activityType: p['activityType'] != null
+            ? ActivityType.fromString(p['activityType'] as String?)
+            : null,
       );
     }
-    final rawTints = map['tintColors'] as Map<String, dynamic>? ?? {};
+    final rawTints = (map['tintColors'] as Map?)?.cast<String, dynamic>() ?? {};
     final parsedTints = <SketchSlot, int>{};
     for (final entry in rawTints.entries) {
       final slot = SketchSlot.fromString(entry.key);
@@ -114,11 +122,11 @@ class SketchComposition {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is SketchComposition &&
-              runtimeType == other.runtimeType &&
-              imagePath == other.imagePath &&
-              mapEquals(parts, other.parts) &&
-              mapEquals(tintColors, other.tintColors);
+      other is SketchComposition &&
+          runtimeType == other.runtimeType &&
+          imagePath == other.imagePath &&
+          mapEquals(parts, other.parts) &&
+          mapEquals(tintColors, other.tintColors);
 
   @override
   int get hashCode => Object.hash(
@@ -134,11 +142,33 @@ class SketchPartsCatalog {
 
   static final Random _random = Random();
 
+  static const List<int> costumeTintPalette = [
+    0xFFEF4444,
+    0xFFF97316,
+    0xFFF59E0B,
+    0xFF10B981,
+    0xFF06B6D4,
+    0xFF3B82F6,
+    0xFF8B5CF6,
+    0xFFEC4899,
+  ];
+
+  static int getRandomCostumeTint() {
+    return costumeTintPalette[_random.nextInt(costumeTintPalette.length)];
+  }
+
   static const SketchPart defaultBackground = SketchPart(
     id: 'bg_default',
     slot: SketchSlot.background,
     name: '동네 길거리',
     assetPath: Assets.bgDefault,
+  );
+
+  static const SketchPart defaultExpression = SketchPart(
+    id: 'expr_default',
+    slot: SketchSlot.expression,
+    name: '기본 표정',
+    assetPath: Assets.exprDefault,
   );
 
   static final List<SketchPart> allParts = [
@@ -151,6 +181,7 @@ class SketchPartsCatalog {
       tier: 1,
       name: '햇살 가득한 공원',
       assetPath: Assets.bgParkDay,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'bg_river_sunset',
@@ -158,6 +189,7 @@ class SketchPartsCatalog {
       tier: 2,
       name: '노을 지는 강변',
       assetPath: Assets.bgRiverSunset,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'bg_city_night',
@@ -165,6 +197,7 @@ class SketchPartsCatalog {
       tier: 3,
       name: '반짝이는 도심 야경',
       assetPath: Assets.bgCityNight,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'bg_hangang_track',
@@ -172,6 +205,7 @@ class SketchPartsCatalog {
       tier: 1,
       name: '한강 자전거길',
       assetPath: Assets.bgHangangTrack,
+      activityType: ActivityType.riding,
     ),
     const SketchPart(
       id: 'bg_coastal_road',
@@ -179,6 +213,7 @@ class SketchPartsCatalog {
       tier: 2,
       name: '시원한 해안 도로',
       assetPath: Assets.bgCoastalRoad,
+      activityType: ActivityType.riding,
     ),
     const SketchPart(
       id: 'bg_mountain_pass',
@@ -186,6 +221,7 @@ class SketchPartsCatalog {
       tier: 3,
       name: '도전적인 업힐 고갯길',
       assetPath: Assets.bgMountainPass,
+      activityType: ActivityType.riding,
     ),
 
     const SketchPart(
@@ -238,6 +274,7 @@ class SketchPartsCatalog {
       name: '베이직 러닝 웨어',
       assetPath: Assets.costumeSportT1,
       supportsTint: true,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'costume_sport_t2',
@@ -246,6 +283,7 @@ class SketchPartsCatalog {
       name: '프로 러너 셋업',
       assetPath: Assets.costumeSportT2,
       supportsTint: true,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'costume_sport_t3',
@@ -254,6 +292,7 @@ class SketchPartsCatalog {
       name: '챔피언 윈드브레이커',
       assetPath: Assets.costumeSportT3,
       supportsTint: true,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'costume_jersey_t1',
@@ -262,6 +301,7 @@ class SketchPartsCatalog {
       name: '에어로 사이클 저지',
       assetPath: Assets.costumeJerseyT1,
       supportsTint: true,
+      activityType: ActivityType.riding,
     ),
     const SketchPart(
       id: 'costume_jersey_t2',
@@ -270,6 +310,7 @@ class SketchPartsCatalog {
       name: '투어링 슈트',
       assetPath: Assets.costumeJerseyT2,
       supportsTint: true,
+      activityType: ActivityType.riding,
     ),
     const SketchPart(
       id: 'costume_jersey_t3',
@@ -278,6 +319,7 @@ class SketchPartsCatalog {
       name: '마스터 빕숏 & 저지',
       assetPath: Assets.costumeJerseyT3,
       supportsTint: true,
+      activityType: ActivityType.riding,
     ),
 
     const SketchPart(
@@ -286,6 +328,7 @@ class SketchPartsCatalog {
       tier: 1,
       name: '스포츠 물병',
       assetPath: Assets.propWaterBottle,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'prop_camera',
@@ -293,6 +336,7 @@ class SketchPartsCatalog {
       tier: 2,
       name: '미니 액션캠',
       assetPath: Assets.propCamera,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'prop_explorer_flag',
@@ -300,6 +344,7 @@ class SketchPartsCatalog {
       tier: 3,
       name: '탐험가의 깃발',
       assetPath: Assets.propExplorerFlag,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'prop_helmet_light',
@@ -307,6 +352,7 @@ class SketchPartsCatalog {
       tier: 1,
       name: '안전 헬멧 라이트',
       assetPath: Assets.propHelmetLight,
+      activityType: ActivityType.riding,
     ),
     const SketchPart(
       id: 'prop_cyclocomputer',
@@ -314,6 +360,7 @@ class SketchPartsCatalog {
       tier: 2,
       name: '스마트 사이클링 컴퓨터',
       assetPath: Assets.propCyclocomputer,
+      activityType: ActivityType.riding,
     ),
     const SketchPart(
       id: 'prop_pannier_bag',
@@ -321,6 +368,7 @@ class SketchPartsCatalog {
       tier: 3,
       name: '투어링 패니어 백',
       assetPath: Assets.propPannierBag,
+      activityType: ActivityType.riding,
     ),
 
     const SketchPart(
@@ -329,6 +377,7 @@ class SketchPartsCatalog {
       tier: 1,
       name: '산들바람',
       assetPath: Assets.effectBreeze,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'effect_sparkle',
@@ -336,6 +385,7 @@ class SketchPartsCatalog {
       tier: 2,
       name: '반짝이는 땀방울',
       assetPath: Assets.effectSparkle,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'effect_fire_boost',
@@ -343,6 +393,7 @@ class SketchPartsCatalog {
       tier: 3,
       name: '버스트 불꽃',
       assetPath: Assets.effectFireBoost,
+      activityType: ActivityType.jogging,
     ),
     const SketchPart(
       id: 'effect_wind_lines',
@@ -350,6 +401,7 @@ class SketchPartsCatalog {
       tier: 1,
       name: '스피드 바람선',
       assetPath: Assets.effectWindLines,
+      activityType: ActivityType.riding,
     ),
     const SketchPart(
       id: 'effect_lightning_trail',
@@ -357,6 +409,7 @@ class SketchPartsCatalog {
       tier: 2,
       name: '번개 잔상 트레일',
       assetPath: Assets.effectLightningTrail,
+      activityType: ActivityType.riding,
     ),
     const SketchPart(
       id: 'effect_supersonic',
@@ -364,6 +417,7 @@ class SketchPartsCatalog {
       tier: 3,
       name: '초음속 충격파',
       assetPath: Assets.effectSupersonic,
+      activityType: ActivityType.riding,
     ),
   ];
   static SketchPart? findById(String id) {
@@ -374,12 +428,27 @@ class SketchPartsCatalog {
     }
   }
 
-  static SketchPart? getPartForSlotAndTier(SketchSlot slot, int tier) {
+  static SketchPart? getPartForSlotAndTier({
+    required SketchSlot slot,
+    required int tier,
+    ActivityType? activityType,}
+  ) {
     final candidates = allParts
-        .where((p) => p.slot == slot && p.tier == tier)
+        .where(
+          (p) =>
+              p.slot == slot &&
+              p.tier == tier &&
+              (activityType == null ||
+                  p.activityType == null ||
+                  p.activityType == activityType),
+        )
         .toList();
-    if (candidates.isEmpty) return null;
-    if (candidates.length == 1) return candidates.first;
+    if (candidates.isEmpty) {
+      return null;
+    }
+    if (candidates.length == 1) {
+      return candidates.first;
+    }
     return candidates[_random.nextInt(candidates.length)];
   }
 

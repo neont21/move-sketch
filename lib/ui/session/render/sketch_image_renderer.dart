@@ -31,7 +31,16 @@ class SketchImageRenderer {
         );
         final dst = Rect.fromLTWH(0, 0, width, height);
 
-        canvas.drawImageRect(image, src, dst, ui.Paint()..isAntiAlias = true);
+        final paint = ui.Paint()..isAntiAlias = true;
+        if (part.supportsTint &&
+            composition.tintColors.containsKey(part.slot)) {
+          final tintInt = composition.tintColors[part.slot]!;
+          paint.colorFilter = ui.ColorFilter.mode(
+            ui.Color(tintInt),
+            ui.BlendMode.hue,
+          );
+        }
+        canvas.drawImageRect(image, src, dst, paint);
         drawnAny = true;
       } catch (_) {
         // 아직 추가되지 않은 에셋이나 로드 실패 파일은 무시하고 안전하게 진행

@@ -46,18 +46,25 @@ class MissionInstance {
 
   MissionInstance evaluateWith(double newValue, MissionTemplate template) {
     final tier = template.evaluateTier(newValue);
-    final achieved = tier != null;
-    final part = achieved
-        ? SketchPartsCatalog.getPartForSlotAndTier(
-            template.partsSlot,
-            tier.tier,
-          )
-        : null;
+    final newTierNumber = tier?.tier ?? 0;
+    final String? newPartId;
 
+    if (newTierNumber == 0) {
+      newPartId = null;
+    } else if (newTierNumber == achievedTier && partId != null) {
+      newPartId = partId;
+    } else {
+      final part = SketchPartsCatalog.getPartForSlotAndTier(
+        slot: template.partsSlot,
+        tier: newTierNumber,
+        activityType: template.activityType,
+      );
+      newPartId = part?.id;
+    }
     return copyWith(
       currentValue: newValue,
-      achievedTier: tier?.tier ?? 0,
-      partId: part?.id,
+      achievedTier: newTierNumber,
+      partId: newPartId,
     );
   }
 

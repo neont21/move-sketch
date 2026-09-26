@@ -5,11 +5,8 @@ import 'package:gal/gal.dart';
 import '../../../config/dependencies.dart';
 import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/enums/session_status.dart';
-import '../../../domain/models/enums/sketch_slot.dart';
 import '../../../domain/models/enums/sync_status.dart';
-import '../../../domain/models/fixed/mission_template.dart';
 import '../../../domain/models/fixed/sketch_parts.dart';
-import '../../../domain/models/session/mission_instance.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../utils/date_time_utils.dart';
@@ -108,7 +105,10 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
     if (user == null) {
       throw const AuthException('사용자 정보를 찾을 수 없습니다.');
     }
-    final sketchComposition = _composeSketch(
+
+    final composeSketchUseCase = ref.read(composeSketchUseCaseProvider);
+
+    final sketchComposition =  composeSketchUseCase.execute(
       missions: session.missions,
       character: user.selectedCharacter,
     );
@@ -160,42 +160,6 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
     );
   }
 
-  SketchComposition _composeSketch({
-    required List<MissionInstance> missions,
-    required CharacterType character,
-  }) {
-    final characterPart = character.toSketchPart();
-    final parts = <SketchSlot, SketchPart>{
-      SketchSlot.character: characterPart,
-      SketchSlot.background: SketchPartsCatalog.defaultBackground,
-    };
-
-    for (final mission in missions) {
-      SketchPart? part;
-
-      if (mission.partId != null && mission.partId!.isNotEmpty) {
-        part = SketchPartsCatalog.findById(mission.partId!);
-      }
-
-      if (part == null && mission.achievedTier > 0) {
-        final template = MissionTemplate.defaultTemplates
-            .where((t) => t.id == mission.missionTemplateId)
-            .firstOrNull;
-        if (template != null) {
-          part = SketchPartsCatalog.getPartForSlotAndTier(
-            template.partsSlot,
-            mission.achievedTier,
-          );
-        }
-      }
-
-      if (part != null) {
-        parts[part.slot] = part;
-      }
-    }
-
-    return SketchComposition(parts: parts);
-  }
 
   Future<Result<SessionResult>> completeAndSaveSession({
     required Uint8List sketchBytes,
