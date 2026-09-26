@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../../../utils/exceptions.dart';
+
 class StorageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
@@ -41,6 +43,18 @@ class StorageService {
     );
 
     return await snapshot.ref.getDownloadURL();
+  }
+
+  Future<Uint8List> downloadFileByUrl(
+      String fileUrl, {
+        int maxSizeBytes = 10 * 1024 * 1024,
+      }) async {
+    final ref = _storage.refFromURL(fileUrl);
+    final bytes = await ref.getData(maxSizeBytes);
+    if (bytes == null) {
+      throw const NotFoundException('이미지 데이터를 찾을 수 없습니다.');
+    }
+    return bytes;
   }
 
   Future<void> deleteFileByUrl(String fileUrl) async {

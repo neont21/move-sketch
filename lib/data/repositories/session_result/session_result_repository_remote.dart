@@ -53,6 +53,24 @@ final class SessionResultRepositoryRemote implements SessionResultRepository {
   }
 
   @override
+  Future<Result<Uint8List>> downloadSketchImage(String imageUrl) async {
+    try {
+      final bytes = await storageService.downloadFileByUrl(imageUrl);
+      return Result.ok(bytes);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '스케치 이미지 다운로드 중 오류가 발생했습니다.'),
+      );
+    } on AppException catch (e){
+      return Result.error(e);
+    } catch (e) {
+      return Result.error(
+        DatabaseException('스케치 이미지 다운로드 중 오류가 발생했습니다.', cause: e),
+      );
+    }
+  }
+
+  @override
   Future<Result<SessionResult?>> getResultById(String sessionId) async {
     try {
       final result = await sessionResultService.getResultById(sessionId);

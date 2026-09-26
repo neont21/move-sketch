@@ -10,6 +10,9 @@ abstract interface class SessionResultRepository {
     required Uint8List sketchBytes,
   });
 
+  /// 스케치 이미지 URL로부터 이미지 바이트를 내려받는다.
+  Future<Result<Uint8List>> downloadSketchImage(String imageUrl);
+
   /// 특정 세션 결과를 조회한다.
   Future<Result<SessionResult?>> getResultById(String sessionId);
 

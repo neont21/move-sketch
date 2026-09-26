@@ -1,54 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import '../../../domain/models/mock_mission_data.dart';
-import '../../../domain/models/mock_session_data.dart';
-import '../../../domain/models/mock_session_history.dart';
+import '../../../config/assets.dart';
+import '../../../domain/models/session/mission_instance.dart';
 import '../../../routing/routes.dart';
+import '../../../utils/date_time_utils.dart';
+import '../../../utils/exceptions.dart';
+import '../../../utils/polyline_utils.dart';
+import '../../../utils/result.dart';
 import '../../core/widgets/activity_badge.dart';
 import '../../session/widgets/path_tracker_view.dart';
 import '../../session/widgets/sketch_card.dart';
+import '../view_models/history_details_viewmodel.dart';
 
-class HistoryDetailsScreen extends StatelessWidget {
+class HistoryDetailsScreen extends ConsumerStatefulWidget {
   final String sessionId;
-  HistoryDetailsScreen({super.key, required this.sessionId});
 
-  final _history = MockSessionHistory(
-    sessionId: 'test1',
-    createdAt: DateTime(2026, 9, 2, 11, 23),
-    isJogging: true,
-    sessionData: MockSessionData(
-      minutes: 32,
-      seconds: 12,
-      km: 3,
-      kcal: 123,
-      id: 'test1',
-    ),
-    missionData: [
-      MockMissionData(
-        title: '거리',
-        data: '4.3',
-        unit: 'km',
-        comment: '충분히 해냈어요',
-      ),
-      MockMissionData(title: '인터벌', data: '2', unit: '회', comment: '충분히 해냈어요'),
-    ],
-  );
+  const HistoryDetailsScreen({super.key, required this.sessionId});
 
-  List<Row> _buildMissionData(BuildContext context) {
+  @override
+  ConsumerState<HistoryDetailsScreen> createState() =>
+      _HistoryDetailsScreenState();
+}
+
+class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
+  late final TextEditingController _memoController;
+  bool _isMemoInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _memoController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _memoController.dispose();
+
+    super.dispose();
+  }
+
+  List<Row> _buildMissionData(
+    BuildContext context,
+    List<MissionInstance> missions,
+  ) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<Row> texts = [];
 
-    for (var mission in _history.missionData) {
+    for (var mission in missions) {
       texts.add(
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${mission.title} · ${mission.comment}',
+              '${mission.axis.label} · ${mission.tierComment}',
               style: textTheme.bodyMedium,
             ),
-            Text('${mission.data}${mission.unit}', style: textTheme.labelLarge),
+            Text(
+              '${mission.formattedValue}${mission.axis.unit}',
+              style: textTheme.labelLarge,
+            ),
           ],
         ),
       );
@@ -57,16 +69,17 @@ class HistoryDetailsScreen extends StatelessWidget {
     return texts;
   }
 
-  Widget? _buildBottomButton(BuildContext context) {
+  Widget? _buildBottomButton(BuildContext context, HistoryDetailsState state) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final result = state.sessionResult;
 
-    if (_history.shared) {
+    if (result.isShared) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
         child: SafeArea(
           child: ElevatedButton(
             onPressed: () {
-              context.go(Routes.historyPost(sessionId));
+              context.go(Routes.historyPost(widget.sessionId));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.surfaceContainer,
@@ -77,14 +90,13 @@ class HistoryDetailsScreen extends StatelessWidget {
           ),
         ),
       );
-    } else if (_history.createdAt == DateTime.now()) {
-      // TODO: 조건 변경 필요 -- 가장 최근 기록일 때
+    } else if (state.isLatest) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
         child: SafeArea(
           child: ElevatedButton(
             onPressed: () {
-              context.go(Routes.historyShare(sessionId));
+              context.go(Routes.historyShare(widget.sessionId));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
@@ -103,118 +115,247 @@ class HistoryDetailsScreen extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          spacing: 20,
-          children: [
-            Text(DateFormat('yyyy-MM-dd (E)', 'ko').format(_history.createdAt)),
-            ActivityBadge(isJogging: _history.isJogging),
-          ],
-        ),
+    final detailsState = ref.watch(
+      historyDetailsViewModelProvider(widget.sessionId),
+    );
+
+    return detailsState.when(
+      loading: () => Scaffold(
+        appBar: AppBar(title: const Text('기록 상세')),
+        body: const Center(child: CircularProgressIndicator()),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Center(
-            child: Column(
-              spacing: 4,
-              children: [
-                SketchCard(
-                  imageProvider: _history.imageURL != null
-                      ? NetworkImage(_history.imageURL!)
-                      : AssetImage('assets/sample_sketch.png'),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: Icon(Icons.download),
-                  label: Text(
-                    '이미지 내려받기',
-                    style: textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.surfaceContainer,
-                    foregroundColor: colorScheme.tertiaryContainer,
-                  ),
-                ),
-                FractionallySizedBox(
-                  widthFactor: 0.9,
-                  child: PathTrackerView(),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(text: '소요 시간\n', style: textTheme.bodySmall),
-                          TextSpan(
-                            text: '${_history.sessionData.minutes}분',
-                            style: textTheme.headlineMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(text: '이동 거리\n', style: textTheme.bodySmall),
-                          TextSpan(
-                            text: '${_history.sessionData.km}km',
-                            style: textTheme.headlineMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '소모 칼로리\n',
-                            style: textTheme.bodySmall,
-                          ),
-                          TextSpan(
-                            text: '${_history.sessionData.kcal}kcal',
-                            style: textTheme.headlineMedium,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Divider(),
-                ..._buildMissionData(context),
-                const SizedBox(height: 16),
-                Row(
-                  spacing: 8,
-                  children: [
-                    Icon(
-                      Icons.lock,
-                      color: textTheme.labelLarge?.color,
-                      size: textTheme.labelLarge?.fontSize,
-                    ),
-                    Text('나만 보는 메모', style: textTheme.labelLarge),
-                  ],
-                ),
-                TextField(
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 20,
-                  minLines: 4,
-                  maxLength: 500,
-                  style: textTheme.bodyMedium,
-                  decoration: InputDecoration(
-                    hintText: '나만 보는 메모를 남길 수 있어요. 피드에도 친구에게도 보이지 않아요.',
-                  ),
-                ),
-              ],
+      error: (error, _) => Scaffold(
+        appBar: AppBar(title: const Text('기록 상세')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(
+              error is AppException ? error.message : '기록을 불러오는 중 오류가 발생했습니다.',
+              style: textTheme.bodyMedium,
             ),
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomButton(context),
+      data: (state) {
+        final result = state.sessionResult;
+
+        if (!_isMemoInitialized) {
+          _memoController.text = result.secretMemo ?? '';
+          _isMemoInitialized = true;
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Row(
+              spacing: 20,
+              children: [
+                Text(result.endedAt.formattedDateWithDay),
+                ActivityBadge(activityType: result.activityType),
+              ],
+            ),
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                child: Column(
+                  spacing: 4,
+                  children: [
+                    SketchCard(
+                      imageProvider:
+                          result.resultSketchImageUrl != null &&
+                              result.resultSketchImageUrl!.isNotEmpty
+                          ? NetworkImage(result.resultSketchImageUrl!)
+                          : const AssetImage(Assets.sampleSketch),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: state.isDownloadingImage
+                          ? null
+                          : () async {
+                              final messenger = ScaffoldMessenger.of(context);
+                              final downloadResult = await ref
+                                  .read(
+                                    historyDetailsViewModelProvider(
+                                      widget.sessionId,
+                                    ).notifier,
+                                  )
+                                  .downloadSketchImage();
+                              switch (downloadResult) {
+                                case Ok():
+                                  messenger.showSnackBar(
+                                    const SnackBar(
+                                      content: Text('스케치 이미지를 갤러리에 저장했습니다.'),
+                                      duration: Duration(seconds: 3),
+                                    ),
+                                  );
+                                case Error(:final error):
+                                  messenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        error is AppException
+                                            ? error.message
+                                            : '이미지 저장에 실패했습니다.',
+                                      ),
+                                      duration: const Duration(seconds: 3),
+                                    ),
+                                  );
+                              }
+                            },
+                      icon: state.isDownloadingImage
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.download),
+                      label: Text(
+                        '이미지 내려받기',
+                        style: textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.surfaceContainer,
+                        foregroundColor: colorScheme.tertiaryContainer,
+                      ),
+                    ),
+                    FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: PathTrackerView(
+                        gpsPoints: PolylineUtils.decodePolyline(
+                          result.routePolyline ?? '',
+                        ),
+                        isTracking: false,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '소요 시간\n',
+                                style: textTheme.bodySmall,
+                              ),
+                              TextSpan(
+                                text: '${result.elapsedDuration.inMinutes}분',
+                                style: textTheme.headlineMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '이동 거리\n',
+                                style: textTheme.bodySmall,
+                              ),
+                              TextSpan(
+                                text:
+                                    '${result.distanceInKm.toStringAsFixed(1)}km',
+                                style: textTheme.headlineMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '소모 칼로리\n',
+                                style: textTheme.bodySmall,
+                              ),
+                              TextSpan(
+                                text: '${result.caloriesBurned}kcal',
+                                style: textTheme.headlineMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+                    ..._buildMissionData(context, result.missions),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.lock,
+                          color: textTheme.labelLarge?.color,
+                          size: textTheme.labelLarge?.fontSize,
+                        ),
+                        const SizedBox(width: 8),
+                        Text('나만 보는 메모', style: textTheme.labelLarge),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: state.isSavingMemo
+                              ? null
+                              : () async {
+                                  final messenger = ScaffoldMessenger.of(
+                                    context,
+                                  );
+                                  final saveResult = await ref
+                                      .read(
+                                        historyDetailsViewModelProvider(
+                                          widget.sessionId,
+                                        ).notifier,
+                                      )
+                                      .updateSecretMemo(_memoController.text);
+                                  switch (saveResult) {
+                                    case Ok():
+                                      messenger.showSnackBar(
+                                        const SnackBar(
+                                          content: Text('메모가 저장되었습니다.'),
+                                          duration: Duration(seconds: 3),
+                                        ),
+                                      );
+                                    case Error(:final error):
+                                      messenger.showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            error is AppException
+                                                ? error.message
+                                                : '메모 저장에 실패했습니다.',
+                                          ),
+                                          duration: const Duration(seconds: 3),
+                                        ),
+                                      );
+                                  }
+                                },
+                          child: state.isSavingMemo
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('저장'),
+                        ),
+                      ],
+                    ),
+                    TextField(
+                      keyboardType: TextInputType.multiline,
+                      controller: _memoController,
+                      maxLines: 20,
+                      minLines: 4,
+                      maxLength: 500,
+                      style: textTheme.bodyMedium,
+                      decoration: InputDecoration(
+                        hintText: '나만 보는 메모를 남길 수 있어요. 피드에도 친구에게도 보이지 않아요.',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          bottomNavigationBar: _buildBottomButton(context, state),
+        );
+      },
     );
   }
 }

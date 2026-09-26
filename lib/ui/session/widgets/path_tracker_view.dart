@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -111,12 +112,12 @@ class _PathTrackerViewState extends State<PathTrackerView> {
           _mapController.move(lastestPoint, _mapController.camera.zoom);
         }
       } else if (!widget.isTracking && widget.gpsPoints.length >= 2) {
-        if (oldWidget.gpsPoints != widget.gpsPoints) {
+        if (!listEquals(oldWidget.gpsPoints, widget.gpsPoints)) {
           _mapController.fitCamera(
             CameraFit.bounds(
               bounds: LatLngBounds.fromPoints(widget.gpsPoints),
               padding: const EdgeInsets.all(28.0),
-              maxZoom: 17.0,
+              maxZoom: 16.0,
             ),
           );
         }
@@ -191,19 +192,18 @@ class _PathTrackerViewState extends State<PathTrackerView> {
           child: FlutterMap(
             mapController: _mapController,
             options: MapOptions(
+              initialCameraFit:
+                  !widget.isTracking && widget.gpsPoints.length >= 2
+                  ? CameraFit.bounds(
+                      bounds: LatLngBounds.fromPoints(widget.gpsPoints),
+                      padding: const EdgeInsets.all(28.0),
+                      maxZoom: 16.0,
+                    )
+                  : null,
               initialCenter: _resolvedCenter,
               initialZoom: widget.initialZoom,
               onMapReady: () {
                 _isMapReady = true;
-                if (!widget.isTracking && widget.gpsPoints.length >= 2) {
-                  _mapController.fitCamera(
-                    CameraFit.bounds(
-                      bounds: LatLngBounds.fromPoints(widget.gpsPoints),
-                      padding: const EdgeInsets.all(28.0),
-                      maxZoom: 17.0,
-                    ),
-                  );
-                }
               },
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.none,
@@ -212,13 +212,14 @@ class _PathTrackerViewState extends State<PathTrackerView> {
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.move_sketch.app',
+                userAgentPackageName: 'com.neonsigntrap.move_sketch',
                 maxZoom: 19,
+                evictErrorTileStrategy: EvictErrorTileStrategy.dispose,
+                tileProvider: NetworkTileProvider(
+                  silenceExceptions: true,
+                ),
                 tileBuilder: (context, tileWidget, tile) {
-                  return Opacity(
-                    opacity: 0.48,
-                    child: tileWidget,
-                  );
+                  return Opacity(opacity: 0.48, child: tileWidget);
                 },
               ),
               if (widget.gpsPoints.isNotEmpty)
