@@ -45,7 +45,6 @@ abstract interface class SessionRepository {
     required String sessionId,
     required SketchComposition sketchComposition,
     String? routePolyline,
-    String? routeImageUrl,
     String? resultSketchImageUrl,
   });
 

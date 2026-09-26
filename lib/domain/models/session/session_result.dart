@@ -28,7 +28,6 @@ class SessionResult {
   final List<MissionInstance> missions;
 
   final String? routePolyline;
-  final String? routeImageUrl;
   final String? resultSketchImageUrl;
 
   final String? secretMemo;
@@ -58,7 +57,6 @@ class SessionResult {
     this.averagePaceInSeconds,
     this.averageSpeedKmh,
     this.routePolyline,
-    this.routeImageUrl,
     this.resultSketchImageUrl,
     this.secretMemo,
     this.syncStatus = SyncStatus.synced,
@@ -87,7 +85,6 @@ class SessionResult {
       'sketchComposition': sketchComposition.toMap(),
       'missions': missions.map((m) => m.toMap()).toList(),
       'routePolyline': routePolyline,
-      'routeImageUrl': routeImageUrl,
       'resultSketchImageUrl': resultSketchImageUrl,
       'secretMemo': secretMemo,
       'isShared': isShared,
@@ -128,7 +125,6 @@ class SessionResult {
               .toList() ??
           [],
       routePolyline: map['routePolyline'] as String?,
-      routeImageUrl: map['routeImageUrl'] as String?,
       resultSketchImageUrl: map['resultSketchImageUrl'] as String?,
       secretMemo: map['secretMemo'] as String?,
       isShared: map['isShared'] as bool? ?? false,
@@ -156,7 +152,6 @@ class SessionResult {
     SketchComposition? sketchComposition,
     List<MissionInstance>? missions,
     ValueGetter<String?>? routePolyline,
-    ValueGetter<String?>? routeImageUrl,
     ValueGetter<String?>? resultSketchImageUrl,
     ValueGetter<String?>? secretMemo,
     bool? isShared,
@@ -189,9 +184,6 @@ class SessionResult {
       routePolyline: routePolyline != null
           ? routePolyline()
           : this.routePolyline,
-      routeImageUrl: routeImageUrl != null
-          ? routeImageUrl()
-          : this.routeImageUrl,
       resultSketchImageUrl: resultSketchImageUrl != null
           ? resultSketchImageUrl()
           : this.resultSketchImageUrl,

@@ -43,19 +43,6 @@ class StorageService {
     return await snapshot.ref.getDownloadURL();
   }
 
-  Future<String> uploadRouteImage({
-    required String userId,
-    required String sessionId,
-    required Uint8List bytes,
-  }) async {
-    final ref = _storage.ref().child('routes/$userId/$sessionId.png');
-    final snapshot = await ref.putData(
-      bytes,
-      SettableMetadata(contentType: 'image/png'),
-    );
-    return await snapshot.ref.getDownloadURL();
-  }
-
   Future<void> deleteFileByUrl(String fileUrl) async {
     final ref = _storage.refFromURL(fileUrl);
     await ref.delete();

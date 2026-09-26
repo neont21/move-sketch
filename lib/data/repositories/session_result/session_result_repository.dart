@@ -8,7 +8,6 @@ abstract interface class SessionResultRepository {
   Future<Result<SessionResult>> saveResult({
     required SessionResult result,
     required Uint8List sketchBytes,
-    required Uint8List routeBytes,
   });
 
   /// 특정 세션 결과를 조회한다.

@@ -136,7 +136,6 @@ final class SessionRepositoryLocal implements SessionRepository {
     required String sessionId,
     required SketchComposition sketchComposition,
     String? routePolyline,
-    String? routeImageUrl,
     String? resultSketchImageUrl,
   }) async {
     try {
@@ -170,7 +169,6 @@ final class SessionRepositoryLocal implements SessionRepository {
         waypoint: waypoint,
         endLocation: session.pathPoints.last,
         routePolyline: routePolyline,
-        routeImageUrl: routeImageUrl,
         resultSketchImageUrl: resultSketchImageUrl,
         missions: List.unmodifiable(session.missions),
         createdAt: now,

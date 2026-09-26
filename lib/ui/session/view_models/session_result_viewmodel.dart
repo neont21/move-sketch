@@ -118,11 +118,6 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
     );
     final routePolyline = PolylineUtils.encodePolyline(simplifiedPoints);
 
-    final routeRenderer = ref.read(routeImageRendererProvider);
-    final routeBytes = await routeRenderer.renderRoute(
-      gpsPoints: simplifiedPoints,
-    );
-
     final sketchRenderer = ref.read(sketchImageRendererProvider);
     final sketchBytes = await sketchRenderer.renderSketch(
       composition: sketchComposition,
@@ -131,16 +126,12 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
     SessionResult? sessionResult;
     String? sketchImageUrl;
 
-    if (sketchBytes != null &&
-        sketchBytes.isNotEmpty &&
-        routeBytes != null &&
-        routeBytes.isNotEmpty) {
+    if (sketchBytes != null && sketchBytes.isNotEmpty) {
       final completeSessionUseCase = ref.read(completeSessionUseCaseProvider);
       final saveResult = await completeSessionUseCase.execute(
         sessionId: session.id,
         sketchComposition: sketchComposition,
         sketchBytes: sketchBytes,
-        routeBytes: routeBytes,
         routePolyline: routePolyline,
       );
 
@@ -222,22 +213,11 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
       );
       final routePolyline = PolylineUtils.encodePolyline(simplifiedPoints);
 
-      final renderer = ref.read(routeImageRendererProvider);
-      final routeBytes = await renderer.renderRoute(
-        gpsPoints: simplifiedPoints,
-      );
-
-      if (routeBytes == null || routeBytes.isEmpty) {
-        state = AsyncData(current.copyWith(isSubmitting: false));
-        return const Result.error(ValidationException('경로 이미지 생성에 실패했습니다.'));
-      }
-
       final completeSessionUseCase = ref.read(completeSessionUseCaseProvider);
       final result = await completeSessionUseCase.execute(
         sessionId: current.session.id,
         sketchComposition: current.sketchComposition,
         sketchBytes: sketchBytes,
-        routeBytes: routeBytes,
         routePolyline: routePolyline,
       );
       state = AsyncData(current.copyWith(isSubmitting: false));
@@ -287,25 +267,10 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
     );
 
     final sketchBytes = current.sketchBytes ?? Uint8List(0);
-    Uint8List routeBytes = Uint8List(0);
-    if (current.session.pathPoints.isNotEmpty) {
-      final simplifiedPoints = await PolylineUtils.simplifyLocationPoints(
-        current.session.pathPoints,
-      );
-      final routeRenderer = ref.read(routeImageRendererProvider);
-      routeBytes =
-          await routeRenderer.renderRoute(gpsPoints: simplifiedPoints) ??
-          Uint8List(0);
-    }
     try {
       final sessionResultRepository = ref.read(sessionResultRepositoryProvider);
-      // 이미지 2장 업로드 시간을 고려해 15초 타임아웃 부여
       final saveResult = await sessionResultRepository
-          .saveResult(
-            result: current.sessionResult!,
-            sketchBytes: sketchBytes,
-            routeBytes: routeBytes,
-          )
+          .saveResult(result: current.sessionResult!, sketchBytes: sketchBytes)
           .timeout(const Duration(seconds: 15));
       switch (saveResult) {
         case Ok(:final value):

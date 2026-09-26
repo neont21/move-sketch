@@ -25,25 +25,16 @@ final class SessionResultRepositoryRemote implements SessionResultRepository {
   Future<Result<SessionResult>> saveResult({
     required SessionResult result,
     required Uint8List sketchBytes,
-    required Uint8List routeBytes,
   }) async {
     try {
-      final uploadedUrl = await Future.wait([
-        storageService.uploadSketchImage(
-          userId: result.userId,
-          sessionId: result.id,
-          bytes: sketchBytes,
-        ),
-        storageService.uploadRouteImage(
-          userId: result.userId,
-          sessionId: result.id,
-          bytes: routeBytes,
-        ),
-      ]);
+      final sketchUrl = await storageService.uploadSketchImage(
+        userId: result.userId,
+        sessionId: result.id,
+        bytes: sketchBytes,
+      );
 
       final resultWithImages = result.copyWith(
-        resultSketchImageUrl: () => uploadedUrl[0],
-        routeImageUrl: () => uploadedUrl[1],
+        resultSketchImageUrl: () => sketchUrl,
       );
       final savedResult = await sessionResultService.saveResult(
         resultWithImages,

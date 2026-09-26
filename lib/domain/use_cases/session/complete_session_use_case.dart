@@ -20,12 +20,11 @@ final class CompleteSessionUseCase {
     required String sessionId,
     required SketchComposition sketchComposition,
     required Uint8List sketchBytes,
-    required Uint8List routeBytes,
     String? routePolyline,
   }) async {
-    if (sketchBytes.isEmpty || routeBytes.isEmpty) {
+    if (sketchBytes.isEmpty) {
       return const Result.error(
-        ValidationException('스케치 또는 경로 이미지 데이터가 비어 있습니다.'),
+        ValidationException('스케치 이미지 데이터가 비어 있습니다.'),
       );
     }
 
@@ -49,7 +48,6 @@ final class CompleteSessionUseCase {
           .saveResult(
         result: sessionResult,
         sketchBytes: sketchBytes,
-        routeBytes: routeBytes,
       )
           .timeout(const Duration(seconds: 10));
     } catch (_) {
