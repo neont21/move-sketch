@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' hide User;
+import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -73,7 +74,7 @@ final class AuthRepositoryRemote implements AuthRepository {
     required String nickname,
     required String email,
     required String password,
-    String selectedCharacterId = 'bear',
+    CharacterType selectedCharacter = CharacterType.bear,
   }) async {
     final trimmed = username.trim();
     if (trimmed.isEmpty) {
@@ -98,7 +99,7 @@ final class AuthRepositoryRemote implements AuthRepository {
         username: username,
         nickname: nickname,
         email: email,
-        selectedCharacterId: selectedCharacterId,
+        selectedCharacterId: selectedCharacter.id,
       );
 
       await authService.resendVerificationEmail().catchError((_) {});

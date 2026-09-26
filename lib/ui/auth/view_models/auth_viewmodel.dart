@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:move_sketch/utils/exceptions.dart';
 import '../../../config/dependencies.dart';
 import '../../../data/repositories/auth/auth_repository.dart';
 import '../../../data/repositories/user/user_repository.dart';
+import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/social/user.dart';
+import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 
 class AuthViewModel extends AsyncNotifier<User?> {
@@ -110,7 +111,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     required String nickname,
     required String email,
     required String password,
-    String selectedCharacterId = 'bear',
+    CharacterType character = CharacterType.bear,
   }) async {
     if (state.isLoading) {
       return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
@@ -123,7 +124,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
       nickname: nickname,
       email: email,
       password: password,
-      selectedCharacterId: selectedCharacterId,
+      selectedCharacter: character,
     );
 
     if (!ref.mounted) {

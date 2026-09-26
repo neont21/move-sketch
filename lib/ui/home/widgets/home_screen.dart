@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/assets.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
@@ -136,7 +137,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         latestResult?.resultSketchImageUrl != null &&
                             latestResult!.resultSketchImageUrl!.isNotEmpty
                         ? NetworkImage(latestResult.resultSketchImageUrl!)
-                        : const AssetImage('assets/sample_sketch.png'),
+                        : const AssetImage(Assets.sampleSketch),
                     caption: latestResult != null
                         ? latestResult.endedAt.formattedDateDot
                         : '첫 장을 기다리는 중',

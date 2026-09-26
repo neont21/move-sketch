@@ -1,3 +1,4 @@
+import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/result.dart';
 
@@ -23,7 +24,7 @@ abstract interface class AuthRepository {
     required String nickname,
     required String email,
     required String password,
-    String selectedCharacterId = 'bear',
+    CharacterType selectedCharacter = CharacterType.bear,
   });
 
   /// 아이디 또는 이메일을 사용하여 내부적으로 이메일 기반 로그인을 한다.

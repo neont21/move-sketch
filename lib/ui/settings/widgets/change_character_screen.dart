@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../config/assets.dart';
+import '../../../domain/models/enums/character_type.dart';
+
 class ChangeCharacterScreen extends StatefulWidget {
   const ChangeCharacterScreen({super.key});
 
@@ -8,7 +11,7 @@ class ChangeCharacterScreen extends StatefulWidget {
 }
 
 class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
-  final List<String> _characters = ['곰', '판다', '고양이', '강아지', '토끼', '카피바라'];
+  final List<CharacterType> _characters = CharacterType.values;
   int _selected = 0;
 
   @override
@@ -28,11 +31,12 @@ class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
             Expanded(
               child: GridView.builder(
                 itemCount: _characters.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 4 / 5,
                 ),
                 itemBuilder: (context, index) {
+                  final character = _characters[index];
                   return GestureDetector(
                     onTap: () {
                       setState(() {
@@ -40,8 +44,8 @@ class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('캐릭터 변경 완료: ${_characters[_selected]}'),
-                          duration: Duration(seconds: 3),
+                          content: Text('캐릭터 변경 완료: ${character.label}'),
+                          duration: const Duration(seconds: 3),
                         ),
                       );
                     },
@@ -66,23 +70,21 @@ class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
                                 aspectRatio: 1,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
-                                  // child: Image(
-                                  //   image: AssetImage(
-                                  //     'assets/character/${_characters[index]}.png',
-                                  //   ),
-                                  //   fit: BoxFit.cover,
-                                  // ),
                                   child: Image(
                                     image: AssetImage(
-                                      'assets/default_profile.png',
+                                      character.defaultImagePath,
                                     ),
                                     fit: BoxFit.cover,
+                                    errorBuilder: (_, _, _) => const Image(
+                                      image: AssetImage(Assets.sampleSketch),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                             Text(
-                              _characters[index],
+                              character.label,
                               style: textTheme.bodyMedium?.copyWith(
                                 color: _selected == index
                                     ? colorScheme.primary

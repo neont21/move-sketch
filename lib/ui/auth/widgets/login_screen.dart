@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/assets.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -137,7 +138,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ],
                     ),
-                    child: SvgPicture.asset('assets/brand/logo-mark.svg'),
+                    child: SvgPicture.asset(Assets.logoMark),
                   ),
                   Text('가볍게 시작해 볼까요?', style: textTheme.displaySmall),
                   AnimatedCrossFade(

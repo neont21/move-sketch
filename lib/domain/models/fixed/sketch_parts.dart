@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import '../../../config/assets.dart';
 import '../enums/character_type.dart';
 import '../enums/sketch_slot.dart';
 
@@ -137,7 +138,7 @@ class SketchPartsCatalog {
     id: 'bg_default',
     slot: SketchSlot.background,
     name: '동네 길거리',
-    assetPath: 'assets/sample_sketch.png',
+    assetPath: Assets.bgDefault,
   );
 
   static final List<SketchPart> allParts = [
@@ -149,42 +150,42 @@ class SketchPartsCatalog {
       slot: SketchSlot.background,
       tier: 1,
       name: '햇살 가득한 공원',
-      assetPath: 'assets/sketch_parts/bg_park_day.png',
+      assetPath: Assets.bgParkDay,
     ),
     const SketchPart(
       id: 'bg_river_sunset',
       slot: SketchSlot.background,
       tier: 2,
       name: '노을 지는 강변',
-      assetPath: 'assets/sketch_parts/bg_river_sunset.png',
+      assetPath: Assets.bgRiverSunset,
     ),
     const SketchPart(
       id: 'bg_city_night',
       slot: SketchSlot.background,
       tier: 3,
       name: '반짝이는 도심 야경',
-      assetPath: 'assets/sketch_parts/bg_city_night.png',
+      assetPath: Assets.bgCityNight,
     ),
     const SketchPart(
       id: 'bg_hangang_track',
       slot: SketchSlot.background,
       tier: 1,
       name: '한강 자전거길',
-      assetPath: 'assets/sketch_parts/bg_hangang_track.png',
+      assetPath: Assets.bgHangangTrack,
     ),
     const SketchPart(
       id: 'bg_coastal_road',
       slot: SketchSlot.background,
       tier: 2,
       name: '시원한 해안 도로',
-      assetPath: 'assets/sketch_parts/bg_coastal_road.png',
+      assetPath: Assets.bgCoastalRoad,
     ),
     const SketchPart(
       id: 'bg_mountain_pass',
       slot: SketchSlot.background,
       tier: 3,
       name: '도전적인 업힐 고갯길',
-      assetPath: 'assets/sketch_parts/bg_mountain_pass.png',
+      assetPath: Assets.bgMountainPass,
     ),
 
     const SketchPart(
@@ -192,42 +193,42 @@ class SketchPartsCatalog {
       slot: SketchSlot.expression,
       tier: 1,
       name: '가벼운 미소',
-      assetPath: 'assets/sketch_parts/expr_smile.png',
+      assetPath: Assets.exprSmile,
     ),
     const SketchPart(
       id: 'expr_energetic',
       slot: SketchSlot.expression,
       tier: 2,
       name: '활기찬 표정',
-      assetPath: 'assets/sketch_parts/expr_energetic.png',
+      assetPath: Assets.exprEnergetic,
     ),
     const SketchPart(
       id: 'expr_proud',
       slot: SketchSlot.expression,
       tier: 3,
       name: '뿌듯한 표정',
-      assetPath: 'assets/sketch_parts/expr_proud.png',
+      assetPath: Assets.exprProud,
     ),
     const SketchPart(
       id: 'expr_relaxed',
       slot: SketchSlot.expression,
       tier: 1,
       name: '여유로운 표정',
-      assetPath: 'assets/sketch_parts/expr_relaxed.png',
+      assetPath: Assets.exprRelaxed,
     ),
     const SketchPart(
       id: 'expr_confident',
       slot: SketchSlot.expression,
       tier: 2,
       name: '자신만만한 표정',
-      assetPath: 'assets/sketch_parts/expr_confident.png',
+      assetPath: Assets.exprConfident,
     ),
     const SketchPart(
       id: 'expr_thrilled',
       slot: SketchSlot.expression,
       tier: 3,
       name: '짜릿한 표정',
-      assetPath: 'assets/sketch_parts/expr_thrilled.png',
+      assetPath: Assets.exprThrilled,
     ),
 
     const SketchPart(
@@ -235,7 +236,7 @@ class SketchPartsCatalog {
       slot: SketchSlot.costume,
       tier: 1,
       name: '베이직 러닝 웨어',
-      assetPath: 'assets/sketch_parts/costume_sport_t1.png',
+      assetPath: Assets.costumeSportT1,
       supportsTint: true,
     ),
     const SketchPart(
@@ -243,7 +244,7 @@ class SketchPartsCatalog {
       slot: SketchSlot.costume,
       tier: 2,
       name: '프로 러너 셋업',
-      assetPath: 'assets/sketch_parts/costume_sport_t2.png',
+      assetPath: Assets.costumeSportT2,
       supportsTint: true,
     ),
     const SketchPart(
@@ -251,7 +252,7 @@ class SketchPartsCatalog {
       slot: SketchSlot.costume,
       tier: 3,
       name: '챔피언 윈드브레이커',
-      assetPath: 'assets/sketch_parts/costume_sport_t3.png',
+      assetPath: Assets.costumeSportT3,
       supportsTint: true,
     ),
     const SketchPart(
@@ -259,7 +260,7 @@ class SketchPartsCatalog {
       slot: SketchSlot.costume,
       tier: 1,
       name: '에어로 사이클 저지',
-      assetPath: 'assets/sketch_parts/costume_jersey_t1.png',
+      assetPath: Assets.costumeJerseyT1,
       supportsTint: true,
     ),
     const SketchPart(
@@ -267,7 +268,7 @@ class SketchPartsCatalog {
       slot: SketchSlot.costume,
       tier: 2,
       name: '투어링 슈트',
-      assetPath: 'assets/sketch_parts/costume_jersey_t2.png',
+      assetPath: Assets.costumeJerseyT2,
       supportsTint: true,
     ),
     const SketchPart(
@@ -275,7 +276,7 @@ class SketchPartsCatalog {
       slot: SketchSlot.costume,
       tier: 3,
       name: '마스터 빕숏 & 저지',
-      assetPath: 'assets/sketch_parts/costume_jersey_t3.png',
+      assetPath: Assets.costumeJerseyT3,
       supportsTint: true,
     ),
 
@@ -284,42 +285,42 @@ class SketchPartsCatalog {
       slot: SketchSlot.prop,
       tier: 1,
       name: '스포츠 물병',
-      assetPath: 'assets/sketch_parts/prop_water_bottle.png',
+      assetPath: Assets.propWaterBottle,
     ),
     const SketchPart(
       id: 'prop_camera',
       slot: SketchSlot.prop,
       tier: 2,
       name: '미니 액션캠',
-      assetPath: 'assets/sketch_parts/prop_camera.png',
+      assetPath: Assets.propCamera,
     ),
     const SketchPart(
       id: 'prop_explorer_flag',
       slot: SketchSlot.prop,
       tier: 3,
       name: '탐험가의 깃발',
-      assetPath: 'assets/sketch_parts/prop_explorer_flag.png',
+      assetPath: Assets.propExplorerFlag,
     ),
     const SketchPart(
       id: 'prop_helmet_light',
       slot: SketchSlot.prop,
       tier: 1,
       name: '안전 헬멧 라이트',
-      assetPath: 'assets/sketch_parts/prop_helmet_light.png',
+      assetPath: Assets.propHelmetLight,
     ),
     const SketchPart(
       id: 'prop_cyclocomputer',
       slot: SketchSlot.prop,
       tier: 2,
       name: '스마트 사이클링 컴퓨터',
-      assetPath: 'assets/sketch_parts/prop_cyclocomputer.png',
+      assetPath: Assets.propCyclocomputer,
     ),
     const SketchPart(
       id: 'prop_pannier_bag',
       slot: SketchSlot.prop,
       tier: 3,
       name: '투어링 패니어 백',
-      assetPath: 'assets/sketch_parts/prop_pannier_bag.png',
+      assetPath: Assets.propPannierBag,
     ),
 
     const SketchPart(
@@ -327,42 +328,42 @@ class SketchPartsCatalog {
       slot: SketchSlot.effect,
       tier: 1,
       name: '산들바람',
-      assetPath: 'assets/sketch_parts/effect_breeze.png',
+      assetPath: Assets.effectBreeze,
     ),
     const SketchPart(
       id: 'effect_sparkle',
       slot: SketchSlot.effect,
       tier: 2,
       name: '반짝이는 땀방울',
-      assetPath: 'assets/sketch_parts/effect_sparkle.png',
+      assetPath: Assets.effectSparkle,
     ),
     const SketchPart(
       id: 'effect_fire_boost',
       slot: SketchSlot.effect,
       tier: 3,
       name: '버스트 불꽃',
-      assetPath: 'assets/sketch_parts/effect_fire_boost.png',
+      assetPath: Assets.effectFireBoost,
     ),
     const SketchPart(
       id: 'effect_wind_lines',
       slot: SketchSlot.effect,
       tier: 1,
       name: '스피드 바람선',
-      assetPath: 'assets/sketch_parts/effect_wind_lines.png',
+      assetPath: Assets.effectWindLines,
     ),
     const SketchPart(
       id: 'effect_lightning_trail',
       slot: SketchSlot.effect,
       tier: 2,
       name: '번개 잔상 트레일',
-      assetPath: 'assets/sketch_parts/effect_lightning_trail.png',
+      assetPath: Assets.effectLightningTrail,
     ),
     const SketchPart(
       id: 'effect_supersonic',
       slot: SketchSlot.effect,
       tier: 3,
       name: '초음속 충격파',
-      assetPath: 'assets/sketch_parts/effect_supersonic.png',
+      assetPath: Assets.effectSupersonic,
     ),
   ];
   static SketchPart? findById(String id) {

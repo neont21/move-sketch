@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/assets.dart';
 import '../../../routing/routes.dart';
 
 class LandingScreen extends StatelessWidget {
@@ -24,7 +25,7 @@ class LandingScreen extends StatelessWidget {
                   SizedBox(
                     height: 80,
                     width: 80,
-                    child: SvgPicture.asset('assets/brand/logo-mark.svg'),
+                    child: SvgPicture.asset(Assets.logoMark),
                   ),
                   Text('무브스케치', style: textTheme.displayLarge),
                 ],
