@@ -57,30 +57,12 @@ class HistoryDetailsViewModel extends AsyncNotifier<HistoryDetailsState> {
 
     try {
       final geocodingRepository = ref.read(geocodingRepositoryProvider);
-      final startTag = await geocodingRepository.reverseGeocode(
-        latitude: sessionResult.startLocation.latitude,
-        longitude: sessionResult.startLocation.longitude,
+      final tags = await geocodingRepository.resolveSessionLocationTags(
+        start: sessionResult.startLocation,
+        waypoint: sessionResult.waypoint,
+        end: sessionResult.endLocation,
       );
-      final waypointTag = await geocodingRepository.reverseGeocode(
-        latitude: sessionResult.waypoint.latitude,
-        longitude: sessionResult.waypoint.longitude,
-      );
-      final isRoundTrip =
-          (sessionResult.startLocation.latitude -
-              sessionResult.endLocation.latitude)
-              .abs() <
-              0.0005 &&
-              (sessionResult.startLocation.longitude -
-                  sessionResult.endLocation.longitude)
-                  .abs() <
-                  0.0005;
-      final endTag = isRoundTrip
-          ? startTag
-          : await geocodingRepository.reverseGeocode(
-        latitude: sessionResult.endLocation.latitude,
-        longitude: sessionResult.endLocation.longitude,
-      );
-      final tags = [startTag, waypointTag, endTag];
+
 
       if (tags.any((t) => t == '알 수 없는 위치')) {
         return sessionResult;

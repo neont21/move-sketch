@@ -106,30 +106,12 @@ class SessionShareViewModel extends AsyncNotifier<SessionShareState> {
         !sessionResult.locationTags.any((t) => t == '알 수 없는 위치')) {
       locationTags = sessionResult.locationTags;
     } else if (sessionResult != null) {
-      final startTag = await geocodingRepository.reverseGeocode(
-        latitude: sessionResult.startLocation.latitude,
-        longitude: sessionResult.startLocation.longitude,
+      locationTags = await geocodingRepository.resolveSessionLocationTags(
+        start: sessionResult.startLocation,
+        waypoint: sessionResult.waypoint,
+        end: sessionResult.endLocation,
       );
-      final waypointTag = await geocodingRepository.reverseGeocode(
-        latitude: sessionResult.waypoint.latitude,
-        longitude: sessionResult.waypoint.longitude,
-      );
-      final isRoundTrip =
-          (sessionResult.startLocation.latitude -
-                      sessionResult.endLocation.latitude)
-                  .abs() <
-              0.0005 &&
-          (sessionResult.startLocation.longitude -
-                      sessionResult.endLocation.longitude)
-                  .abs() <
-              0.0005;
-      final endTag = isRoundTrip
-          ? startTag
-          : await geocodingRepository.reverseGeocode(
-              latitude: sessionResult.endLocation.latitude,
-              longitude: sessionResult.endLocation.longitude,
-            );
-      locationTags = [startTag, waypointTag, endTag];
+
     } else {
       locationTags = const ['알 수 없는 위치', '알 수 없는 위치', '알 수 없는 위치'];
     }
