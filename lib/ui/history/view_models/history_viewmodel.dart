@@ -7,6 +7,7 @@ import '../../../domain/models/session/session_result.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
+import '../../home/view_models/home_viewmodel.dart';
 
 @immutable
 class HistoryState {
@@ -127,6 +128,7 @@ class HistoryViewModel extends AsyncNotifier<HistoryState> {
 
     switch (result) {
       case Ok():
+        ref.invalidate(homeViewModelProvider);
         state = state.whenData((current) {
           return current.copyWith(
             results: current.results

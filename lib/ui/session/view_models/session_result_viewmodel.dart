@@ -14,6 +14,8 @@ import '../../../utils/exceptions.dart';
 import '../../../utils/polyline_utils.dart';
 import '../../../utils/result.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
+import '../../history/view_models/history_viewmodel.dart';
+import '../../home/view_models/home_viewmodel.dart';
 
 @immutable
 class SessionResultState {
@@ -139,6 +141,8 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
         case Ok(:final value):
           sessionResult = value;
           sketchImageUrl = value.resultSketchImageUrl;
+          ref.invalidate(homeViewModelProvider);
+          ref.invalidate(historyViewModelProvider);
         case Error():
           sessionResult = null;
       }
@@ -184,6 +188,13 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
         sketchBytes: sketchBytes,
         routePolyline: routePolyline,
       );
+      switch (result) {
+        case Ok():
+          ref.invalidate(homeViewModelProvider);
+          ref.invalidate(historyViewModelProvider);
+        case Error():
+          break;
+      }
       state = AsyncData(current.copyWith(isSubmitting: false));
       return result;
     } catch (e) {
