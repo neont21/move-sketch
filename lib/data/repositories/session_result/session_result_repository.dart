@@ -48,6 +48,12 @@ abstract interface class SessionResultRepository {
     required bool isShared,
   });
 
+  /// 역지오코딩된 위치 태그를 업데이트한다.
+  Future<Result<void>> updateLocationTags({
+    required String sessionId,
+    required List<String> locationTags,
+  });
+
   /// 세션 결과를 삭제한다.
   Future<Result<void>> deleteResult(
     String sessionId, {

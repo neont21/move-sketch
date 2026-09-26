@@ -61,7 +61,7 @@ final class SessionResultRepositoryRemote implements SessionResultRepository {
       return Result.error(
         e.toAppException(defaultMessage: '스케치 이미지 다운로드 중 오류가 발생했습니다.'),
       );
-    } on AppException catch (e){
+    } on AppException catch (e) {
       return Result.error(e);
     } catch (e) {
       return Result.error(
@@ -227,6 +227,28 @@ final class SessionResultRepositoryRemote implements SessionResultRepository {
     } catch (e) {
       return Result.error(
         DatabaseException('공유 상태 변경 중 오류가 발생했습니다.', cause: e),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> updateLocationTags({
+    required String sessionId,
+    required List<String> locationTags,
+  }) async {
+    try {
+      await sessionResultService.updateLocationTags(
+        resultId: sessionId,
+        locationTags: locationTags,
+      );
+      return const Result.ok(null);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '위치 태그 저장 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('위치 태그 저장 중 오류가 발생했습니다.', cause: e),
       );
     }
   }

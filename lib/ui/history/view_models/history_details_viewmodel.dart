@@ -6,6 +6,7 @@ import 'package:gal/gal.dart';
 import 'package:move_sketch/ui/auth/view_models/auth_viewmodel.dart';
 
 import '../../../config/dependencies.dart';
+import '../../../data/repositories/session_result/session_result_repository.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../utils/date_time_utils.dart';
 import '../../../utils/exceptions.dart';
@@ -45,6 +46,59 @@ class HistoryDetailsViewModel extends AsyncNotifier<HistoryDetailsState> {
 
   HistoryDetailsViewModel(this.sessionId);
 
+  Future<SessionResult> _enrichLocationTags(
+      SessionResult sessionResult,
+      SessionResultRepository sessionResultRepository,
+      ) async {
+    if (sessionResult.locationTags.length == 3 &&
+        !sessionResult.locationTags.any((t) => t == '알 수 없는 위치')) {
+      return sessionResult;
+    }
+
+    try {
+      final geocodingRepository = ref.read(geocodingRepositoryProvider);
+      final startTag = await geocodingRepository.reverseGeocode(
+        latitude: sessionResult.startLocation.latitude,
+        longitude: sessionResult.startLocation.longitude,
+      );
+      final waypointTag = await geocodingRepository.reverseGeocode(
+        latitude: sessionResult.waypoint.latitude,
+        longitude: sessionResult.waypoint.longitude,
+      );
+      final isRoundTrip =
+          (sessionResult.startLocation.latitude -
+              sessionResult.endLocation.latitude)
+              .abs() <
+              0.0005 &&
+              (sessionResult.startLocation.longitude -
+                  sessionResult.endLocation.longitude)
+                  .abs() <
+                  0.0005;
+      final endTag = isRoundTrip
+          ? startTag
+          : await geocodingRepository.reverseGeocode(
+        latitude: sessionResult.endLocation.latitude,
+        longitude: sessionResult.endLocation.longitude,
+      );
+      final tags = [startTag, waypointTag, endTag];
+
+      if (tags.any((t) => t == '알 수 없는 위치')) {
+        return sessionResult;
+      }
+
+      unawaited(
+        sessionResultRepository.updateLocationTags(
+          sessionId: sessionId,
+          locationTags: tags,
+        ),
+      );
+
+      return sessionResult.copyWith(locationTags: tags);
+    } catch (_) {
+      return sessionResult;
+    }
+  }
+
   @override
   Future<HistoryDetailsState> build() async {
     final sessionResultRepository = ref.read(sessionResultRepositoryProvider);
@@ -60,6 +114,10 @@ class HistoryDetailsViewModel extends AsyncNotifier<HistoryDetailsState> {
       case Error(:final error):
         throw error;
     }
+    final enrichedResult = await _enrichLocationTags(
+      sessionResult,
+      sessionResultRepository,
+    );
 
     final user = await ref.watch(authViewModelProvider.future);
     bool isLatest = false;
@@ -74,7 +132,7 @@ class HistoryDetailsViewModel extends AsyncNotifier<HistoryDetailsState> {
     }
 
     return HistoryDetailsState(
-      sessionResult: sessionResult,
+      sessionResult: enrichedResult,
       isLatest: isLatest,
     );
   }

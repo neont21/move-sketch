@@ -101,6 +101,10 @@ class SessionShareViewModel extends AsyncNotifier<SessionShareState> {
     if (sketchPost != null && sketchPost.locationTags.length == 3) {
       locationTags = sketchPost.locationTags;
       selectedIndex = sketchPost.locationIndex;
+    } else if (sessionResult != null &&
+        sessionResult.locationTags.length == 3 &&
+        !sessionResult.locationTags.any((t) => t == '알 수 없는 위치')) {
+      locationTags = sessionResult.locationTags;
     } else if (sessionResult != null) {
       final startTag = await geocodingRepository.reverseGeocode(
         latitude: sessionResult.startLocation.latitude,

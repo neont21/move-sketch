@@ -32,6 +32,7 @@ class SessionResult {
 
   final String? secretMemo;
   final bool isShared;
+  final List<String> locationTags;
 
   final SyncStatus syncStatus;
   final DateTime createdAt;
@@ -54,6 +55,7 @@ class SessionResult {
     required this.missions,
     required this.createdAt,
     required this.isShared,
+    this.locationTags = const [],
     this.averagePaceInSeconds,
     this.averageSpeedKmh,
     this.routePolyline,
@@ -88,6 +90,7 @@ class SessionResult {
       'resultSketchImageUrl': resultSketchImageUrl,
       'secretMemo': secretMemo,
       'isShared': isShared,
+      'locationTags': locationTags,
       'syncStatus': syncStatus.name,
       'createdAt': createdAt.toUtc().toIso8601String(),
       'updatedAt': updatedAt?.toUtc().toIso8601String(),
@@ -128,6 +131,11 @@ class SessionResult {
       resultSketchImageUrl: map['resultSketchImageUrl'] as String?,
       secretMemo: map['secretMemo'] as String?,
       isShared: map['isShared'] as bool? ?? false,
+      locationTags:
+          (map['locationTags'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
       syncStatus: SyncStatus.fromString(map['syncStatus'] as String?),
       createdAt: parseDateTime(map['createdAt']).toLocal(),
       updatedAt: tryParseDateTime(map['updatedAt'])?.toLocal(),
@@ -155,6 +163,7 @@ class SessionResult {
     ValueGetter<String?>? resultSketchImageUrl,
     ValueGetter<String?>? secretMemo,
     bool? isShared,
+    List<String>? locationTags,
     ValueGetter<String?>? sharedPostId,
     SyncStatus? syncStatus,
     DateTime? createdAt,
@@ -189,6 +198,7 @@ class SessionResult {
           : this.resultSketchImageUrl,
       secretMemo: secretMemo != null ? secretMemo() : this.secretMemo,
       isShared: isShared ?? this.isShared,
+      locationTags: locationTags ?? this.locationTags,
       syncStatus: syncStatus ?? this.syncStatus,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt != null ? updatedAt() : this.updatedAt,

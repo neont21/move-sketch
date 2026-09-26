@@ -69,6 +69,45 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
     return texts;
   }
 
+  String? _formatCourseRoute(List<String> tags) {
+    if (tags.isEmpty) {
+      return null;
+    }
+
+    final validTags = tags
+        .where((t) => t.isNotEmpty && t != '알 수 없는 위치')
+        .toList();
+    if (validTags.isEmpty) {
+      return null;
+    }
+
+    if (tags.length == 3) {
+      final start = tags[0];
+      final mid = tags[1];
+      final end = tags[2];
+
+      final isStartValid = start != '알 수 없는 위치';
+      final isMidValid = mid != '알 수 없는 위치';
+      final isEndValid = end != '알 수 없는 위치';
+
+      if (isStartValid && isEndValid && start == end) {
+        if (isMidValid && mid != start) {
+          return '$start ↔︎ $mid';
+        }
+        return start;
+      }
+    }
+
+    final uniqueConsecutive = <String>[];
+    for (final t in validTags) {
+      if (uniqueConsecutive.isEmpty || uniqueConsecutive.last != t) {
+        uniqueConsecutive.add(t);
+      }
+    }
+
+    return uniqueConsecutive.join(' ➔ ');
+  }
+
   Widget? _buildBottomButton(BuildContext context, HistoryDetailsState state) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final result = state.sessionResult;
@@ -227,6 +266,54 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
                         ),
                         isTracking: false,
                       ),
+                    ),
+                    Builder(
+                      builder: (context) {
+                        final courseRoute = _formatCourseRoute(
+                          result.locationTags,
+                        );
+                        if (courseRoute == null) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainer,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: colorScheme.outlineVariant,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.place_outlined,
+                                  size: 16,
+                                  color: colorScheme.primary,
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    courseRoute,
+                                    style: textTheme.labelMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
                     Row(

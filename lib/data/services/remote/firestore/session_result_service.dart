@@ -119,6 +119,16 @@ class SessionResultService {
     });
   }
 
+  Future<void> updateLocationTags({
+    required String resultId,
+    required List<String> locationTags,
+  }) async {
+    await _resultsRef.doc(resultId).update({
+      'locationTags': locationTags,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   Future<void> deleteResult(String resultId) async {
     await _resultsRef.doc(resultId).update({
       'deletedAt': FieldValue.serverTimestamp(),

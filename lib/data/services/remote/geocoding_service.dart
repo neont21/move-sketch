@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 class GeocodingService {
   final http.Client _client;
   final String baseUrl;
+  DateTime _lastRequestTime = DateTime(2000);
 
   GeocodingService({
     http.Client? client,
@@ -14,6 +15,12 @@ class GeocodingService {
     required double latitude,
     required double longitude,
   }) async {
+    final now = DateTime.now();
+    final elapsed = now.difference(_lastRequestTime);
+    if (elapsed < const Duration(milliseconds: 1100)) {
+      await Future.delayed(const Duration(milliseconds: 1100) - elapsed);
+    }
+    _lastRequestTime = DateTime.now();
     try {
       final uri = Uri.parse('$baseUrl/reverse').replace(
         queryParameters: {
