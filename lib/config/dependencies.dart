@@ -11,6 +11,8 @@ import '../data/repositories/location/location_repository.dart';
 import '../data/repositories/location/location_repository_local.dart';
 import '../data/repositories/notification/notification_repository.dart';
 import '../data/repositories/notification/notification_repository_remote.dart';
+import '../data/repositories/report/report_repository.dart';
+import '../data/repositories/report/report_repository_remote.dart';
 import '../data/repositories/session/session_repository.dart';
 import '../data/repositories/session/session_repository_local.dart';
 import '../data/repositories/session_result/session_result_repository.dart';
@@ -28,6 +30,7 @@ import '../data/services/local/session_service.dart';
 import '../data/services/remote/auth_service.dart';
 import '../data/services/remote/firestore/friendship_service.dart';
 import '../data/services/remote/firestore/notification_service.dart';
+import '../data/services/remote/firestore/report_service.dart';
 import '../data/services/remote/firestore/session_result_service.dart';
 import '../data/services/remote/firestore/sketch_post_service.dart';
 import '../data/services/remote/firestore/user_service.dart';
@@ -112,6 +115,11 @@ final sketchPostServiceProvider = Provider<SketchPostService>((ref) {
 /// NotificationService Provider: Firestore 기반 알림 소셜 활동 알림 관리
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
+});
+
+/// ReportService Provider: Firestore 기반 신고 접수 저장
+final reportServiceProvider = Provider<ReportService>((ref) {
+  return ReportService();
 });
 
 /// GeocodingService Provider: OpenStreetMap Nominatim 기반 한글 행정구역 역지오코딩
@@ -201,6 +209,14 @@ final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   );
 });
 
+/// ReportRepository Provider: 게시물/댓글/사용자 신고 접수 저장소
+/// 신고 대상 및 신고 사유에 대한 보고
+final reportRepositoryProvider = Provider<ReportRepository>((ref) {
+  return ReportRepositoryRemote(
+    reportService: ref.watch(reportServiceProvider),
+  );
+});
+
 /// GeocodingRepository Provider: 위/경도 기반 한국 행정구역 주소 변환 저장소
 /// 출발지/경유지/도착지 좌표를 통해 주소 표기
 final geocodingRepositoryProvider = Provider<GeocodingRepository>((ref) {
@@ -218,7 +234,6 @@ final completeSessionUseCaseProvider = Provider<CompleteSessionUseCase>((ref) {
     sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
   );
 });
-
 
 /// ComposeSketchUseCase Provider: 운동 미션 달성 티어에 따른 스케치 파츠 조합 UseCase
 /// 티어에 맞는 스케치 파츠에 랜덤 틴트를 묻혀 쌓아올린 결과물 생성

@@ -1,38 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../config/dependencies.dart';
+import '../../../domain/models/enums/report_type.dart';
+import '../../../domain/models/social/report.dart';
+import '../../../domain/models/social/user.dart';
+import '../../../utils/exceptions.dart';
+import '../../../utils/result.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
 
-enum ReportReason {
-  inappropriateProfile('부적절한 프로필'),
-  harassment('욕설, 비하 또는 괴롭힘'),
-  spam('스팸 또는 홍보'),
-  other('기타');
-
-  final String label;
-
-  const ReportReason(this.label);
-}
-
-class ReportDialog extends StatefulWidget {
-  final String userId;
-  final String targetUserId;
+class ReportDialog extends ConsumerStatefulWidget {
+  final UserSummary targetUser;
+  final UserSummary reporter;
   final String? sketchId;
   final String? commentId;
 
   const ReportDialog({
     super.key,
-    required this.userId,
-    required this.targetUserId,
+    required this.targetUser,
+    required this.reporter,
     this.sketchId,
     this.commentId,
   });
 
   @override
-  State<ReportDialog> createState() => _ReportDialogState();
+  ConsumerState<ReportDialog> createState() => _ReportDialogState();
 }
 
-class _ReportDialogState extends State<ReportDialog> {
-  ReportReason? _selectedReason;
+class _ReportDialogState extends ConsumerState<ReportDialog> {
+  late final TextEditingController _descriptionController;
+  ReportType? _reportType;
+  bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _descriptionController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_reportType == null || _isSubmitting) {
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final report = Report.create(
+      targetUser: widget.targetUser,
+      reporter: widget.reporter,
+      reportType: _reportType!,
+      sketchId: widget.sketchId,
+      commentId: widget.commentId,
+      description: _reportType == ReportType.other ? _descriptionController.text : null,
+    );
+
+    final result = await ref.read(reportRepositoryProvider).submitReport(report);
+
+    if (!mounted) {
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    context.pop();
+    messenger.showSnackBar(
+      SnackBar(content: Text(
+        switch (result) {
+          Ok() => '신고가 접수되었습니다.',
+          Error(:final error) => error is AppException
+              ? error.message
+              : '신고 접수 중 오류가 발생했습니다.',
+        }
+      ))
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,16 +97,16 @@ class _ReportDialogState extends State<ReportDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('신고 사유를 선택해 주세요', style: textTheme.headlineSmall),
-          RadioGroup<ReportReason>(
-            groupValue: _selectedReason,
+          RadioGroup<ReportType>(
+            groupValue: _reportType,
             onChanged: (value) {
               setState(() {
-                _selectedReason = value;
+                _reportType = value;
               });
             },
             child: Column(
-              children: ReportReason.values.map((reason) {
-                return RadioListTile<ReportReason>(
+              children: ReportType.values.map((reason) {
+                return RadioListTile<ReportType>(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   activeColor: colorScheme.primary,
@@ -66,7 +116,7 @@ class _ReportDialogState extends State<ReportDialog> {
               }).toList(),
             ),
           ),
-          if (_selectedReason == ReportReason.other)
+          if (_reportType == ReportType.other)
             TextField(
               maxLength: 60,
               maxLines: 4,
@@ -89,16 +139,7 @@ class _ReportDialogState extends State<ReportDialog> {
             onCancel: () {
               context.pop();
             },
-            onConfirm: () {
-              context.pop();
-              // TODO implement
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('신고가 접수되었습니다.'),
-                  duration: Duration(seconds: 3),
-                ),
-              );
-            },
+            onConfirm: _submit,
           ),
         ],
       ),
