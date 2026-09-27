@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import '../../../domain/models/enums/activity_type.dart';
-import '../../../domain/models/mock_sketch.dart';
-import '../../../domain/models/mock_user.dart';
+import '../../../domain/models/social/sketch_post.dart';
 import '../../../routing/routes.dart';
+import '../../../utils/date_time_utils.dart';
 import '../../core/widgets/activity_badge.dart';
 import '../../core/widgets/bottom_sheet_button.dart';
+import '../../core/widgets/user_avatar.dart';
 import '../../session/widgets/sketch_card.dart';
 
 class FeedPostCard extends StatelessWidget {
-  final MockSketch sketch;
-  final MockUser user = MockUser(id: '@daniil_a_np', name: '다닐루쉬카');
+  final SketchPost sketch;
   final bool isDetail;
+  final VoidCallback? onDelete;
 
-  FeedPostCard({super.key, required this.sketch, this.isDetail = false});
+  const FeedPostCard({super.key, required this.sketch, this.isDetail = false, this.onDelete});
 
-  Row? metadata(BuildContext context) {
+  Row? _metadata(BuildContext context) {
     if (isDetail) {
       return null;
     }
@@ -30,14 +29,14 @@ class FeedPostCard extends StatelessWidget {
           color: colorScheme.tertiaryContainer,
           size: 16,
         ),
-        Text('응원 ${sketch.cheeredUser.length}', style: textTheme.labelMedium),
+        Text('응원 ${sketch.cheerCount}', style: textTheme.labelMedium),
         SizedBox(width: 10),
         Icon(
           Icons.mode_comment_outlined,
           color: colorScheme.tertiaryContainer,
           size: 16,
         ),
-        Text('댓글 ${sketch.comments.length}', style: textTheme.labelMedium),
+        Text('댓글 ${sketch.commentCount}', style: textTheme.labelMedium),
       ],
     );
   }
@@ -46,20 +45,23 @@ class FeedPostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
+    final metaText = [
+      sketch.locationTag,
+      if (sketch.weather != null) {sketch.weather!.shortSummary},
+      sketch.createdAt.formattedFeedTime,
+    ].join(' · ');
+
     return Column(
       spacing: 20,
       children: [
         Row(
           spacing: 8,
           children: [
-            GestureDetector(
-              onTap: () {
-                context.go(Routes.feedProfile(sketch.author.id));
-              },
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage: const AssetImage('assets/default_profile.png'),
-              ),
+            UserAvatar(
+              username: sketch.author.username,
+              imageUrl: sketch.author.imageUrl,
+              onTap: () =>
+                  context.go(Routes.feedProfile(sketch.author.username)),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,49 +71,41 @@ class FeedPostCard extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        context.go(Routes.feedProfile(sketch.author.id));
+                        context.go(Routes.feedProfile(sketch.author.username));
                       },
                       child: Text(
-                        sketch.author.name,
+                        sketch.author.nickname,
                         style: textTheme.bodyLarge,
                       ),
                     ),
-                    ActivityBadge(
-                      activityType: sketch.isJogging
-                          ? ActivityType.jogging
-                          : ActivityType.riding,
-                    ),
+                    ActivityBadge(activityType: sketch.activityType),
                   ],
                 ),
-                Text(
-                  '${sketch.location} · ${sketch.weather} · ${DateFormat('MM/dd (E) HH:mm', 'ko').format(sketch.createdAt)}',
-                  style: textTheme.labelMedium,
-                ),
+                Text(metaText, style: textTheme.labelMedium),
               ],
             ),
             Spacer(),
             BottomSheetButton(
-              authorId: sketch.author.id,
-              sketchIdIfPost: sketch.sketchId,
+              author: sketch.author,
+              sketchIdIfPost: sketch.id,
+              onDelete: onDelete,
             ),
           ],
         ),
         GestureDetector(
           onTap: () {
-            context.go(Routes.feedPost(sketch.sketchId));
+            context.go(Routes.feedPost(sketch.id));
           },
           child: Transform.rotate(
             angle: 0.03,
             child: SketchCard(
-              imageProvider: (sketch.sketchURL != null)
-                  ? NetworkImage(sketch.sketchURL!)
-                  : AssetImage('assets/sample_sketch.png'),
-              caption: sketch.text,
+              imageProvider: NetworkImage(sketch.sketchUrl),
+              caption: sketch.caption,
             ),
           ),
         ),
-        ?metadata(context),
-        if (!isDetail) const SizedBox(height: 16,),
+        ?_metadata(context),
+        if (!isDetail) const SizedBox(height: 16),
       ],
     );
   }

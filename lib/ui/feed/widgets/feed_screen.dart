@@ -1,95 +1,72 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../domain/models/mock_sketch.dart';
-import '../../../domain/models/mock_user.dart';
 import '../../../routing/routes.dart';
+import '../../../utils/exceptions.dart';
+import '../../../utils/result.dart';
+import '../view_models/feed_viewmodel.dart';
 import 'feed_post_card.dart';
 
-class FeedScreen extends StatelessWidget {
-  FeedScreen({super.key});
+class FeedScreen extends ConsumerStatefulWidget {
+  const FeedScreen({super.key});
 
-  final List<MockSketch> _sampleData = [
-    MockSketch(
-      sketchId: 'test1',
-      author: MockUser(id: '@edenjint3927', name: '후이'),
-      createdAt: DateTime.now(),
-      isJogging: false,
-      location: '동대문구 휘경동',
-      weather: '맑음',
-      text: '뇨이 만나러 가는 길에 중랑천 따릉이~~',
-      cheeredUser: [],
-      comments: [],
-    ),
-    MockSketch(
-      sketchId: 'test2',
-      author: MockUser(id: '@daniil_a_np', name: '다닐루쉬카'),
-      createdAt: DateTime(2026, 9, 1, 13, 42),
-      isJogging: true,
-      location: '동대문구 전농동',
-      weather: '흐림',
-      text: '생각보다 많이 걸었다...',
-      cheeredUser: [],
-      comments: [],
-    ),
-    MockSketch(
-      sketchId: 'test3',
-      author: MockUser(id: '@user_name', name: '테스트'),
-      createdAt: DateTime(2026, 8, 1, 12, 00),
-      isJogging: true,
-      location: '임의의 장소',
-      weather: '날씨',
-      text: '60자 이내의 코멘트는 경우에 따라서 상당히 길어지기도 합니다. 그래서 다음 줄로 내려가는 경우도 발생하죠.',
-      cheeredUser: [],
-      comments: [],
-    ),
-    MockSketch(
-      sketchId: 'test4',
-      author: MockUser(id: '@user_name', name: '테스트'),
-      createdAt: DateTime(2026, 8, 1, 12, 00),
-      isJogging: true,
-      location: '임의의 장소',
-      weather: '날씨',
-      text: '60자 이내의 코멘트',
-      cheeredUser: [],
-      comments: [],
-    ),
-    MockSketch(
-      sketchId: 'test5',
-      author: MockUser(id: '@user_name', name: '테스트'),
-      createdAt: DateTime(2026, 8, 1, 12, 00),
-      isJogging: true,
-      location: '임의의 장소',
-      weather: '날씨',
-      text: '60자 이내의 코멘트',
-      cheeredUser: [],
-      comments: [],
-    ),
-    MockSketch(
-      sketchId: 'test6',
-      author: MockUser(id: '@user_name', name: '테스트'),
-      createdAt: DateTime(2026, 8, 1, 12, 00),
-      isJogging: true,
-      location: '임의의 장소',
-      weather: '날씨',
-      text: '60자 이내의 코멘트',
-      cheeredUser: [],
-      comments: [],
-    ),
-    MockSketch(
-      sketchId: 'test7',
-      author: MockUser(id: '@user_name', name: '테스트'),
-      createdAt: DateTime(2026, 8, 1, 12, 00),
-      isJogging: true,
-      location: '임의의 장소',
-      weather: '날씨',
-      text: '60자 이내의 코멘트',
-      cheeredUser: [],
-      comments: [],
-    ),
-  ];
+  @override
+  ConsumerState<FeedScreen> createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends ConsumerState<FeedScreen> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      ref.read(feedViewModelProvider.notifier).fetchMore();
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final result = await ref.read(feedViewModelProvider.notifier).refreshFeed();
+
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok():
+        break;
+      case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '피드를 불러올 수 없습니다.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final feedState = ref.watch(feedViewModelProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('피드'),
@@ -102,14 +79,44 @@ class FeedScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: ListView.builder(
-          itemCount: _sampleData.length, // test
-          itemBuilder: (context, index) {
-            return FeedPostCard(sketch: _sampleData[index]);
-          },
+      body: feedState.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('피드를 불러올 수 없습니다.'),
+              TextButton(
+                onPressed: () => ref.invalidate(feedViewModelProvider),
+                child: const Text('다시 시도'),
+              ),
+            ],
+          ),
         ),
+        data: (state) => state.sketches.isEmpty
+            ? const Center(child: Text('아직 피드에 표시할 게시물이 없습니다.'))
+            : RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount:
+                        state.sketches.length + (state.isFetchingMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == state.sketches.length) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      return FeedPostCard(sketch: state.sketches[index]);
+                    },
+                  ),
+                ),
+              ),
       ),
     );
   }
