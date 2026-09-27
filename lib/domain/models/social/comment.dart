@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 import '../../../utils/date_time_utils.dart';
 import 'user.dart';
 
@@ -21,6 +22,23 @@ class Comment {
     this.parentCommentId,
     this.deletedAt,
   });
+
+
+  factory Comment.create({
+    required String sketchId,
+    required UserSummary author,
+    required String text,
+    String? parentCommentId,
+  }) {
+    return Comment(
+      id: const Uuid().v7(),
+      sketchId: sketchId,
+      author: author,
+      text: text,
+      parentCommentId: parentCommentId,
+      createdAt: DateTime.now(),
+    );
+  }
 
   bool get isReply => parentCommentId != null && parentCommentId!.isNotEmpty;
   String get authorUid => author.uid;

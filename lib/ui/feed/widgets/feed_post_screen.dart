@@ -1,74 +1,187 @@
 import 'package:flutter/material.dart';
-import 'package:move_sketch/ui/feed/widgets/user_comment_tile.dart';
-import '../../../domain/models/mock_sketch.dart';
-import '../../../domain/models/mock_user.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../config/dependencies.dart';
+import '../../../domain/models/social/comment.dart';
+import '../../../domain/models/social/user.dart';
+import '../../../utils/exceptions.dart';
+import '../../../utils/result.dart';
+import '../../auth/view_models/auth_viewmodel.dart';
+import '../../friends/widgets/user_list_dialog.dart';
+import '../view_models/feed_post_viewmodel.dart';
+import '../view_models/feed_viewmodel.dart';
 import 'cheer_button.dart';
 import 'feed_post_card.dart';
+import 'user_comment_tile.dart';
 
-class FeedPostScreen extends StatefulWidget {
+class FeedPostScreen extends ConsumerStatefulWidget {
   final String sketchId;
-  late final MockSketch _sketch;
-  FeedPostScreen({super.key, required this.sketchId}) {
-    _sketch = MockSketch(
-      sketchId: sketchId,
-      author: MockUser(id: '@user_id', name: '테스트'),
-      createdAt: DateTime.now(),
-      isJogging: true,
-      location: '동대문구 휘경동',
-      weather: '맑음',
-      text: '기록을 남겨요',
-      cheeredUser: [
-        MockUser(id: '@peeeeeter_j', name: '피터'),
-        MockUser(id: '@nyong_nyoi', name: '뇨이'),
-      ],
-      comments: [],
-    );
+
+  const FeedPostScreen({super.key, required this.sketchId});
+
+  @override
+  ConsumerState<FeedPostScreen> createState() => _FeedPostScreenState();
+}
+
+class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
+  late final TextEditingController _commentController;
+  Comment? _replyTarget;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _commentController = TextEditingController();
   }
 
   @override
-  State<FeedPostScreen> createState() => _FeedPostScreenState();
-}
+  void dispose() {
+    _commentController.dispose();
 
-class _FeedPostScreenState extends State<FeedPostScreen> {
-  final MockUser user = MockUser(id: '@daniil_a_np', name: '다닐루쉬카');
-  // final MockUser user = MockUser(id: '@user_id', name: '테스트');
-  String? _replyTargetId;
-
-  void _onReply(String commentId) {
-    setState(() {
-      _replyTargetId = commentId;
-    });
+    super.dispose();
   }
 
-  Column buildComments() {
-    List<UserCommentTile> comments = [
-      UserCommentTile(
-        user: MockUser(id: '@peeeeeter_j', name: '피터'),
-        createdAt: DateTime.now(),
-        sketchId: 'test1',
-        commentId: 'test1-1',
-        text: '댓글 달고 갑니다~~ 댓글도 너무 길게 달진 않도록 할까 하는데 어떻게 생각하세요?',
-        onReply: _onReply,
-      ),
-      UserCommentTile(
-        user: MockUser(id: '@edenjint3927', name: '후이'),
-        createdAt: DateTime.now(),
-        sketchId: 'test1',
-        commentId: 'test1-2',
-        text: '어느 정도가 긴 거지...',
-        parentCommentId: 'test1-1',
-      ),
-      UserCommentTile(
-        user: MockUser(id: '@daniil_a_np', name: '다닐루쉬카'),
-        createdAt: DateTime.now(),
-        sketchId: 'test1',
-        commentId: 'test1-3',
-        text: '이게 뭐람.',
-        onReply: _onReply,
-      ),
-    ];
+  Future<void> _showCheeredUser(Set<String> cheeredUserIds) async {
+    final List<UserSummary> users;
 
-    return Column(mainAxisSize: MainAxisSize.min, children: comments);
+    if (cheeredUserIds.isEmpty) {
+      users = [];
+    } else {
+      final result = await ref
+          .read(sketchPostRepositoryProvider)
+          .getCheeredUsers(cheeredUserIds.toList());
+
+      users = switch (result) {
+        Ok(:final value) => value,
+        Error() => const [],
+      };
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: UserListDialog(title: '응원한 친구', userList: users),
+      ),
+    );
+  }
+
+  Future<void> _toggleCheer() async {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final result = await ref
+        .read(feedPostViewModelProvider(widget.sketchId).notifier)
+        .toggleCheer();
+
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok():
+        break;
+      case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '응원 처리 중 오류가 발생했습니다.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
+
+  Future<void> _submitComment() async {
+    final text = _commentController.text.trim();
+    if (text.isEmpty) {
+      return;
+    }
+
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final result = await ref
+        .read(feedPostViewModelProvider(widget.sketchId).notifier)
+        .addComment(text: text, parentCommentId: _replyTarget?.id);
+
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok():
+        _commentController.clear();
+        setState(() {
+          _replyTarget = null;
+        });
+      case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '댓글 작성 중 오류가 발생했습니다.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
+
+  Future<void> _deleteComment(String commentId) async {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final result = await ref
+        .read(feedPostViewModelProvider(widget.sketchId).notifier)
+        .deleteComment(commentId);
+
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok():
+        break;
+      case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '댓글 삭제 중 오류가 발생했습니다.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
+
+  Future<void> _deleteSketch() async {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final result = await ref
+        .read(feedPostViewModelProvider(widget.sketchId).notifier)
+        .deletePost();
+
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok():
+        ref.invalidate(feedViewModelProvider);
+      case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '스케치 삭제 중 오류가 발생했습니다.';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
   }
 
   @override
@@ -76,85 +189,142 @@ class _FeedPostScreenState extends State<FeedPostScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final feedPostState = ref.watch(feedPostViewModelProvider(widget.sketchId));
+    final currentUser = ref.watch(currentUserProvider);
+    if (currentUser == null) {
+      throw const AuthException('로그인된 사용자 세션이 없습니다.');
+    }
+
     return Scaffold(
       appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
-          child: Column(
-            spacing: 20,
-            children: [
-              FeedPostCard(sketch: widget._sketch, isDetail: true),
-              CheerButton(
-                author: widget._sketch.author,
-                user: user,
-                cheeredUser: widget._sketch.cheeredUser,
-              ),
-              Divider(),
-              buildComments(),
-            ],
+      body: feedPostState.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(
+          child: Text(
+            error is AppException ? error.message : '게시물을 불러올 수 없습니다.',
           ),
         ),
-      ),
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (_replyTargetId != null)
-            Container(
-              decoration: BoxDecoration(
-                color: colorScheme.outlineVariant,
-                borderRadius: BorderRadiusGeometry.vertical(
-                  top: const Radius.circular(20),
-                ),
-              ),
-              padding: const EdgeInsets.only(left: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        data: (state) {
+          final sketch = state.sketch;
+          final comments = state.comments;
+          final isMyPost = sketch.authorId == currentUser.uid;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SingleChildScrollView(
+              child: Column(
+                spacing: 20,
                 children: [
-                  // FIXME: Comment.getById(_replyTargetId).user.name
-                  Text('$_replyTargetId 에 답글 다는 중'),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _replyTargetId = null;
-                      });
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      size: textTheme.labelLarge?.fontSize,
+                  FeedPostCard(
+                    sketch: sketch,
+                    isDetail: true,
+                    onDelete: _deleteSketch,
+                  ),
+                  CheerButton(
+                    isMyPost: isMyPost,
+                    isCheered: sketch.isCheeredBy(currentUser.uid),
+                    isLoading: state.isTogglingCheer,
+                    cheerCount: sketch.cheerCount,
+                    onToggle: _toggleCheer,
+                    onTapCount: () => _showCheeredUser(sketch.cheeredUserIds),
+                  ),
+                  const Divider(),
+                  ...comments.map(
+                    (comment) => UserCommentTile(
+                      comment: comment,
+                      sketchAuthor: sketch.author,
+                      onReply: (comment) => setState(() {
+                        _replyTarget = comment;
+                      }),
+                      onDelete: () => _deleteComment(comment.id),
                     ),
                   ),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-            child: Row(
-              spacing: 8,
+          );
+        },
+      ),
+      bottomNavigationBar: (feedPostState.hasError)
+          ? null
+          : Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: TextField(
-                    keyboardType: TextInputType.text,
-                    style: textTheme.bodyMedium,
-                    minLines: 1,
-                    maxLines: 1,
+                if (_replyTarget != null)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: colorScheme.outlineVariant,
+                      borderRadius: BorderRadiusGeometry.vertical(
+                        top: const Radius.circular(20),
+                      ),
+                    ),
+                    padding: const EdgeInsets.only(left: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('${_replyTarget?.author.nickname} 에게 답글 다는 중'),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _replyTarget = null;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.close,
+                            size: textTheme.labelLarge?.fontSize,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    // TODO: 댓글 추가
-                  },
-                  icon: Icon(Icons.arrow_upward),
-                  style: IconButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 20,
+                  ),
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _commentController,
+                          keyboardType: TextInputType.text,
+                          style: textTheme.bodyMedium,
+                          minLines: 1,
+                          maxLines: 1,
+                          decoration: const InputDecoration(
+                            hintText: '댓글을 입력하세요.',
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed:
+                            feedPostState.value?.isSubmittingComment == true ||
+                                _commentController.text.trim().isEmpty
+                            ? null
+                            : _submitComment,
+                        icon: feedPostState.value?.isSubmittingComment == true
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Icon(Icons.arrow_upward),
+                        style: IconButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
+                          disabledBackgroundColor: colorScheme.primaryContainer,
+                          disabledForegroundColor: colorScheme.onPrimary,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

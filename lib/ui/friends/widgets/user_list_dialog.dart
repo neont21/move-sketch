@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../domain/models/mock_user.dart';
+import '../../../domain/models/social/user.dart';
 import '../../../routing/routes.dart';
+import '../../core/widgets/user_avatar.dart';
 
 class UserListDialog extends StatelessWidget {
   final String title;
-  final List<MockUser> userList;
-  const UserListDialog({super.key, required this.title, required this.userList});
+  final List<UserSummary> userList;
+  const UserListDialog({
+    super.key,
+    required this.title,
+    required this.userList,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,22 +31,18 @@ class UserListDialog extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: userList.length,
                   itemBuilder: (context, index) {
+                    final user = userList[index];
                     return ListTile(
                       onTap: () {
-                        context.push(Routes.userProfile(userList[index].id));
+                        context.push(Routes.userProfile(user.username));
                       },
-                      leading: CircleAvatar(
-                        radius: 20,
-                        backgroundImage: const AssetImage(
-                          'assets/default_profile.png',
-                        ),
+                      leading: UserAvatar(
+                        username: user.username,
+                        imageUrl: user.imageUrl,
                       ),
-                      title: Text(
-                        userList[index].name,
-                        style: textTheme.bodyLarge,
-                      ),
+                      title: Text(user.nickname, style: textTheme.bodyLarge),
                       subtitle: Text(
-                        userList[index].id,
+                        '@${user.username}',
                         style: textTheme.labelMedium,
                       ),
                     );
