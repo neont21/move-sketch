@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:move_sketch/domain/models/session/session_result.dart';
-import 'package:move_sketch/ui/auth/view_models/auth_viewmodel.dart';
 import '../../../config/dependencies.dart';
 import '../../../domain/models/enums/activity_type.dart';
 import '../../../domain/models/enums/mission_axis.dart';
 import '../../../domain/models/fixed/mission_template.dart';
 import '../../../domain/models/session/mission_instance.dart';
+import '../../../domain/models/session/session_result.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../utils/result.dart';
+import '../../auth/view_models/auth_viewmodel.dart';
 
 @immutable
 class SessionStartState {

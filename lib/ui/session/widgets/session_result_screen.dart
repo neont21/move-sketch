@@ -8,6 +8,8 @@ import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../history/view_models/history_viewmodel.dart';
+import '../../home/view_models/home_viewmodel.dart';
 import '../view_models/session_result_viewmodel.dart';
 import 'path_tracker_view.dart';
 import 'sketch_card.dart';
@@ -110,6 +112,18 @@ class _SessionResultScreenState extends ConsumerState<SessionResultScreen> {
     final resultState = ref.watch(
       sessionResultViewModelProvider(widget.sessionId),
     );
+
+    ref.listen(sessionResultViewModelProvider(widget.sessionId), (prev, next) {
+      final prevSynced =
+          prev?.value?.sessionResult?.syncStatus == SyncStatus.synced;
+      final nextSynced =
+          next.value?.sessionResult?.syncStatus == SyncStatus.synced;
+
+      if (!prevSynced && nextSynced) {
+        ref.invalidate(homeViewModelProvider);
+        ref.invalidate(historyViewModelProvider);
+      }
+    });
 
     return PopScope(
       canPop: false,
@@ -307,6 +321,8 @@ class _SessionResultScreenState extends ConsumerState<SessionResultScreen> {
                       onPressed: resultState.isLoading
                           ? null
                           : () {
+                              ref.invalidate(homeViewModelProvider);
+                              ref.invalidate(historyViewModelProvider);
                               context.go(Routes.home);
                             },
                       style: ElevatedButton.styleFrom(

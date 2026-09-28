@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
+import '../../feed/view_models/feed_viewmodel.dart';
+import '../../home/view_models/home_viewmodel.dart';
 import '../view_models/history_viewmodel.dart';
 
 class DeleteHistoryDialog extends ConsumerStatefulWidget {
@@ -74,6 +76,10 @@ class _DeleteHistoryDialogState extends ConsumerState<DeleteHistoryDialog> {
                   );
               switch (result) {
                 case Ok():
+                  ref.invalidate(homeViewModelProvider);
+                  if (_cascade) {
+                    ref.invalidate(feedViewModelProvider);
+                  }
                   messenger.showSnackBar(
                     const SnackBar(
                       content: Text('기록이 삭제되었습니다.'),

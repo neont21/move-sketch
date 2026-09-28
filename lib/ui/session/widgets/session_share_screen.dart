@@ -2,14 +2,14 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/domain/models/enums/character_type.dart';
-import 'package:move_sketch/ui/session/view_models/session_share_viewmodel.dart';
-import 'package:move_sketch/utils/exceptions.dart';
+import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../routing/routes.dart';
+import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../feed/view_models/feed_post_viewmodel.dart';
 import '../../feed/view_models/feed_viewmodel.dart';
+import '../view_models/session_share_viewmodel.dart';
 import 'sketch_card.dart';
 
 class SessionShareScreen extends ConsumerStatefulWidget {

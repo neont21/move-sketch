@@ -1,16 +1,14 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gal/gal.dart';
-import 'package:move_sketch/ui/auth/view_models/auth_viewmodel.dart';
-
 import '../../../config/dependencies.dart';
 import '../../../data/repositories/session_result/session_result_repository.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../utils/date_time_utils.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../auth/view_models/auth_viewmodel.dart';
 
 @immutable
 class HistoryDetailsState {

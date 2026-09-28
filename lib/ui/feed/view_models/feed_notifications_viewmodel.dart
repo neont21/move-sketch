@@ -145,7 +145,7 @@ class FeedNotificationsViewModel extends AsyncNotifier<FeedNotificationsState> {
 
     final user = await ref.read(authViewModelProvider.future);
     if (user == null) {
-      throw AuthException('로그인된 사용자 세션이 없습니다.');
+      return const Result.error(AuthException('로그인된 사용자 세션이 없습니다.'));
     }
 
     state = AsyncData(current.copyWith(isProcessing: true));
