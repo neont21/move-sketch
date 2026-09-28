@@ -1,25 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../domain/models/mock_user.dart';
+import '../../../domain/models/social/user.dart';
 import 'user_card.dart';
 
-class MyFriendListView extends StatefulWidget {
-  const MyFriendListView({super.key});
+class MyFriendListView extends StatelessWidget {
+  final List<UserSummary> friends;
 
-  @override
-  State<MyFriendListView> createState() => _MyFriendListViewState();
-}
-
-class _MyFriendListViewState extends State<MyFriendListView> {
-  final List<MockUser> _friendList = [
-    MockUser(id: '@friend1', name: '친구1'),
-    MockUser(id: '@friend2', name: '친구2'),
-    MockUser(id: '@friend3', name: '친구3'),
-    MockUser(id: '@friend4', name: '친구4'),
-    MockUser(id: '@friend5', name: '친구5'),
-    MockUser(id: '@friend6', name: '친구6'),
-    MockUser(id: '@friend7', name: '친구7'),
-    MockUser(id: '@friend8', name: '친구8'),
-  ];
+  const MyFriendListView({super.key, required this.friends});
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +15,26 @@ class _MyFriendListViewState extends State<MyFriendListView> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('내 친구 ${_friendList.length}', style: textTheme.labelLarge),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: _friendList.length,
-          itemBuilder: (context, index) {
-            return UserCard(user: _friendList[index], isFriend: true);
-          },
-        ),
+        Text('내 친구 ${friends.length}', style: textTheme.labelLarge),
+        if (friends.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 60, horizontal: 20),
+            child: Center(
+              child: Text(
+                '아직 등록된 친구가 없습니다.\n상단 검색 버튼을 눌러 새로운 친구를 찾아보세요!',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: friends.length,
+            itemBuilder: (context, index) {
+              return UserCard(user: friends[index], isFriend: true);
+            },
+          ),
       ],
     );
   }

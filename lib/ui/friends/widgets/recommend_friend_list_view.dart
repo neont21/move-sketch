@@ -58,8 +58,8 @@ class _RecommendFriendListViewState extends State<RecommendFriendListView> {
               (user) => user.id == _recommendList[index].id,
             );
             return UserCard(
-              user: _recommendList[index],
-              onRecommend: true,
+              user: _recommendList[index].toSummary(),
+              subtitle: '알 수도 있는 친구',
               isFriend: isFriend,
               isRequested: isReceived,
               isSent: isSent,

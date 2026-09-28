@@ -1,64 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../domain/models/mock_user.dart';
+import '../../../domain/models/social/user.dart';
 import '../../../routing/routes.dart';
 import '../../core/widgets/system_alert_dialog.dart';
+import '../../core/widgets/user_avatar.dart';
 
 class UserCard extends StatelessWidget {
-  final MockUser user;
+  final UserSummary user;
+  final String? subtitle;
   final bool isFriend;
   final bool isRequested;
   final bool isSent;
-  final bool onSearch;
-  final bool onRecommend;
-  final bool onBlocked;
+  final bool isBlocked;
+
+  final VoidCallback? onAccept;
+  final VoidCallback? onDecline;
+  final VoidCallback? onSendRequest;
+  final VoidCallback? onCancelRequest;
+  final VoidCallback? onUnblock;
 
   const UserCard({
     super.key,
     required this.user,
+    this.subtitle,
     this.isFriend = false,
     this.isRequested = false,
     this.isSent = false,
-    this.onSearch = false,
-    this.onRecommend = false,
-    this.onBlocked = false,
+    this.isBlocked = false,
+    this.onAccept,
+    this.onDecline,
+    this.onSendRequest,
+    this.onCancelRequest,
+    this.onUnblock,
   });
 
   Widget _buildTitle(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    if (onSearch || (isRequested && !onRecommend) || onBlocked) {
-      return Text(user.name, style: textTheme.bodyMedium);
-    } else {
+    if (subtitle != null) {
       return RichText(
         text: TextSpan(
           children: [
-            TextSpan(text: user.name, style: textTheme.bodyMedium),
-            TextSpan(text: ' '),
-            TextSpan(text: user.id, style: textTheme.labelMedium),
+            TextSpan(text: user.nickname, style: textTheme.bodyMedium),
+            const TextSpan(text: ' '),
+            TextSpan(text: '@${user.username}', style: textTheme.labelMedium),
           ],
         ),
       );
+    } else {
+      return Text(user.nickname, style: textTheme.bodyMedium);
     }
   }
 
   Widget _buildSubtitle(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
 
-    if (onSearch || (isRequested && !onRecommend) || onBlocked) {
-      return Text(user.id, style: textTheme.labelMedium);
-    } else if (isFriend) {
-      return Text('오늘 공유함', style: textTheme.labelMedium);
-    } else if (onRecommend) {
-      return Text('~~님과 아는 사이', style: textTheme.labelMedium);
+    if (subtitle != null) {
+      return Text(subtitle!, style: textTheme.labelMedium);
     } else {
-      return const SizedBox.shrink();
+      return Text('@${user.username}', style: textTheme.labelMedium);
     }
   }
 
   Widget _buildTrailing(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     if (isRequested) {
       return Row(
@@ -66,7 +72,7 @@ class UserCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           OutlinedButton(
-            onPressed: () {},
+            onPressed: onDecline,
             style: OutlinedButton.styleFrom(
               minimumSize: Size.zero,
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -74,7 +80,7 @@ class UserCard extends StatelessWidget {
             child: Text('거절', style: textTheme.bodySmall),
           ),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: onAccept,
             style: OutlinedButton.styleFrom(
               minimumSize: Size.zero,
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -92,7 +98,7 @@ class UserCard extends StatelessWidget {
       );
     } else if (isSent) {
       return OutlinedButton(
-        onPressed: () {},
+        onPressed: onCancelRequest,
         style: OutlinedButton.styleFrom(
           minimumSize: Size.zero,
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -101,7 +107,7 @@ class UserCard extends StatelessWidget {
       );
     } else if (isFriend) {
       return Icon(Icons.chevron_right, color: colorScheme.tertiaryContainer);
-    } else if (onBlocked) {
+    } else if (isBlocked) {
       return OutlinedButton(
         onPressed: () {
           showDialog(
@@ -112,8 +118,8 @@ class UserCard extends StatelessWidget {
                 description: '차단을 해제하면 서로의 프로필을 다시 볼 수 있어요.',
                 confirmText: '차단 해제',
                 onConfirm: () {
-                  // TODO implement
                   context.pop();
+                  onUnblock?.call();
                 },
               ),
             ),
@@ -123,7 +129,7 @@ class UserCard extends StatelessWidget {
       );
     } else {
       return OutlinedButton(
-        onPressed: () {},
+        onPressed: onSendRequest,
         style: OutlinedButton.styleFrom(
           minimumSize: Size.zero,
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -142,13 +148,12 @@ class UserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        context.push(Routes.userProfile(user.id));
+        context.push(Routes.userProfile(user.uid));
       },
-      leading: CircleAvatar(
+      leading: UserAvatar(
+        username: user.username,
+        imageUrl: user.imageUrl,
         radius: 24,
-        backgroundImage: user.imageURL != null
-            ? NetworkImage(user.imageURL!)
-            : AssetImage('assets/default_profile.png'),
       ),
       title: _buildTitle(context),
       subtitle: _buildSubtitle(context),

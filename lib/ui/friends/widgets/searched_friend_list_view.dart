@@ -57,8 +57,7 @@ class _SearchedFriendListViewState extends State<SearchedFriendListView> {
               (user) => user.id == _resultList[index].id,
             );
             return UserCard(
-              user: _resultList[index],
-              onSearch: true,
+              user: _resultList[index].toSummary(),
               isFriend: isFriend,
               isRequested: isReceived,
               isSent: isSent,

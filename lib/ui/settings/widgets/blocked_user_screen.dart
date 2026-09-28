@@ -21,7 +21,7 @@ class BlockedUserScreen extends StatelessWidget {
           physics: NeverScrollableScrollPhysics(),
           itemCount: blockedList.length,
           itemBuilder: (context, index) {
-            return UserCard(user: blockedList[index], onBlocked: true);
+            return UserCard(user: blockedList[index].toSummary(), isBlocked: true);
           },
         ),
       ),
