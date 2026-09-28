@@ -41,10 +41,7 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
     super.dispose();
   }
 
-  List<Row> _buildMissionData(
-    BuildContext context,
-    List<MissionInstance> missions,
-  ) {
+  List<Row> _buildMissionData(List<MissionInstance> missions) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final List<Row> texts = [];
 
@@ -108,7 +105,7 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
     return uniqueConsecutive.join(' ➔ ');
   }
 
-  Widget? _buildBottomButton(BuildContext context, HistoryDetailsState state) {
+  Widget? _buildBottomButton(HistoryDetailsState state) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final result = state.sessionResult;
 
@@ -365,7 +362,7 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
                       ],
                     ),
                     Divider(),
-                    ..._buildMissionData(context, result.missions),
+                    ..._buildMissionData(result.missions),
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -440,7 +437,7 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
               ),
             ),
           ),
-          bottomNavigationBar: _buildBottomButton(context, state),
+          bottomNavigationBar: _buildBottomButton(state),
         );
       },
     );

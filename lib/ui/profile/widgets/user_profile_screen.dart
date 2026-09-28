@@ -29,7 +29,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _user = MockUser.byId(widget.userId);
   }
 
-  Widget _buildDescriptionOrButton(BuildContext context) {
+  Widget _buildDescriptionOrButton() {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -113,7 +113,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       Text(_user.name, style: textTheme.bodyLarge),
                       Text(_user.id, style: textTheme.labelMedium),
                       const SizedBox(height: 4),
-                      _buildDescriptionOrButton(context),
+                      _buildDescriptionOrButton(),
                     ],
                   ),
                 ),
@@ -137,7 +137,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       sketchList: _sketchList,
                       onTap: (index) {
                         context.go(
-                          Routes.feedPost(_sketchList.sketches[index].sketchId)
+                          Routes.feedPost(_sketchList.sketches[index].sketchId),
                         );
                       },
                     )

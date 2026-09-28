@@ -46,7 +46,7 @@ class _ModifyProfileDialogState extends State<ModifyProfileDialog> {
     }
   }
 
-  List<ListTile> _buildBottomDialogSheet(BuildContext context) {
+  List<ListTile> _buildBottomDialogSheet() {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     List<ListTile> menuItems = [];
@@ -149,7 +149,7 @@ class _ModifyProfileDialogState extends State<ModifyProfileDialog> {
                             return SafeArea(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
-                                children: _buildBottomDialogSheet(context),
+                                children: _buildBottomDialogSheet(),
                               ),
                             );
                           },

@@ -42,7 +42,7 @@ class _OSSLicensesScreenState extends State<OSSLicensesScreen> {
     }
   }
 
-  void _showBottomSheet(BuildContext context, String package, List licenses) {
+  void _showBottomSheet(String package, List licenses) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     showModalBottomSheet(
@@ -122,7 +122,7 @@ class _OSSLicensesScreenState extends State<OSSLicensesScreen> {
                         Icons.chevron_right,
                         color: colorScheme.tertiaryContainer,
                       ),
-                      onTap: () => _showBottomSheet(context, package, licenses),
+                      onTap: () => _showBottomSheet(package, licenses),
                     ),
                   );
                 },
