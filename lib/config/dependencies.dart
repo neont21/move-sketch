@@ -40,6 +40,7 @@ import '../data/services/remote/weather_service.dart';
 
 import '../domain/use_cases/session/complete_session_use_case.dart';
 import '../domain/use_cases/session/compose_sketch_use_case.dart';
+import '../domain/use_cases/social/delete_sketch_post_use_case.dart';
 import '../ui/session/render/sketch_image_renderer.dart';
 
 /// 외부 REST API 통신을 위한 Provider
@@ -239,4 +240,13 @@ final completeSessionUseCaseProvider = Provider<CompleteSessionUseCase>((ref) {
 /// 티어에 맞는 스케치 파츠에 랜덤 틴트를 묻혀 쌓아올린 결과물 생성
 final composeSketchUseCaseProvider = Provider<ComposeSketchUseCase>((ref) {
   return const ComposeSketchUseCase();
+});
+
+/// DeleteSketchPostUseCase Provider: 스케치 삭제 후 공유 상태를 변경하는 UseCase
+/// 스케치 삭제 후 삭제된 스케치에 해당하는 세션 결과의 공유 상태를 공유되지 않음으로 변환
+final deleteSketchPostUseCaseProvider = Provider<DeleteSketchPostUseCase>((ref) {
+  return DeleteSketchPostUseCase(
+    sketchPostRepository: ref.watch(sketchPostRepositoryProvider),
+    sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
+  );
 });

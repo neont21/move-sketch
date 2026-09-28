@@ -54,7 +54,10 @@ class FeedViewModel extends AsyncNotifier<FeedState> {
 
     switch (result) {
       case Ok(:final value):
-        return FeedState(sketches: value, hasReachedMax: value.length < _pageSize);
+        return FeedState(
+          sketches: value,
+          hasReachedMax: value.length < _pageSize,
+        );
       case Error(:final error):
         throw error;
     }
@@ -121,8 +124,10 @@ class FeedViewModel extends AsyncNotifier<FeedState> {
     }
 
     final sketchPostRepository = ref.read(sketchPostRepositoryProvider);
-    final result = await sketchPostRepository
-        .getFeedPosts(currentUserId: user.uid, limit: _pageSize);
+    final result = await sketchPostRepository.getFeedPosts(
+      currentUserId: user.uid,
+      limit: _pageSize,
+    );
 
     if (!ref.mounted) {
       return const Result.ok(null);
@@ -136,6 +141,28 @@ class FeedViewModel extends AsyncNotifier<FeedState> {
         return const Result.ok(null);
       case Error(:final error):
         state = AsyncData(current.copyWith(isRefreshing: false));
+        return Result.error(error);
+    }
+  }
+
+  Future<Result<void>> deletePost(String sketchId) async {
+    final result = await ref
+        .read(deleteSketchPostUseCaseProvider)
+        .execute(sketchId);
+    switch (result) {
+      case Ok():
+        final current = state.value;
+        if (current != null) {
+          state = AsyncData(
+            current.copyWith(
+              sketches: current.sketches
+                  .where((s) => s.id != sketchId)
+                  .toList(),
+            ),
+          );
+        }
+        return const Result.ok(null);
+      case Error(:final error):
         return Result.error(error);
     }
   }

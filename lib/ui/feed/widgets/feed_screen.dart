@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../history/view_models/history_viewmodel.dart';
+import '../../home/view_models/home_viewmodel.dart';
 import '../view_models/feed_viewmodel.dart';
 import 'feed_post_card.dart';
 
@@ -63,6 +65,33 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     }
   }
 
+  Future<void> _deleteSketch(String sketchId) async {
+    final colorScheme = Theme.of(context).colorScheme;
+    final result = await ref
+        .read(feedViewModelProvider.notifier)
+        .deletePost(sketchId);
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok():
+        ref.invalidate(historyViewModelProvider);
+        ref.invalidate(homeViewModelProvider);
+      case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '게시물 삭제 중 오류가 발생했습니다.';
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final feedState = ref.watch(feedViewModelProvider);
@@ -112,7 +141,10 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                           ),
                         );
                       }
-                      return FeedPostCard(sketch: state.sketches[index]);
+                      return FeedPostCard(
+                        sketch: state.sketches[index],
+                        onDelete: () => _deleteSketch(state.sketches[index].id),
+                      );
                     },
                   ),
                 ),
