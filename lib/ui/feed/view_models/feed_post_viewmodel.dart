@@ -66,10 +66,20 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
         throw error;
     }
 
-    final comments = switch (commentResult) {
-      Ok(:final value) => value,
-      Error() => const <Comment>[],
-    };
+    final List<Comment> comments;
+    switch (commentResult) {
+      case Ok(:final value):
+        final roots = value.where((c) => !c.isReply).toList();
+        final replies = value.where((c) => c.isReply).toList();
+        final sorted = <Comment>[];
+        for (final root in roots) {
+          sorted.add(root);
+          sorted.addAll(replies.where((r) => r.parentCommentId == root.id));
+        }
+        comments = sorted;
+      case Error():
+        comments = const <Comment>[];
+    }
 
     return FeedPostState(sketch: sketch, comments: comments);
   }
@@ -167,11 +177,24 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
 
     switch (result) {
       case Ok():
+        final hasReplies = current.comments.any(
+          (comment) =>
+              comment.parentCommentId == commentId && !comment.isDeleted,
+        );
+        final updatedComments = hasReplies
+            ? current.comments.map((comment) {
+                if (comment.id == commentId) {
+                  return comment.copyWith(deletedAt: () => DateTime.now());
+                }
+                return comment;
+              }).toList()
+            : current.comments
+                  .where((comment) => comment.id != commentId)
+                  .toList();
+
         state = AsyncData(
           current.copyWith(
-            comments: current.comments
-                .where((comment) => comment.id != commentId)
-                .toList(),
+            comments: updatedComments,
             sketch: current.sketch.copyWith(
               commentCount: current.sketch.commentCount - 1,
             ),
@@ -184,11 +207,7 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
   }
 
   Future<Result<void>> deletePost() async {
-    final result = await ref
-        .read(sketchPostRepositoryProvider)
-        .deletePost(sketchId);
-
-    return result;
+    return ref.read(deleteSketchPostUseCaseProvider).execute(sketchId);
   }
 }
 

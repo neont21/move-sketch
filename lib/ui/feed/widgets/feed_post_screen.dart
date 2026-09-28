@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../config/dependencies.dart';
 import '../../../domain/models/social/comment.dart';
 import '../../../domain/models/social/user.dart';
@@ -7,6 +8,8 @@ import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
 import '../../friends/widgets/user_list_dialog.dart';
+import '../../history/view_models/history_viewmodel.dart';
+import '../../home/view_models/home_viewmodel.dart';
 import '../view_models/feed_post_viewmodel.dart';
 import '../view_models/feed_viewmodel.dart';
 import 'cheer_button.dart';
@@ -81,7 +84,7 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
 
     switch (result) {
       case Ok():
-        break;
+        ref.read(feedViewModelProvider.notifier).refreshFeed();
       case Error(:final error):
         final errorMessage = error is AppException
             ? error.message
@@ -117,6 +120,7 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
         setState(() {
           _replyTarget = null;
         });
+        ref.read(feedViewModelProvider.notifier).refreshFeed();
       case Error(:final error):
         final errorMessage = error is AppException
             ? error.message
@@ -143,7 +147,7 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
 
     switch (result) {
       case Ok():
-        break;
+        ref.read(feedViewModelProvider.notifier).refreshFeed();
       case Error(:final error):
         final errorMessage = error is AppException
             ? error.message
@@ -171,6 +175,12 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
     switch (result) {
       case Ok():
         ref.invalidate(feedViewModelProvider);
+        ref.invalidate(historyViewModelProvider);
+        ref.invalidate(homeViewModelProvider);
+
+        if (mounted) {
+          context.pop();
+        }
       case Error(:final error):
         final errorMessage = error is AppException
             ? error.message
@@ -248,83 +258,91 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
       ),
       bottomNavigationBar: (feedPostState.hasError)
           ? null
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_replyTarget != null)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: colorScheme.outlineVariant,
-                      borderRadius: BorderRadiusGeometry.vertical(
-                        top: const Radius.circular(20),
+          : SafeArea(
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_replyTarget != null)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.outlineVariant,
+                        borderRadius: BorderRadiusGeometry.vertical(
+                          top: const Radius.circular(20),
+                        ),
+                      ),
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          RichText(text: TextSpan(
+                            children: [
+                              TextSpan(text: _replyTarget?.author.nickname, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.secondary)),
+                              TextSpan(text: '에게 답글 다는 중', style: textTheme.bodyMedium),
+                            ],
+                          )),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _replyTarget = null;
+                              });
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              size: textTheme.labelLarge?.fontSize,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    padding: const EdgeInsets.only(left: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 20,
+                    ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      spacing: 8,
                       children: [
-                        Text('${_replyTarget?.author.nickname} 에게 답글 다는 중'),
+                        Expanded(
+                          child: TextField(
+                            controller: _commentController,
+                            onChanged: (_) => setState(() {}),
+                            keyboardType: TextInputType.text,
+                            style: textTheme.bodyMedium,
+                            minLines: 1,
+                            maxLines: 1,
+                            decoration: const InputDecoration(
+                              hintText: '댓글을 입력하세요.',
+                            ),
+                          ),
+                        ),
                         IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _replyTarget = null;
-                            });
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            size: textTheme.labelLarge?.fontSize,
+                          onPressed:
+                              feedPostState.value?.isSubmittingComment == true ||
+                                  _commentController.text.trim().isEmpty
+                              ? null
+                              : _submitComment,
+                          icon: feedPostState.value?.isSubmittingComment == true
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Icon(Icons.arrow_upward),
+                          style: IconButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            disabledBackgroundColor: colorScheme.primaryContainer,
+                            disabledForegroundColor: colorScheme.onPrimary,
                           ),
                         ),
                       ],
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 20,
-                  ),
-                  child: Row(
-                    spacing: 8,
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _commentController,
-                          keyboardType: TextInputType.text,
-                          style: textTheme.bodyMedium,
-                          minLines: 1,
-                          maxLines: 1,
-                          decoration: const InputDecoration(
-                            hintText: '댓글을 입력하세요.',
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed:
-                            feedPostState.value?.isSubmittingComment == true ||
-                                _commentController.text.trim().isEmpty
-                            ? null
-                            : _submitComment,
-                        icon: feedPostState.value?.isSubmittingComment == true
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Icon(Icons.arrow_upward),
-                        style: IconButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          disabledBackgroundColor: colorScheme.primaryContainer,
-                          disabledForegroundColor: colorScheme.onPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+          ),
     );
   }
 }

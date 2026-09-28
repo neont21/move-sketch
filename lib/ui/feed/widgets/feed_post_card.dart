@@ -41,13 +41,20 @@ class FeedPostCard extends StatelessWidget {
     );
   }
 
+  double _calculateRotationAngle(String id) {
+    final hash = id.hashCode.abs();
+    final normalized = ((hash % 1000) / 500.0) - 1.0;
+
+    return normalized * 0.06;
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     final metaText = [
       sketch.locationTag,
-      if (sketch.weather != null) {sketch.weather!.shortSummary},
+      if (sketch.weather != null) sketch.weather!.shortSummary,
       sketch.createdAt.formattedFeedTime,
     ].join(' · ');
 
@@ -97,7 +104,7 @@ class FeedPostCard extends StatelessWidget {
             context.go(Routes.feedPost(sketch.id));
           },
           child: Transform.rotate(
-            angle: 0.03,
+            angle:_calculateRotationAngle(sketch.id),
             child: SketchCard(
               imageProvider: NetworkImage(sketch.sketchUrl),
               caption: sketch.caption,

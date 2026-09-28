@@ -65,7 +65,9 @@ class UserCommentTile extends StatelessWidget {
                       comment.createdAt.formattedFeedTime,
                       style: textTheme.labelMedium,
                     ),
-                    if (comment.isReply && onReply != null)
+                    if (!comment.isReply &&
+                        !comment.isDeleted &&
+                        onReply != null)
                       GestureDetector(
                         onTap: () {
                           onReply!(comment);
@@ -79,12 +81,13 @@ class UserCommentTile extends StatelessWidget {
                         ),
                       ),
                     const Spacer(),
-                    BottomSheetButton(
-                      author: comment.author,
-                      sketchAuthorIfComment: sketchAuthor,
-                      commentIdIfComment: comment.id,
-                      onDelete: onDelete,
-                    ),
+                    if (!comment.isDeleted)
+                      BottomSheetButton(
+                        author: comment.author,
+                        sketchAuthorIfComment: sketchAuthor,
+                        commentIdIfComment: comment.id,
+                        onDelete: onDelete,
+                      ),
                   ],
                 ),
                 Padding(

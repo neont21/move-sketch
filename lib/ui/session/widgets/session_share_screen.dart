@@ -8,6 +8,8 @@ import 'package:move_sketch/utils/exceptions.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/result.dart';
+import '../../feed/view_models/feed_post_viewmodel.dart';
+import '../../feed/view_models/feed_viewmodel.dart';
 import 'sketch_card.dart';
 
 class SessionShareScreen extends ConsumerStatefulWidget {
@@ -59,8 +61,11 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
     switch (result) {
       case Ok():
         if (state.isEdit && context.canPop()) {
+          ref.invalidate(feedPostViewModelProvider(widget.sessionId));
+          ref.invalidate(feedViewModelProvider);
           context.pop();
         } else {
+          ref.invalidate(feedViewModelProvider);
           context.go(Routes.feedPost(widget.sessionId));
         }
       case Error(:final error):
