@@ -1,26 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import '../../../domain/models/mock_notification.dart';
-import '../../../domain/models/mock_user.dart';
+import '../../../domain/models/enums/notification_type.dart';
+import '../../../domain/models/social/app_notification.dart';
+import '../../../routing/routes.dart';
+import '../../../utils/date_time_utils.dart';
+import '../../core/widgets/user_avatar.dart';
 
 class NotificationCard extends StatelessWidget {
-  final MockUser user;
-  final ActionType action;
-  final DateTime createdAt;
-  final String goTo;
-  final bool read;
-  final VoidCallback onRead;
+  final AppNotification notification;
+  final VoidCallback onTap;
 
   const NotificationCard({
     super.key,
-    required this.user,
-    required this.action,
-    required this.createdAt,
-    required this.goTo,
-    this.read=false,
-    required this.onRead,
+    required this.notification,
+    required this.onTap,
   });
+
+  String? get _destinationRoute {
+    switch (notification.type) {
+      case NotificationType.comment:
+      case NotificationType.reply:
+      case NotificationType.cheer:
+        if (notification.targetPostId != null) {
+          return Routes.feedNotificationPost(notification.targetPostId!);
+        }
+        return null;
+      case NotificationType.requestFriend:
+      case NotificationType.acceptFriend:
+        return Routes.feedNotificationProfile(notification.sender.uid);
+      case NotificationType.unknown:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,30 +39,38 @@ class NotificationCard extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return ListTile(
-      tileColor: read ? colorScheme.surfaceContainer : colorScheme.outline,
+      tileColor: notification.isRead
+          ? colorScheme.surfaceContainer
+          : colorScheme.primaryContainer.withValues(alpha: 0.2),
       onTap: () {
-        onRead();
-        context.go(goTo);
+        onTap();
+        final route = _destinationRoute;
+        if (route != null) {
+          context.go(route);
+        }
       },
-      leading: CircleAvatar(
-        radius: 20,
-        backgroundImage: const AssetImage('assets/default_profile.png'),
+      leading: UserAvatar(
+        username: notification.sender.username,
+        imageUrl: notification.sender.imageUrl,
       ),
       title: RichText(
         text: TextSpan(
           children: [
             TextSpan(
-              text: user.name,
+              text: notification.sender.nickname,
               style: textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
-            TextSpan(text: action.notification, style: textTheme.bodyMedium),
+            TextSpan(
+              text: notification.type.notification,
+              style: textTheme.bodyMedium,
+            ),
           ],
         ),
       ),
       subtitle: Text(
-        DateFormat('MM/dd (E) HH:mm', 'ko').format(createdAt),
+        notification.createdAt.formattedFeedTime,
         style: textTheme.labelMedium,
       ),
     );

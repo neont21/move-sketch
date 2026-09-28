@@ -6,6 +6,7 @@ import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../history/view_models/history_viewmodel.dart';
 import '../../home/view_models/home_viewmodel.dart';
+import '../view_models/feed_notifications_viewmodel.dart';
 import '../view_models/feed_viewmodel.dart';
 import 'feed_post_card.dart';
 
@@ -104,7 +105,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             onPressed: () {
               context.go(Routes.feedNotifications);
             },
-            icon: Icon(Icons.notifications_outlined),
+            icon: Badge(
+              isLabelVisible:
+                  ref.watch(hasUnreadNotificationsProvider).value ?? false,
+              child: const Icon(Icons.notifications_outlined),
+            ),
           ),
         ],
       ),
@@ -123,7 +128,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           ),
         ),
         data: (state) => state.sketches.isEmpty
-            ? const Center(child: Text('아직 피드에 표시할 게시물이 없습니다.'))
+            ? const Center(
+                child: Text(
+                  '아직 피드에 표시할 게시물이 없습니다.\n친구를 추가하거나 세션을 진행해 보아요 :)',
+                  textAlign: TextAlign.center,
+                ),
+              )
             : RefreshIndicator(
                 onRefresh: _onRefresh,
                 child: Padding(
