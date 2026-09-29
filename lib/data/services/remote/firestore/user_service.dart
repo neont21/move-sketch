@@ -175,27 +175,45 @@ class UserService {
     });
   }
 
-  Future<List<User>> searchUsers({
+  Future<List<UserSummary>> searchUsers({
     required String query,
     int limit = 20,
     List<String>? excludeUserIds,
   }) async {
-    final trimmed = query.trim().toLowerCase();
+    final trimmed = query.trim();
     if (trimmed.isEmpty) {
       return [];
     }
 
-    final snapshot = await _usersRef
-        .where('username', isGreaterThanOrEqualTo: trimmed)
-        .where('username', isLessThanOrEqualTo: '$trimmed\uf8ff')
-        .limit(limit)
-        .get();
+    final lowercased = trimmed.toLowerCase();
+
+    final snapshots = await Future.wait([
+      _usersRef
+          .where('username', isGreaterThanOrEqualTo: lowercased)
+          .where('username', isLessThanOrEqualTo: '$lowercased\uf8ff')
+          .limit(limit)
+          .get(),
+      _usersRef
+          .where('nickname', isGreaterThanOrEqualTo: trimmed)
+          .where('nickname', isLessThanOrEqualTo: '$trimmed\uf8ff')
+          .limit(limit)
+          .get(),
+    ]);
 
     final excludeSet = excludeUserIds?.toSet() ?? {};
+    final userMap = <String, User>{};
 
-    return snapshot.docs
-        .map((doc) => User.fromMap(doc.data(), uid: doc.id))
-        .where((user) => !user.isDeleted && !excludeSet.contains(user.uid))
-        .toList();
+    for (final snapshot in snapshots) {
+      for (final doc in snapshot.docs) {
+        if (!userMap.containsKey(doc.id)) {
+          final user = User.fromMap(doc.data(), uid: doc.id);
+          if (!user.isDeleted && !excludeSet.contains(user.uid)) {
+            userMap[doc.id] = user;
+          }
+        }
+      }
+    }
+
+    return userMap.values.take(limit).map((user) => user.toSummary()).toList();
   }
 }

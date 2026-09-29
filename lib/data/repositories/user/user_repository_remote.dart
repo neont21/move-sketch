@@ -174,7 +174,7 @@ final class UserRepositoryRemote implements UserRepository {
   }
 
   @override
-  Future<Result<List<User>>> searchUsers({
+  Future<Result<List<UserSummary>>> searchUsers({
     required String currentUserId,
     required String query,
     int limit = 20,

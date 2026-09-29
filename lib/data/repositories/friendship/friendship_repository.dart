@@ -1,4 +1,5 @@
 import '../../../domain/models/social/friendship.dart';
+import '../../../domain/models/social/recommended_user.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/result.dart';
 
@@ -27,7 +28,7 @@ abstract interface class FriendshipRepository {
   });
 
   /// 추천 친구 목록을 조회한다. (사용자 검색)
-  Future<Result<List<UserSummary>>> getRecommendedFriends(
+  Future<Result<List<RecommendedUser>>> getRecommendedFriends(
     String currentUserId, {
     int limit = 10,
   });

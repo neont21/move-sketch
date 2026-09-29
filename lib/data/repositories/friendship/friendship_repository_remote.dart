@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import '../../../domain/models/social/block_status.dart';
 import '../../../domain/models/social/friendship.dart';
+import '../../../domain/models/social/recommended_user.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -174,7 +175,7 @@ final class FriendshipRepositoryRemote implements FriendshipRepository {
   }
 
   @override
-  Future<Result<List<UserSummary>>> getRecommendedFriends(
+  Future<Result<List<RecommendedUser>>> getRecommendedFriends(
     String currentUserId, {
     int limit = 10,
   }) async {
@@ -191,39 +192,74 @@ final class FriendshipRepositoryRemote implements FriendshipRepository {
       );
       final excludeSet = {currentUserId, ...myFriendIds, ...blockedUserIds};
 
-      final friendLists = await Future.wait(
-        myFriendIds.map((id) => friendshipService.getFriendUserIds(id)),
+      final mutualFriendsMapsList = await Future.wait(
+        myFriendIds.map(
+          (friendId) => friendshipService.getFriendUserIds(friendId),
+        ),
       );
 
-      final candidateFrequency = <String, int>{};
-      for (final fofIds in friendLists) {
-        for (final fofId in fofIds) {
+      final mutualFriendsMap = <String, List<String>>{};
+      for (int i = 0; i < myFriendIds.length; i++) {
+        final String myFriendId = myFriendIds[i];
+        final List<String> friendsOfFriendIds = mutualFriendsMapsList[i];
+        for (final fofId in friendsOfFriendIds) {
           if (!excludeSet.contains(fofId)) {
-            candidateFrequency[fofId] = (candidateFrequency[fofId] ?? 0) + 1;
+            mutualFriendsMap.putIfAbsent(fofId, () => []).add(myFriendId);
           }
         }
       }
-      if (candidateFrequency.isEmpty) {
+
+      if (mutualFriendsMap.isEmpty) {
         return const Result.ok([]);
       }
 
-      final sortedCandidateIds = candidateFrequency.keys.toList()
+      final sortedCandidateIds = mutualFriendsMap.keys.toList()
         ..sort(
-          (a, b) => candidateFrequency[b]!.compareTo(candidateFrequency[a]!),
+          (a, b) => mutualFriendsMap[b]!.length.compareTo(
+            mutualFriendsMap[a]!.length,
+          ),
         );
 
-      final targetIds = sortedCandidateIds.take(limit).toList();
-      final targetSummaries = await userService.getUserSummaries(targetIds);
+      final targetCandidateIds = sortedCandidateIds.take(limit).toList();
 
-      final summaryMap = {
-        for (final summary in targetSummaries) summary.uid: summary,
+      final userIdsToFetch = <String>{};
+      for (final candidateId in targetCandidateIds) {
+        userIdsToFetch.add(candidateId);
+        userIdsToFetch.addAll(mutualFriendsMap[candidateId]!);
+      }
+
+      final userSummaries = await userService.getUserSummaries(
+        userIdsToFetch.toList(),
+      );
+      final userMap = <String, UserSummary>{
+        for (final summary in userSummaries) summary.uid: summary,
       };
-      final orderedSummaries = targetIds
-          .map((id) => summaryMap[id])
-          .whereType<UserSummary>()
-          .toList();
 
-      return Result.ok(orderedSummaries);
+      final recommendedUsers = <RecommendedUser>[];
+      for (final candidateId in targetCandidateIds) {
+        final candidateUser = userMap[candidateId];
+        if (candidateUser == null) {
+          continue;
+        }
+
+        final mutualFriendIds = mutualFriendsMap[candidateId]!;
+        final mutualFriendSummaries = <UserSummary>[];
+
+        for (final friendId in mutualFriendIds) {
+          final friendSummary = userMap[friendId];
+          if (friendSummary != null) {
+            mutualFriendSummaries.add(friendSummary);
+          }
+        }
+
+        recommendedUsers.add(
+          RecommendedUser(
+            user: candidateUser,
+            mutualFriends: mutualFriendSummaries,
+          ),
+        );
+      }
+      return Result.ok(recommendedUsers);
     } on FirebaseException catch (e) {
       return Result.error(
         e.toAppException(defaultMessage: '추천 친구 조회 중 오류가 발생했습니다.'),
