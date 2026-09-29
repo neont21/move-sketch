@@ -1,66 +1,76 @@
 import 'package:flutter/material.dart';
-import '../../../domain/models/mock_user.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../domain/models/social/user.dart';
 import 'user_card.dart';
+import 'user_search_action_handler.dart';
 
-class SearchedFriendListView extends StatefulWidget {
-  const SearchedFriendListView({super.key});
+class SearchedFriendListView extends ConsumerWidget {
+  final List<UserSummary> searchedUsers;
+  final Set<String> friendIds;
+  final Set<String> sentRequestIds;
+  final Set<String> receivedRequestIds;
 
-  @override
-  State<SearchedFriendListView> createState() => _SearchedFriendListViewState();
-}
-
-class _SearchedFriendListViewState extends State<SearchedFriendListView> {
-  final List<MockUser> _resultList = [
-    MockUser(id: '@result1', name: '사용자1'),
-    MockUser(id: '@result2', name: '사용자2'),
-    MockUser(id: '@result3', name: '사용자3'),
-    MockUser(id: '@result4', name: '사용자4'),
-    MockUser(id: '@result5', name: '사용자5'),
-    MockUser(id: '@result6', name: '사용자6'),
-    MockUser(id: '@result7', name: '사용자7'),
-    MockUser(id: '@result8', name: '사용자8'),
-    MockUser(id: '@result9', name: '사용자9'),
-    MockUser(id: '@result10', name: '사용자10'),
-  ];
-
-  final List<MockUser> friendsList = [MockUser(id: '@result5', name: '사용자5')];
-  final List<MockUser> sentRequestList = [
-    MockUser(id: '@recommend2', name: '사용자2'),
-    MockUser(id: '@result4', name: '사용자4'),
-  ];
-  final List<MockUser> receivedRequestList = [
-    MockUser(id: '@recommend5', name: '사용자5'),
-    MockUser(id: '@result7', name: '사용자7'),
-  ];
+  const SearchedFriendListView({
+    super.key,
+    required this.searchedUsers,
+    this.friendIds = const {},
+    this.sentRequestIds = const {},
+    this.receivedRequestIds = const {},
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+
+    if (searchedUsers.isEmpty) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('검색 결과 0', style: textTheme.labelLarge),
+          const SizedBox(height: 48),
+          Center(child: Text('검색 결과가 없습니다.')),
+        ],
+      );
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('검색 결과 ${_resultList.length}', style: textTheme.labelLarge),
+        Text('검색 결과 ${searchedUsers.length}', style: textTheme.labelLarge),
+        const SizedBox(height: 8),
         ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: _resultList.length,
+          itemCount: searchedUsers.length,
           itemBuilder: (context, index) {
-            bool isFriend = friendsList.any(
-              (user) => user.id == _resultList[index].id,
-            );
-            bool isReceived = receivedRequestList.any(
-              (user) => user.id == _resultList[index].id,
-            );
-            bool isSent = sentRequestList.any(
-              (user) => user.id == _resultList[index].id,
-            );
+            final targetUser = searchedUsers[index];
+            bool isFriend = friendIds.contains(targetUser.uid);
+            bool isSent = sentRequestIds.contains(targetUser.uid);
+            bool isReceived = receivedRequestIds.contains(targetUser.uid);
             return UserCard(
-              user: _resultList[index].toSummary(),
+              user: targetUser,
               isFriend: isFriend,
               isRequested: isReceived,
               isSent: isSent,
+              onSendRequest: () =>
+                  UserSearchActionHandler.sendRequest(ref, context, targetUser),
+              onCancelRequest: () => UserSearchActionHandler.cancelRequest(
+                ref,
+                context,
+                targetUser,
+              ),
+              onAccept: () => UserSearchActionHandler.acceptRequest(
+                ref,
+                context,
+                targetUser,
+              ),
+              onDecline: () => UserSearchActionHandler.declineRequest(
+                ref,
+                context,
+                targetUser,
+              ),
             );
           },
         ),

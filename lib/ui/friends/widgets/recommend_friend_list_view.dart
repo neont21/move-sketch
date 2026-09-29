@@ -1,68 +1,68 @@
 import 'package:flutter/material.dart';
-import '../../../domain/models/mock_user.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../domain/models/social/recommended_user.dart';
 import 'user_card.dart';
+import 'user_search_action_handler.dart';
 
-class RecommendFriendListView extends StatefulWidget {
-  const RecommendFriendListView({super.key});
+class RecommendFriendListView extends ConsumerWidget {
+  final List<RecommendedUser> recommends;
+  final Set<String> friendIds;
+  final Set<String> sentRequestIds;
+  final Set<String> receivedRequestIds;
 
-  @override
-  State<RecommendFriendListView> createState() => _RecommendFriendListViewState();
-}
-
-class _RecommendFriendListViewState extends State<RecommendFriendListView> {
-  final List<MockUser> _recommendList = [
-    MockUser(id: '@recommend1', name: '사용자1'),
-    MockUser(id: '@recommend2', name: '사용자2'),
-    MockUser(id: '@recommend3', name: '사용자3'),
-    MockUser(id: '@recommend4', name: '사용자4'),
-    MockUser(id: '@recommend5', name: '사용자5'),
-    MockUser(id: '@recommend6', name: '사용자6'),
-    MockUser(id: '@recommend7', name: '사용자7'),
-    MockUser(id: '@recommend8', name: '사용자8'),
-  ];
-
-  final List<MockUser> friendsList = [MockUser(id: '@result5', name: '사용자5')];
-  final List<MockUser> sentRequestList = [
-    MockUser(id: '@recommend2', name: '사용자2'),
-    MockUser(id: '@result4', name: '사용자4'),
-  ];
-  final List<MockUser> receivedRequestList = [
-    MockUser(id: '@recommend5', name: '사용자5'),
-    MockUser(id: '@result7', name: '사용자7'),
-  ];
+  const RecommendFriendListView({
+    super.key,
+    required this.recommends,
+    this.friendIds = const {},
+    this.sentRequestIds = const {},
+    this.receivedRequestIds = const {},
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
+    if (recommends.isEmpty) {
+      return SizedBox.shrink();
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '알 수도 있는 사람 ${_recommendList.length}',
-          style: textTheme.labelLarge,
-        ),
+        Text('알 수도 있는 사람 ${recommends.length}', style: textTheme.labelLarge),
+        const SizedBox(height: 8),
         ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: _recommendList.length,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: recommends.length,
           itemBuilder: (context, index) {
-            bool isFriend = friendsList.any(
-              (user) => user.id == _recommendList[index].id,
-            );
-            bool isReceived = receivedRequestList.any(
-              (user) => user.id == _recommendList[index].id,
-            );
-            bool isSent = sentRequestList.any(
-              (user) => user.id == _recommendList[index].id,
-            );
+            final targetUser = recommends[index].user;
+            bool isFriend = friendIds.contains(targetUser.uid);
+            bool isSent = sentRequestIds.contains(targetUser.uid);
+            bool isReceived = receivedRequestIds.contains(targetUser.uid);
             return UserCard(
-              user: _recommendList[index].toSummary(),
-              subtitle: '알 수도 있는 친구',
+              user: targetUser,
+              subtitle: recommends[index].subtitle,
               isFriend: isFriend,
               isRequested: isReceived,
               isSent: isSent,
+              onSendRequest: () =>
+                  UserSearchActionHandler.sendRequest(ref, context, targetUser),
+              onCancelRequest: () => UserSearchActionHandler.cancelRequest(
+                ref,
+                context,
+                targetUser,
+              ),
+              onAccept: () => UserSearchActionHandler.acceptRequest(
+                ref,
+                context,
+                targetUser,
+              ),
+              onDecline: () => UserSearchActionHandler.declineRequest(
+                ref,
+                context,
+                targetUser,
+              ),
             );
           },
         ),
