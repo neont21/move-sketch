@@ -15,6 +15,13 @@ class _ModifyPasswordScreenState extends State<ModifyPasswordScreen> {
   bool _showNewPassword = false;
   bool _showCheckPassword = false;
 
+  void _handleSubmit() {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('비밀번호가 변경되었습니다.')));
+    context.go(Routes.login);
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -32,6 +39,7 @@ class _ModifyPasswordScreenState extends State<ModifyPasswordScreen> {
                 LabeledTextFormField(
                   labelText: '기존 비밀번호',
                   hintText: '기존 비밀번호',
+                  textInputAction: TextInputAction.next,
                   showPassword: _showPassword,
                   toggleVisibility: () {
                     setState(() {
@@ -42,6 +50,7 @@ class _ModifyPasswordScreenState extends State<ModifyPasswordScreen> {
                 LabeledTextFormField(
                   labelText: '새 비밀번호',
                   hintText: '새 비밀번호',
+                  textInputAction: TextInputAction.next,
                   showPassword: _showNewPassword,
                   toggleVisibility: () {
                     setState(() {
@@ -52,6 +61,8 @@ class _ModifyPasswordScreenState extends State<ModifyPasswordScreen> {
                 LabeledTextFormField(
                   labelText: '새 비밀번호 확인',
                   hintText: '새 비밀번호 확인',
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (value) => _handleSubmit(),
                   showPassword: _showCheckPassword,
                   toggleVisibility: () {
                     setState(() {
@@ -67,15 +78,7 @@ class _ModifyPasswordScreenState extends State<ModifyPasswordScreen> {
                   width: double.infinity,
                   height: 60,
                   child: ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('비밀번호가 변경되었습니다.'),
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                      context.go(Routes.login);
-                    },
+                    onPressed: _handleSubmit,
                     child: Text('비밀번호 변경'),
                   ),
                 ),

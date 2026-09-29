@@ -16,6 +16,9 @@ class LabeledTextFormField extends StatelessWidget {
   final bool enabled;
   final AutovalidateMode? autoValidateMode;
 
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
+
   const LabeledTextFormField({
     super.key,
     this.inputType = TextInputType.name,
@@ -31,6 +34,8 @@ class LabeledTextFormField extends StatelessWidget {
     this.onChanged,
     this.enabled = true,
     this.autoValidateMode,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -48,6 +53,8 @@ class LabeledTextFormField extends StatelessWidget {
       validator: validator,
       onChanged: onChanged,
       autovalidateMode: autoValidateMode,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,

@@ -101,6 +101,15 @@ class _ModifyProfileDialogState extends State<ModifyProfileDialog> {
     return menuItems;
   }
 
+  void _handleSave() {
+    // TODO: form 내용 반영
+    context.pop();
+    // FIXME: 변동사항이 있을 경우에만
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('프로필이 수정되었습니다.'), duration: Duration(seconds: 3)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
@@ -177,29 +186,22 @@ class _ModifyProfileDialogState extends State<ModifyProfileDialog> {
                   labelText: '닉네임',
                   hintText: '닉네임은 10자 이내로 정해주세요',
                   initialValue: user.name,
+                  textInputAction: TextInputAction.next,
                   maxLength: 10,
                 ),
                 LabeledTextFormField(
                   labelText: '한 줄 소개',
                   hintText: '나에 대한 짧은 소개를 작성해 보아요',
                   initialValue: user.description,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (value) => _handleSave(),
                   maxLength: 30,
                 ),
               ],
             ),
             DialogActionButtons(
               confirmText: '저장',
-              onConfirm: () {
-                // TODO: form 내용 반영
-                context.pop();
-                // FIXME: 변동사항이 있을 경우에만
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('프로필이 수정되었습니다.'),
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              },
+              onConfirm: _handleSave,
               onCancel: () {
                 context.pop();
               },

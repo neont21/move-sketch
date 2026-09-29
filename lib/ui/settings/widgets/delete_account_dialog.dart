@@ -14,6 +14,15 @@ class DeleteAccountDialog extends StatefulWidget {
 class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
   bool _showPassword = false;
 
+  void _handleDelete() {
+    // TODO: controller를 통해 입력값이 정확할 때만 수행
+    context.pop();
+    context.go(Routes.login);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('계정이 삭제되었습니다.')));
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -38,6 +47,8 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
           LabeledTextFormField(
             hintText: '비밀번호 입력',
             showPassword: _showPassword,
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (value) => _handleDelete(),
             toggleVisibility: () {
               setState(() {
                 _showPassword = !_showPassword;
@@ -47,17 +58,7 @@ class _DeleteAccountDialogState extends State<DeleteAccountDialog> {
           DialogActionButtons(
             confirmText: '삭제',
             confirmColor: colorScheme.error,
-            onConfirm: () {
-              // TODO: controller를 통해 입력값이 정확할 때만 수행
-              context.pop();
-              context.go(Routes.login);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('계정이 삭제되었습니다.'),
-                  duration: Duration(seconds: 3),
-                ),
-              );
-            },
+            onConfirm: _handleDelete,
             onCancel: () {
               context.pop();
             },

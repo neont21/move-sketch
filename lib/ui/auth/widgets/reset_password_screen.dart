@@ -113,6 +113,12 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   Text('가입할 때 쓴 이메일로 재설정 링크를 보내 드려요.'),
                   LabeledTextFormField(
                     inputType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (value) {
+                      if (!_isLoading) {
+                        _handleResetPassword();
+                      }
+                    },
                     labelText: '이메일',
                     hintText: 'user@example.com',
                     controller: _emailController,

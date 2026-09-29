@@ -259,7 +259,7 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
       bottomNavigationBar: (feedPostState.hasError)
           ? null
           : SafeArea(
-            child: Column(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_replyTarget != null)
@@ -274,12 +274,23 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          RichText(text: TextSpan(
-                            children: [
-                              TextSpan(text: _replyTarget?.author.nickname, style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700, color: colorScheme.secondary)),
-                              TextSpan(text: '에게 답글 다는 중', style: textTheme.bodyMedium),
-                            ],
-                          )),
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: _replyTarget?.author.nickname,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: colorScheme.secondary,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: '에게 답글 다는 중',
+                                  style: textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
                           IconButton(
                             onPressed: () {
                               setState(() {
@@ -307,6 +318,14 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                             controller: _commentController,
                             onChanged: (_) => setState(() {}),
                             keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.send,
+                            onSubmitted: (value) {
+                              if (feedPostState.value?.isSubmittingComment !=
+                                      true &&
+                                  _commentController.text.trim().isNotEmpty) {
+                                _submitComment();
+                              }
+                            },
                             style: textTheme.bodyMedium,
                             minLines: 1,
                             maxLines: 1,
@@ -317,7 +336,8 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                         ),
                         IconButton(
                           onPressed:
-                              feedPostState.value?.isSubmittingComment == true ||
+                              feedPostState.value?.isSubmittingComment ==
+                                      true ||
                                   _commentController.text.trim().isEmpty
                               ? null
                               : _submitComment,
@@ -333,7 +353,8 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                           style: IconButton.styleFrom(
                             backgroundColor: colorScheme.primary,
                             foregroundColor: colorScheme.onPrimary,
-                            disabledBackgroundColor: colorScheme.primaryContainer,
+                            disabledBackgroundColor:
+                                colorScheme.primaryContainer,
                             disabledForegroundColor: colorScheme.onPrimary,
                           ),
                         ),
@@ -342,7 +363,7 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                   ),
                 ],
               ),
-          ),
+            ),
     );
   }
 }

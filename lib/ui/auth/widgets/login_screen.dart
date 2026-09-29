@@ -222,6 +222,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   LabeledTextFormField(
                     inputType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
                     labelText: '아이디/이메일',
                     hintText: '아이디/이메일',
                     controller: _usernameController,
@@ -236,6 +237,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   LabeledTextFormField(
                     inputType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (value) {
+                      if (!isLoading) {
+                        _handleLogin();
+                      }
+                    },
                     labelText: '비밀번호',
                     hintText: '비밀번호',
                     controller: _passwordController,
