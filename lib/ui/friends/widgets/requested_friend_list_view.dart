@@ -29,11 +29,12 @@ class RequestedFriendListView extends ConsumerWidget {
           SnackBar(content: Text('${requester.nickname} 님의 친구 요청을 수락했습니다.')),
         );
       case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '친구 요청 수락 중 오류가 발생했습니다.';
         messenger.showSnackBar(
           SnackBar(
-            content: Text(
-              error is AppException ? error.message : '친구 요청 수락 중 오류가 발생했습니다.',
-            ),
+            content: Text(errorMessage),
             backgroundColor: colorScheme.error,
           ),
         );
@@ -58,11 +59,12 @@ class RequestedFriendListView extends ConsumerWidget {
           SnackBar(content: Text('${requester.nickname} 님의 친구 요청을 거절했습니다.')),
         );
       case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '친구 요청 거절 중 오류가 발생했습니다.';
         messenger.showSnackBar(
           SnackBar(
-            content: Text(
-              error is AppException ? error.message : '친구 요청 거절 중 오류가 발생했습니다.',
-            ),
+            content: Text(errorMessage),
             backgroundColor: colorScheme.error,
           ),
         );

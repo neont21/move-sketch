@@ -111,7 +111,6 @@ class SessionShareViewModel extends AsyncNotifier<SessionShareState> {
         waypoint: sessionResult.waypoint,
         end: sessionResult.endLocation,
       );
-
     } else {
       locationTags = const ['알 수 없는 위치', '알 수 없는 위치', '알 수 없는 위치'];
     }
@@ -202,9 +201,13 @@ class SessionShareViewModel extends AsyncNotifier<SessionShareState> {
         final createResult = await sketchPostRepository.createPost(post);
         switch (createResult) {
           case Ok():
-            await ref
-                .read(sessionResultRepositoryProvider)
-                .updateShareStatus(sessionId: sessionResult.id, isShared: true);
+            final sessionResultRepository = ref.read(
+              sessionResultRepositoryProvider,
+            );
+            await sessionResultRepository.updateShareStatus(
+              sessionId: sessionResult.id,
+              isShared: true,
+            );
             state = AsyncData(current.copyWith(isPublishing: false));
             return const Result.ok(null);
           case Error(:final error):

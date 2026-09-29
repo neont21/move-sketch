@@ -65,9 +65,8 @@ class FeedNotificationsViewModel extends AsyncNotifier<FeedNotificationsState> {
 
     state = AsyncData(current.copyWith(notifications: updated));
 
-    final result = await ref
-        .read(notificationRepositoryProvider)
-        .markAsRead(notificationId);
+    final notificationRepository = ref.read(notificationRepositoryProvider);
+    final result = await notificationRepository.markAsRead(notificationId);
 
     switch (result) {
       case Ok():
@@ -91,9 +90,8 @@ class FeedNotificationsViewModel extends AsyncNotifier<FeedNotificationsState> {
 
     state = AsyncData(current.copyWith(isProcessing: true));
 
-    final result = await ref
-        .read(notificationRepositoryProvider)
-        .markAllAsRead(user.uid);
+    final notificationRepository = ref.read(notificationRepositoryProvider);
+    final result = await notificationRepository.markAllAsRead(user.uid);
 
     switch (result) {
       case Ok():
@@ -124,9 +122,8 @@ class FeedNotificationsViewModel extends AsyncNotifier<FeedNotificationsState> {
 
     state = AsyncData(current.copyWith(notifications: updated));
 
-    final result = await ref
-        .read(notificationRepositoryProvider)
-        .deleteNotification(notificationId);
+    final notificationRepository = ref.read(notificationRepositoryProvider);
+    final result = await notificationRepository.deleteNotification(notificationId);
 
     switch (result) {
       case Ok():
@@ -150,9 +147,8 @@ class FeedNotificationsViewModel extends AsyncNotifier<FeedNotificationsState> {
 
     state = AsyncData(current.copyWith(isProcessing: true));
 
-    final result = await ref
-        .read(notificationRepositoryProvider)
-        .deleteReadNotifications(user.uid);
+    final notificationRepository = ref.read(notificationRepositoryProvider);
+    final result = await notificationRepository.deleteReadNotifications(user.uid);
 
     switch (result) {
       case Ok():
@@ -187,9 +183,8 @@ final hasUnreadNotificationsProvider = FutureProvider.autoDispose<bool>((
     return false;
   }
 
-  final result = await ref
-      .read(notificationRepositoryProvider)
-      .hasUnreadNotifications(user.uid);
+  final notificationRepository = ref.read(notificationRepositoryProvider);
+  final result = await notificationRepository.hasUnreadNotifications(user.uid);
 
   switch (result) {
     case Ok(:final value):

@@ -248,9 +248,9 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
             ),
           );
 
-          await ref
-              .read(sessionRepositoryProvider)
-              .discardSession(current.session.id);
+          final sessionRepository = ref.read(sessionRepositoryProvider);
+          await sessionRepository.discardSession(current.session.id);
+
           return Result.ok(syncedResult);
         case Error():
           state = AsyncData(

@@ -103,13 +103,12 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
       ),
     );
 
-    final result = await ref
-        .read(sketchPostRepositoryProvider)
-        .toggleCheer(
-          sketchId: sketchId,
-          userId: user.uid,
-          isCheered: !isCheered,
-        );
+    final sketchPostRepository = ref.read(sketchPostRepositoryProvider);
+    final result = await sketchPostRepository.toggleCheer(
+      sketchId: sketchId,
+      userId: user.uid,
+      isCheered: !isCheered,
+    );
 
     switch (result) {
       case Ok():
@@ -143,9 +142,12 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
     );
 
     state = AsyncData(current.copyWith(isSubmittingComment: true));
-    final result = await ref
-        .read(sketchPostRepositoryProvider)
-        .addComment(sketchId: sketchId, comment: comment);
+
+    final sketchPostRepository = ref.read(sketchPostRepositoryProvider);
+    final result = await sketchPostRepository.addComment(
+      sketchId: sketchId,
+      comment: comment,
+    );
 
     switch (result) {
       case Ok(:final value):
@@ -171,9 +173,11 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
       return const Result.ok(null);
     }
 
-    final result = await ref
-        .read(sketchPostRepositoryProvider)
-        .deleteComment(sketchId: sketchId, commentId: commentId);
+    final sketchPostRepository = ref.read(sketchPostRepositoryProvider);
+    final result = await sketchPostRepository.deleteComment(
+      sketchId: sketchId,
+      commentId: commentId,
+    );
 
     switch (result) {
       case Ok():
@@ -207,7 +211,8 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
   }
 
   Future<Result<void>> deletePost() async {
-    return ref.read(deleteSketchPostUseCaseProvider).execute(sketchId);
+    final deleteSketchPostUseCase = ref.read(deleteSketchPostUseCaseProvider);
+    return deleteSketchPostUseCase.execute(sketchId);
   }
 }
 
