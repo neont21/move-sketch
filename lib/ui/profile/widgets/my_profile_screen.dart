@@ -111,7 +111,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ),
             const SizedBox(height: 16),
             Divider(),
-            Expanded(child: ProfileGrid(userId: user.id, sketchList: _sketchList, onTap: (index) {
+            Expanded(child: ProfileGrid(userId: user.id, sketches: const [], onTap: (index) {
             context.go(Routes.mePost(_sketchList.sketches[index].sketchId));
             }, )),
           ],

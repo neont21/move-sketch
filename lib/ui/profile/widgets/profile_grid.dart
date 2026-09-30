@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
-import '../../../domain/models/mock_sketch_list.dart';
+import '../../../domain/models/social/sketch_post.dart';
 import '../../session/widgets/sketch_card.dart';
 
 class ProfileGrid extends StatelessWidget {
   final String userId;
   final ValueChanged<int> onTap;
-  final MockSketchList sketchList;
+  final List<SketchPost> sketches;
+
   const ProfileGrid({
     super.key,
     required this.userId,
-    required this.sketchList,
+    required this.sketches,
     required this.onTap,
   });
+
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      itemCount: sketchList.sketches.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      itemCount: sketches.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
       ),
       itemBuilder: (context, index) => GestureDetector(
         onTap: () => onTap(index),
         child: SketchCard(
-          imageProvider: AssetImage('assets/sample_sketch.png'),
+          imageProvider: NetworkImage(sketches[index].sketchUrl),
           isGrid: true,
         ),
       ),

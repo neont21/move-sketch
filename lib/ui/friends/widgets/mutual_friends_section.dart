@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../domain/models/mock_user.dart';
+import '../../../domain/models/social/user.dart';
+import '../../core/widgets/user_avatar.dart';
 import 'user_list_dialog.dart';
 
-final List<MockUser> mutualsList = [
-  MockUser.byId('@user1'),
-  MockUser.byId('@user2'),
-  MockUser.byId('@user3'),
-  MockUser.byId('@user4'),
-  MockUser.byId('@user5'),
-];
-
 class MutualFriendsSection extends StatelessWidget {
-  final String userId;
-  const MutualFriendsSection({super.key, required this.userId});
+  final List<UserSummary> mutualFriends;
+
+  const MutualFriendsSection({super.key, required this.mutualFriends});
 
   List<Widget> _buildMutualFriendsImage(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
@@ -27,17 +21,16 @@ class MutualFriendsSection extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: colorScheme.surfaceContainer, width: 2),
           ),
-          child: CircleAvatar(
+          child: UserAvatar(
+            username: mutualFriends[0].username,
+            imageUrl: mutualFriends[0].imageUrl,
             radius: 16,
-            backgroundImage: mutualsList[0].imageURL != null
-                ? NetworkImage(mutualsList[0].imageURL!)
-                : AssetImage('assets/default_profile.png'),
           ),
         ),
       ),
     );
     images.add(const SizedBox(width: 40));
-    if (mutualsList.length >= 2) {
+    if (mutualFriends.length >= 2) {
       images.add(
         Positioned(
           left: 20,
@@ -47,18 +40,17 @@ class MutualFriendsSection extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: colorScheme.surfaceContainer, width: 2),
             ),
-            child: CircleAvatar(
+            child: UserAvatar(
+              username: mutualFriends[1].username,
+              imageUrl: mutualFriends[1].imageUrl,
               radius: 16,
-              backgroundImage: mutualsList[1].imageURL != null
-                  ? NetworkImage(mutualsList[1].imageURL!)
-                  : AssetImage('assets/default_profile.png'),
             ),
           ),
         ),
       );
       images.add(const SizedBox(width: 60));
     }
-    if (mutualsList.length > 2) {
+    if (mutualFriends.length > 2) {
       images.add(
         Positioned(
           left: 40,
@@ -72,7 +64,7 @@ class MutualFriendsSection extends StatelessWidget {
               radius: 16,
               backgroundColor: colorScheme.outline,
               child: Text(
-                '+${mutualsList.length - 2}',
+                '+${mutualFriends.length - 2}',
                 style: textTheme.bodySmall,
               ),
             ),
@@ -86,12 +78,12 @@ class MutualFriendsSection extends StatelessWidget {
   }
 
   String _buildMutualFriendsText() {
-    if (mutualsList.length == 1) {
-      return mutualsList[0].name;
-    } else if (mutualsList.length == 2) {
-      return '${mutualsList[0].name}, ${mutualsList[1].name}';
+    if (mutualFriends.length == 1) {
+      return mutualFriends[0].nickname;
+    } else if (mutualFriends.length == 2) {
+      return '${mutualFriends[0].nickname}, ${mutualFriends[1].nickname}';
     } else {
-      return '${mutualsList[0].name}, ${mutualsList[1].name} 외 ${mutualsList.length - 2}명';
+      return '${mutualFriends[0].nickname}, ${mutualFriends[1].nickname} 외 ${mutualFriends.length - 2}명';
     }
   }
 
@@ -100,7 +92,7 @@ class MutualFriendsSection extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    if (mutualsList.isEmpty) {
+    if (mutualFriends.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -121,7 +113,7 @@ class MutualFriendsSection extends StatelessWidget {
                 builder: (context) => Dialog(
                   child: UserListDialog(
                     title: '함께 아는 친구',
-                    userList: mutualsList,
+                    userList: mutualFriends,
                   ),
                 ),
               );

@@ -1,43 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../domain/models/mock_user.dart';
+import '../../../domain/models/social/user.dart';
+import '../../../utils/result.dart';
+import '../../auth/view_models/auth_viewmodel.dart';
 import '../../core/widgets/system_alert_dialog.dart';
 import '../../feed/widgets/report_dialog.dart';
+import '../../friends/widgets/friendship_action_handler.dart';
 
-// final MockUser user = MockUser(id: '@daniil_a_np', name: '다닐루쉬카');
-final MockUser user = MockUser(id: '@user_id', name: '테스트');
-final List<MockUser> friendsList = [MockUser(id: '@edenjint3927', name: '후이')];
+class UserSheetButton extends ConsumerWidget {
+  final UserSummary targetUser;
+  final bool isFriend;
 
-class UserSheetButton extends StatelessWidget {
-  final String userId;
-  const UserSheetButton({super.key, required this.userId});
+  const UserSheetButton({
+    super.key,
+    required this.targetUser,
+    required this.isFriend,
+  });
 
-  List<ListTile> buildBottomSheet(BuildContext context) {
+  List<ListTile> buildBottomSheet(BuildContext context, WidgetRef ref) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final List<ListTile> menuItems = [];
 
-    List<ListTile> menuItems = [];
-    if (friendsList.any((user) => user.id == userId)) {
+    if (isFriend) {
       menuItems.add(
         ListTile(
           title: Text('친구 삭제'),
           onTap: () {
-            // TODO: implement delete
             context.pop();
             showDialog(
               context: context,
-              builder: (context) => Dialog(
+              builder: (dialogContext) => Dialog(
                 child: SystemAlertDialog(
                   title: '정말 삭제하시겠습니까?',
-                  description: '삭제하시면 다시 친구가 될 때까지 $userId 님의 스케치를 볼 수 없어요.',
+                  description:
+                      '삭제하시면 다시 친구가 될 때까지 ${targetUser.nickname} (@${targetUser.username}) 님의 스케치를 볼 수 없어요.',
                   confirmText: '삭제',
-                  onConfirm: () {
-                    context.pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('$userId 님을 친구 목록에서 삭제하였습니다.'),
-                        duration: Duration(seconds: 3),
-                      ),
+                  onConfirm: () async {
+                    dialogContext.pop();
+                    await FriendshipActionHandler.removeFriend(
+                      ref,
+                      context,
+                      targetUser,
                     );
                   },
                 ),
@@ -52,12 +56,18 @@ class UserSheetButton extends StatelessWidget {
         title: Text('신고하기', style: TextStyle(color: colorScheme.error)),
         onTap: () {
           context.pop();
-          showDialog(
-            context: context,
-            builder: (context) => Dialog(
-              child: ReportDialog(userId: user.id, targetUserId: userId),
-            ),
-          );
+          final currentUser = ref.read(authViewModelProvider).value;
+          if (currentUser != null) {
+            showDialog(
+              context: context,
+              builder: (dialogContext) => Dialog(
+                child: ReportDialog(
+                  targetUser: targetUser,
+                  reporter: currentUser.toSummary(),
+                ),
+              ),
+            );
+          }
         },
       ),
     );
@@ -68,19 +78,28 @@ class UserSheetButton extends StatelessWidget {
           context.pop();
           showDialog(
             context: context,
-            builder: (context) => Dialog(
+            builder: (dialogContext) => Dialog(
               child: SystemAlertDialog(
                 title: '정말 차단하시겠습니까?',
-                description: '차단하시면 더이상 $userId 님의 프로필과 스케치를 볼 수 없어요.',
+                description:
+                    '차단하시면 더이상 ${targetUser.nickname} (@${targetUser.username}) 님의 프로필과 스케치를 볼 수 없어요.',
                 confirmText: '차단',
-                onConfirm: () {
-                  context.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('$userId 님을 차단하였습니다.'),
-                      duration: Duration(seconds: 3),
-                    ),
+                onConfirm: () async {
+                  dialogContext.pop();
+                  final result = await FriendshipActionHandler.blockUser(
+                    ref,
+                    context,
+                    targetUser,
                   );
+
+                  switch (result) {
+                    case Ok():
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    case Error():
+                      break;
+                  }
                 },
               ),
             ),
@@ -92,7 +111,7 @@ class UserSheetButton extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return IconButton(
@@ -103,7 +122,7 @@ class UserSheetButton extends StatelessWidget {
             return SafeArea(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: buildBottomSheet(context),
+                children: buildBottomSheet(context, ref),
               ),
             );
           },
