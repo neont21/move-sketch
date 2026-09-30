@@ -1,23 +1,87 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/assets.dart';
+import '../../../config/dependencies.dart';
 import '../../../domain/models/enums/character_type.dart';
+import '../../../utils/exceptions.dart';
+import '../../../utils/result.dart';
+import '../../auth/view_models/auth_viewmodel.dart';
 
-class ChangeCharacterScreen extends StatefulWidget {
+class ChangeCharacterScreen extends ConsumerStatefulWidget {
   const ChangeCharacterScreen({super.key});
 
   @override
-  State<ChangeCharacterScreen> createState() => _ChangeCharacterScreenState();
+  ConsumerState<ChangeCharacterScreen> createState() =>
+      _ChangeCharacterScreenState();
 }
 
-class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
+class _ChangeCharacterScreenState extends ConsumerState<ChangeCharacterScreen> {
   final List<CharacterType> _characters = CharacterType.values;
-  int _selected = 0;
+  bool _isSaving = false;
+
+  Future<void> _handleSelect(CharacterType selectedCharacter) async {
+    if (_isSaving) {
+      return;
+    }
+
+    final currentUser = ref.read(currentUserProvider);
+    if (currentUser?.selectedCharacter == selectedCharacter) {
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    final userRepository = ref.read(userRepositoryProvider);
+    final result = await userRepository.updateCharacter(selectedCharacter);
+
+    if (!mounted) {
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    switch (result) {
+      case Ok():
+        await ref.read(authViewModelProvider.notifier).refreshCurrentUser();
+
+        if (!mounted) {
+          return;
+        }
+
+        setState(() {
+          _isSaving = false;
+        });
+
+        messenger.showSnackBar(
+          SnackBar(content: Text('${selectedCharacter.label} 캐릭터로 변경되었습니다.')),
+        );
+      case Error(:final error):
+        setState(() {
+          _isSaving = false;
+        });
+        final errorMessage = error is AppException
+            ? error.message
+            : '캐릭터 변경 중 오류가 발생했습니다.';
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final currentUser = ref.watch(currentUserProvider);
+    final currentCharacter =
+        currentUser?.selectedCharacter ?? CharacterType.bear;
 
     return Scaffold(
       appBar: AppBar(title: Text('내 캐릭터')),
@@ -26,7 +90,7 @@ class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('캐릭터를 변경하면 다음 세션부터 반영되요.', style: textTheme.bodyMedium),
+            Text('캐릭터를 변경하면 다음 세션부터 반영돼요.', style: textTheme.bodyMedium),
             const SizedBox(height: 16),
             Expanded(
               child: GridView.builder(
@@ -34,29 +98,23 @@ class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 4 / 5,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
                 ),
                 itemBuilder: (context, index) {
                   final character = _characters[index];
+                  final bool isSelected = character == currentCharacter;
+
                   return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selected = index;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('캐릭터 변경 완료: ${character.label}'),
-                          duration: const Duration(seconds: 3),
-                        ),
-                      );
-                    },
+                    onTap: _isSaving ? null : () => _handleSelect(character),
                     child: Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadiusGeometry.circular(20),
                         side: BorderSide(
-                          color: _selected == index
+                          color: isSelected
                               ? colorScheme.primary
                               : colorScheme.outline,
-                          width: _selected == index ? 2 : 1,
+                          width: isSelected ? 2 : 1,
                         ),
                       ),
                       child: Padding(
@@ -86,7 +144,7 @@ class _ChangeCharacterScreenState extends State<ChangeCharacterScreen> {
                             Text(
                               character.label,
                               style: textTheme.bodyMedium?.copyWith(
-                                color: _selected == index
+                                color: isSelected
                                     ? colorScheme.primary
                                     : colorScheme.tertiaryContainer,
                                 fontWeight: FontWeight.w700,
