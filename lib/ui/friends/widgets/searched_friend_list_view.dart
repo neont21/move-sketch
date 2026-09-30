@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/models/social/user.dart';
+import 'friendship_action_handler.dart';
 import 'user_card.dart';
-import 'user_search_action_handler.dart';
 
 class SearchedFriendListView extends ConsumerWidget {
   final List<UserSummary> searchedUsers;
@@ -55,18 +55,18 @@ class SearchedFriendListView extends ConsumerWidget {
               isRequested: isReceived,
               isSent: isSent,
               onSendRequest: () =>
-                  UserSearchActionHandler.sendRequest(ref, context, targetUser),
-              onCancelRequest: () => UserSearchActionHandler.cancelRequest(
+                  FriendshipActionHandler.sendRequest(ref, context, targetUser),
+              onCancelRequest: () => FriendshipActionHandler.cancelRequest(
                 ref,
                 context,
                 targetUser,
               ),
-              onAccept: () => UserSearchActionHandler.acceptRequest(
+              onAccept: () => FriendshipActionHandler.acceptRequest(
                 ref,
                 context,
                 targetUser,
               ),
-              onDecline: () => UserSearchActionHandler.declineRequest(
+              onDecline: () => FriendshipActionHandler.declineRequest(
                 ref,
                 context,
                 targetUser,

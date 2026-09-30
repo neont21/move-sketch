@@ -40,7 +40,14 @@ import '../data/services/remote/weather_service.dart';
 
 import '../domain/use_cases/session/complete_session_use_case.dart';
 import '../domain/use_cases/session/compose_sketch_use_case.dart';
+import '../domain/use_cases/social/accept_friend_request_use_case.dart';
+import '../domain/use_cases/social/block_user_use_case.dart';
+import '../domain/use_cases/social/cancel_friend_request_use_case.dart';
+import '../domain/use_cases/social/decline_friend_request_use_case.dart';
 import '../domain/use_cases/social/delete_sketch_post_use_case.dart';
+import '../domain/use_cases/social/remove_friend_use_case.dart';
+import '../domain/use_cases/social/send_friend_request_use_case.dart';
+import '../domain/use_cases/social/unblock_user_use_case.dart';
 import '../ui/session/render/sketch_image_renderer.dart';
 
 /// 외부 REST API 통신을 위한 Provider
@@ -248,5 +255,61 @@ final deleteSketchPostUseCaseProvider = Provider<DeleteSketchPostUseCase>((ref) 
   return DeleteSketchPostUseCase(
     sketchPostRepository: ref.watch(sketchPostRepositoryProvider),
     sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
+  );
+});
+
+/// SendFriendRequestUseCase Provider: 사용자에게 친구 요청을 보내는 UseCase
+final sendFriendRequestUseCaseProvider = Provider<SendFriendRequestUseCase>((ref) {
+  return SendFriendRequestUseCase(
+    friendshipRepository: ref.watch(friendshipRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
+  );
+});
+
+/// CancelFriendRequestUseCase Provider: 사용자에게 보낸 친구 요청을 취소하는 UseCase
+final cancelFriendRequestUseCaseProvider = Provider<CancelFriendRequestUseCase>((ref) {
+  return CancelFriendRequestUseCase(
+    friendshipRepository: ref.watch(friendshipRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
+  );
+});
+
+/// AcceptFriendRequestUseCase Provider: 사용자로부터 받은 친구 요청을 수락하는 UseCase
+final acceptFriendRequestUseCaseProvider = Provider<AcceptFriendRequestUseCase>((ref) {
+  return AcceptFriendRequestUseCase(
+    friendshipRepository: ref.watch(friendshipRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
+  );
+});
+
+/// DeclineFriendRequestUseCase Provider: 사용자로부터 받은 친구 요청을 거절하는 UseCase
+final declineFriendRequestUseCaseProvider = Provider<DeclineFriendRequestUseCase>((ref) {
+  return DeclineFriendRequestUseCase(
+    friendshipRepository: ref.watch(friendshipRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
+  );
+});
+
+/// RemoveFriendUseCase Provider: 사용자를 친구 목록에저 제거하는 UseCase
+final removeFriendUseCaseProvider = Provider<RemoveFriendUseCase>((ref) {
+  return RemoveFriendUseCase(
+    friendshipRepository: ref.watch(friendshipRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
+  );
+});
+
+/// BlockUserUseCase Provider: 사용자를 차단하는 UseCase
+final blockUserUseCaseProvider = Provider<BlockUserUseCase>((ref) {
+  return BlockUserUseCase(
+    friendshipRepository: ref.watch(friendshipRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
+  );
+});
+
+/// UnblockUserUseCase Provider: 사용자에 대한 차단을 해제하는 UseCase
+final unblockUserUseCaseProvider = Provider<UnblockUserUseCase>((ref) {
+  return UnblockUserUseCase(
+    friendshipRepository: ref.watch(friendshipRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
   );
 });

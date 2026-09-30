@@ -1,75 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/models/social/user.dart';
-import '../../../utils/exceptions.dart';
-import '../../../utils/result.dart';
-import '../view_models/friends_viewmodel.dart';
+import 'friendship_action_handler.dart';
 import 'user_card.dart';
 
 class RequestedFriendListView extends ConsumerWidget {
   final List<UserSummary> requests;
 
   const RequestedFriendListView({super.key, required this.requests});
-
-  void _onAcceptRequest(
-    WidgetRef ref,
-    BuildContext context,
-    UserSummary requester,
-  ) async {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final messenger = ScaffoldMessenger.of(context);
-
-    final result = await ref
-        .read(friendsViewModelProvider.notifier)
-        .acceptFriendRequest(requester.uid);
-
-    switch (result) {
-      case Ok():
-        messenger.showSnackBar(
-          SnackBar(content: Text('${requester.nickname} 님의 친구 요청을 수락했습니다.')),
-        );
-      case Error(:final error):
-        final errorMessage = error is AppException
-            ? error.message
-            : '친구 요청 수락 중 오류가 발생했습니다.';
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: colorScheme.error,
-          ),
-        );
-    }
-  }
-
-  void _onDeclineRequest(
-    WidgetRef ref,
-    BuildContext context,
-    UserSummary requester,
-  ) async {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final messenger = ScaffoldMessenger.of(context);
-
-    final result = await ref
-        .read(friendsViewModelProvider.notifier)
-        .declineFriendRequest(requester.uid);
-
-    switch (result) {
-      case Ok():
-        messenger.showSnackBar(
-          SnackBar(content: Text('${requester.nickname} 님의 친구 요청을 거절했습니다.')),
-        );
-      case Error(:final error):
-        final errorMessage = error is AppException
-            ? error.message
-            : '친구 요청 거절 중 오류가 발생했습니다.';
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: colorScheme.error,
-          ),
-        );
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -93,8 +31,16 @@ class RequestedFriendListView extends ConsumerWidget {
             return UserCard(
               user: requests[index],
               isRequested: true,
-              onAccept: () => _onAcceptRequest(ref, context, requests[index]),
-              onDecline: () => _onDeclineRequest(ref, context, requests[index]),
+              onAccept: () => FriendshipActionHandler.acceptRequest(
+                ref,
+                context,
+                requests[index],
+              ),
+              onDecline: () => FriendshipActionHandler.declineRequest(
+                ref,
+                context,
+                requests[index],
+              ),
             );
           },
         ),
