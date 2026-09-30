@@ -12,12 +12,14 @@ import '../../auth/view_models/auth_viewmodel.dart';
 class FeedPostState {
   final SketchPost sketch;
   final List<Comment> comments;
+  final Set<String> blockedUserIds;
   final bool isTogglingCheer;
   final bool isSubmittingComment;
 
   const FeedPostState({
     required this.sketch,
     this.comments = const [],
+    this.blockedUserIds = const {},
     this.isTogglingCheer = false,
     this.isSubmittingComment = false,
   });
@@ -25,12 +27,14 @@ class FeedPostState {
   FeedPostState copyWith({
     SketchPost? sketch,
     List<Comment>? comments,
+    Set<String>? blockedUserIds,
     bool? isTogglingCheer,
     bool? isSubmittingComment,
   }) {
     return FeedPostState(
       sketch: sketch ?? this.sketch,
       comments: comments ?? this.comments,
+      blockedUserIds: blockedUserIds ?? this.blockedUserIds,
       isTogglingCheer: isTogglingCheer ?? this.isTogglingCheer,
       isSubmittingComment: isSubmittingComment ?? this.isSubmittingComment,
     );
@@ -42,6 +46,37 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
 
   FeedPostViewModel(this.sketchId);
 
+  List<Comment> _organizeComments(
+    List<Comment> rawComments,
+    Set<String> blockedUserIds,
+  ) {
+    bool isActive(Comment comment) =>
+        !comment.isDeleted && !blockedUserIds.contains(comment.authorUid);
+    final roots = rawComments.where((comment) => !comment.isReply).toList();
+    final replies = rawComments.where((comment) => comment.isReply).toList();
+
+    final activeReplies = replies.where(isActive).toList();
+    final parentIdsWithActiveReplies = activeReplies
+        .map((reply) => reply.parentCommentId!)
+        .toSet();
+
+    final visibleRoots = roots.where((root) {
+      if (isActive(root)) {
+        return true;
+      }
+      return parentIdsWithActiveReplies.contains(root.id);
+    }).toList();
+
+    final List<Comment> organized = [];
+    for (final root in visibleRoots) {
+      organized.add(root);
+      organized.addAll(
+        activeReplies.where((reply) => reply.parentCommentId == root.id),
+      );
+    }
+    return organized;
+  }
+
   @override
   Future<FeedPostState> build() async {
     final user = await ref.watch(authViewModelProvider.future);
@@ -50,38 +85,40 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
     }
 
     final sketchPostRepository = ref.read(sketchPostRepositoryProvider);
-    final (postResult, commentResult) = await (
+    final friendshipRepository = ref.read(friendshipRepositoryProvider);
+
+    final (postResult, commentResult, blockedIdsResult) = await (
       sketchPostRepository.getPostById(sketchId),
       sketchPostRepository.getComments(sketchId),
+      friendshipRepository.getBlockedUserIds(user.uid),
     ).wait;
 
-    final SketchPost sketch;
-    switch (postResult) {
-      case Ok(:final value):
-        if (value == null) {
-          throw const NotFoundException('스케치를 찾을 수 없습니다.');
-        }
-        sketch = value;
-      case Error(:final error):
-        throw error;
-    }
+    final SketchPost sketch = switch (postResult) {
+      Ok(:final value) =>
+        value ?? (throw const NotFoundException('스케치를 찾을 수 없습니다.')),
+      Error(:final error) => throw error,
+    };
 
-    final List<Comment> comments;
-    switch (commentResult) {
-      case Ok(:final value):
-        final roots = value.where((c) => !c.isReply).toList();
-        final replies = value.where((c) => c.isReply).toList();
-        final sorted = <Comment>[];
-        for (final root in roots) {
-          sorted.add(root);
-          sorted.addAll(replies.where((r) => r.parentCommentId == root.id));
-        }
-        comments = sorted;
-      case Error():
-        comments = const <Comment>[];
-    }
+    final List<Comment> rawComments = switch (commentResult) {
+      Ok(:final value) => value,
+      Error(:final error) => throw error,
+    };
 
-    return FeedPostState(sketch: sketch, comments: comments);
+    final Set<String> blockedUserIds = switch (blockedIdsResult) {
+      Ok(:final value) => value.toSet(),
+      Error() => const <String>{},
+    };
+
+    final List<Comment> organizedComments = _organizeComments(
+      rawComments,
+      blockedUserIds,
+    );
+
+    return FeedPostState(
+      sketch: sketch,
+      comments: organizedComments,
+      blockedUserIds: blockedUserIds,
+    );
   }
 
   Future<Result<void>> toggleCheer() async {
@@ -181,20 +218,16 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
 
     switch (result) {
       case Ok():
-        final hasReplies = current.comments.any(
-          (comment) =>
-              comment.parentCommentId == commentId && !comment.isDeleted,
+        final updatedRawComments = current.comments.map((comment) {
+          if (comment.id == commentId) {
+            return comment.copyWith(deletedAt: () => DateTime.now());
+          }
+          return comment;
+        }).toList();
+        final updatedComments = _organizeComments(
+          updatedRawComments,
+          current.blockedUserIds,
         );
-        final updatedComments = hasReplies
-            ? current.comments.map((comment) {
-                if (comment.id == commentId) {
-                  return comment.copyWith(deletedAt: () => DateTime.now());
-                }
-                return comment;
-              }).toList()
-            : current.comments
-                  .where((comment) => comment.id != commentId)
-                  .toList();
 
         state = AsyncData(
           current.copyWith(

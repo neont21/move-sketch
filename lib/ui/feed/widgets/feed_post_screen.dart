@@ -243,6 +243,7 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                     (comment) => UserCommentTile(
                       comment: comment,
                       sketchAuthor: sketch.author,
+                      isBlocked: state.blockedUserIds.contains(comment.authorUid),
                       onReply: (comment) => setState(() {
                         _replyTarget = comment;
                       }),

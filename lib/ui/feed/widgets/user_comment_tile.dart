@@ -10,6 +10,7 @@ import '../../core/widgets/user_avatar.dart';
 class UserCommentTile extends StatelessWidget {
   final Comment comment;
   final UserSummary sketchAuthor;
+  final bool isBlocked;
   final ValueChanged<Comment>? onReply;
   final VoidCallback? onDelete;
 
@@ -17,23 +18,63 @@ class UserCommentTile extends StatelessWidget {
     super.key,
     required this.comment,
     required this.sketchAuthor,
+    this.isBlocked = false,
     this.onReply,
     this.onDelete,
   });
+
+  Widget _buildMaskedTile(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final String message = comment.isDeleted ? '삭제된 댓글입니다.' : '차단된 사용자의 댓글입니다.';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colorScheme.outline)
+      ),
+      child: Text(
+        message,
+        style: textTheme.bodySmall?.copyWith(
+          color: colorScheme.tertiaryContainer,
+          fontStyle: FontStyle.italic,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    if (comment.isDeleted || isBlocked) {
+      return _buildMaskedTile(context);
+    }
+
     return Padding(
       padding: (comment.isReply)
-          ? const EdgeInsets.fromLTRB(40, 10, 0, 10)
+          ? const EdgeInsets.fromLTRB(16, 6, 0, 6)
           : const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         spacing: 10,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (comment.isReply) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: 8, right: 6),
+              child: Icon(
+                Icons.subdirectory_arrow_right,
+                size: 18,
+                color: colorScheme.outlineVariant,
+              ),
+            ),
+          ],
           GestureDetector(
             onTap: () {
               context.go(Routes.feedProfile(comment.author.username));
@@ -65,9 +106,7 @@ class UserCommentTile extends StatelessWidget {
                       comment.createdAt.formattedFeedTime,
                       style: textTheme.labelMedium,
                     ),
-                    if (!comment.isReply &&
-                        !comment.isDeleted &&
-                        onReply != null)
+                    if (!comment.isReply && onReply != null)
                       GestureDetector(
                         onTap: () {
                           onReply!(comment);
@@ -81,30 +120,21 @@ class UserCommentTile extends StatelessWidget {
                         ),
                       ),
                     const Spacer(),
-                    if (!comment.isDeleted)
-                      BottomSheetButton(
-                        author: comment.author,
-                        sketchAuthorIfComment: sketchAuthor,
-                        commentIdIfComment: comment.id,
-                        onDelete: onDelete,
-                      ),
+                    BottomSheetButton(
+                      author: comment.author,
+                      sketchAuthorIfComment: sketchAuthor,
+                      commentIdIfComment: comment.id,
+                      onDelete: onDelete,
+                    ),
                   ],
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 20),
-                  child: comment.isDeleted
-                      ? Text(
-                          '삭제된 댓글입니다.',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.outlineVariant,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        )
-                      : Text(
-                          comment.text,
-                          style: textTheme.bodyMedium,
-                          textAlign: TextAlign.justify,
-                        ),
+                  child: Text(
+                    comment.text,
+                    style: textTheme.bodyMedium,
+                    textAlign: TextAlign.justify,
+                  ),
                 ),
               ],
             ),
