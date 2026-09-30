@@ -148,7 +148,7 @@ class UserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        context.push(Routes.userProfile(user.uid));
+        context.push(Routes.userProfile(user.username));
       },
       leading: UserAvatar(
         username: user.username,

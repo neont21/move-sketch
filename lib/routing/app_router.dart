@@ -100,7 +100,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: Routes.landing, builder: (context, state) => LandingScreen()),
+      GoRoute(
+        path: Routes.landing,
+        builder: (context, state) => LandingScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state, navigationShell) =>
@@ -145,8 +148,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: Routes.profileRelative,
                         builder: (context, state) {
-                          String userId = state.pathParameters['user_id']!;
-                          return UserProfileScreen(userId: userId);
+                          final username = state.pathParameters['username']!;
+                          return UserProfileScreen(username: username);
                         },
                       ),
                     ],
@@ -154,9 +157,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: Routes.profileRelative,
                     builder: (context, state) {
-                      String userId = state.pathParameters['user_id']!;
-                      return UserProfileScreen(userId: userId);
+                      final username = state.pathParameters['username']!;
+                      return UserProfileScreen(username: username);
                     },
+                    routes: [
+                      GoRoute(
+                        path: Routes.userProfilePostRelative,
+                        builder: (context, state) {
+                          final sketchId = state.pathParameters['sketch_id']!;
+                          return FeedPostScreen(sketchId: sketchId);
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -240,7 +252,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                       ),
                       GoRoute(
                         path: Routes.meSettingsNotificationsRelative,
-                        builder: (context, state) => NotificationSettingsScreen(),
+                        builder: (context, state) =>
+                            NotificationSettingsScreen(),
                       ),
                       GoRoute(
                         path: Routes.meSettingsBlockedRelative,
@@ -289,7 +302,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.license,
         builder: (context, state) => OSSLicensesScreen(),
       ),
-      GoRoute(path: Routes.privacy, builder: (context, state) => PrivacyScreen()),
+      GoRoute(
+        path: Routes.privacy,
+        builder: (context, state) => PrivacyScreen(),
+      ),
       GoRoute(
         path: Routes.tos,
         builder: (context, state) => TermsOfServiceScreen(),
@@ -297,9 +313,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.userProfilePath,
         builder: (context, state) {
-          String userId = state.pathParameters['user_id']!;
-          return UserProfileScreen(userId: userId);
+          final username = state.pathParameters['username']!;
+          return UserProfileScreen(username: username);
         },
+        routes: [
+          GoRoute(
+            path: Routes.userProfilePostRelative,
+            builder: (context, state) {
+              final sketchId = state.pathParameters['sketch_id']!;
+              return FeedPostScreen(sketchId: sketchId);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.auth,

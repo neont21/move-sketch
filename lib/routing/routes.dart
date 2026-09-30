@@ -17,7 +17,7 @@ abstract final class Routes {
   static const home = '/home';
 
   static const postRelative = 'post/:sketch_id';
-  static const profileRelative = 'profile/:user_id';
+  static const profileRelative = 'profile/:username';
 
   static const feed = '/feed';
   static String feedPost(String sketchId) => '$feed/post/$sketchId';
@@ -27,10 +27,10 @@ abstract final class Routes {
 
   static String feedNotificationPost(String sketchId) =>
       '$feedNotifications/post/$sketchId';
-  static String feedNotificationProfile(String userId) =>
-      '$feedNotifications/profile/$userId';
+  static String feedNotificationProfile(String username) =>
+      '$feedNotifications/profile/$username';
 
-  static String feedProfile(String userId) => '$feed/profile/$userId';
+  static String feedProfile(String username) => '$feed/profile/$username';
 
   static const history = '/history';
   static const historyDetailsRelative = 'details/:session_id';
@@ -88,6 +88,7 @@ abstract final class Routes {
   static const privacy = '/privacy';
   static const tos = '/tos';
 
-  static const userProfilePath = '/profile/:user_id';
-  static String userProfile(String userId) => '/profile/$userId';
+  static const userProfilePath = '/profile/:username';
+  static String userProfile(String username) => '/profile/$username';
+  static const userProfilePostRelative = ':sketch_id';
 }

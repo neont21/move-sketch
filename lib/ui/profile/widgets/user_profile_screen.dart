@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../../friends/widgets/mutual_friends_section.dart';
@@ -11,14 +10,14 @@ import 'user_profile_action_button.dart';
 import 'user_sheet_button.dart';
 
 class UserProfileScreen extends ConsumerWidget {
-  final String userId;
-  const UserProfileScreen({super.key, required this.userId});
+  final String username;
+  const UserProfileScreen({super.key, required this.username});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    final profileState = ref.watch(userProfileViewModelProvider(userId));
+    final profileState = ref.watch(userProfileViewModelProvider(username));
 
     return Scaffold(
       appBar: AppBar(
@@ -95,12 +94,11 @@ class UserProfileScreen extends ConsumerWidget {
                                 ),
                               )
                             : ProfileGrid(
-                                userId: userId,
+                                userId: state.user.uid,
                                 sketches: state.sketches,
                                 onTap: (index) {
-                                  context.go(
-                                    Routes.feedPost(state.sketches[index].id),
-                                  );
+                                  final currentPath = GoRouterState.of(context).uri.path;
+                                  context.go('$currentPath/${state.sketches[index].id}');
                                 },
                               ))
                       : Center(

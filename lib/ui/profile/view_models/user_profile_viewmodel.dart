@@ -62,9 +62,9 @@ class UserProfileState {
 }
 
 class UserProfileViewModel extends AsyncNotifier<UserProfileState> {
-  final String targetUserId;
+  final String targetUsername;
 
-  UserProfileViewModel(this.targetUserId);
+  UserProfileViewModel(this.targetUsername);
 
   @override
   Future<UserProfileState> build() async {
@@ -77,29 +77,26 @@ class UserProfileViewModel extends AsyncNotifier<UserProfileState> {
     final friendshipRepository = ref.read(friendshipRepositoryProvider);
     final sketchPostRepository = ref.read(sketchPostRepositoryProvider);
 
-    final (
-      profileResult,
-      friendshipResult,
-      mutualFriendsResult,
-      blockedUsersResult,
-    ) = await (
-      userRepository.getUserProfile(targetUserId),
-      friendshipRepository.getFriendship(
-        currentUserId: user.uid,
-        targetUserId: targetUserId,
-      ),
-      friendshipRepository.getMutualFriends(
-        currentUserId: user.uid,
-        targetUserId: targetUserId,
-      ),
-      friendshipRepository.getBlockedUsers(user.uid),
-    ).wait;
-
+    final profileResult = await userRepository.getUserByUsername(
+      targetUsername,
+    );
     final targetUser = switch (profileResult) {
       Ok(:final value) =>
         value ?? (throw const NotFoundException('사용자를 찾을 수 없습니다.')),
       Error(:final error) => throw error,
     };
+
+    final (friendshipResult, mutualFriendsResult, blockedUsersResult) = await (
+      friendshipRepository.getFriendship(
+        currentUserId: user.uid,
+        targetUserId: targetUser.uid,
+      ),
+      friendshipRepository.getMutualFriends(
+        currentUserId: user.uid,
+        targetUserId: targetUser.uid,
+      ),
+      friendshipRepository.getBlockedUsers(user.uid),
+    ).wait;
 
     final friendship = switch (friendshipResult) {
       Ok(:final value) => value,
@@ -112,14 +109,14 @@ class UserProfileViewModel extends AsyncNotifier<UserProfileState> {
     };
 
     final isBlocked = switch (blockedUsersResult) {
-      Ok(:final value) => value.any((user) => user.uid == targetUserId),
+      Ok(:final value) => value.any((user) => user.uid == targetUser.uid),
       Error(:final error) => throw error,
     };
 
     List<SketchPost> sketches = const [];
     if (friendship?.status == FriendshipStatus.accepted) {
       final postsResult = await sketchPostRepository.getUserPosts(
-        userId: targetUserId,
+        userId: targetUser.uid,
       );
       sketches = switch (postsResult) {
         Ok(:final value) => value,
@@ -140,5 +137,5 @@ class UserProfileViewModel extends AsyncNotifier<UserProfileState> {
 
 final userProfileViewModelProvider = AsyncNotifierProvider.autoDispose
     .family<UserProfileViewModel, UserProfileState, String>(
-      (userId) => UserProfileViewModel(userId),
+      (username) => UserProfileViewModel(username),
     );

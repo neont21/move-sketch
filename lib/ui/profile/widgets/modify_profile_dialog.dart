@@ -11,7 +11,6 @@ import '../../auth/view_models/auth_viewmodel.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 import '../../core/widgets/user_avatar.dart';
-import '../view_models/my_profile_viewmodel.dart';
 
 class ModifyProfileDialog extends ConsumerStatefulWidget {
   final User user;

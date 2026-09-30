@@ -10,17 +10,20 @@ import '../view_models/friends_viewmodel.dart';
 import '../view_models/user_search_viewmodel.dart';
 
 abstract final class FriendshipActionHandler {
-  static void _invalidateRelatedProviders(WidgetRef ref, String targetUserId) {
+  static void _invalidateRelatedProviders(
+    WidgetRef ref,
+    String targetUsername,
+  ) {
     ref.invalidate(friendsViewModelProvider);
     ref.invalidate(userSearchViewModelProvider);
-    ref.invalidate(userProfileViewModelProvider(targetUserId));
+    ref.invalidate(userProfileViewModelProvider(targetUsername));
   }
 
   static Future<Result<void>> sendRequest(
-      WidgetRef ref,
-      BuildContext context,
-      UserSummary targetUser,
-      ) async {
+    WidgetRef ref,
+    BuildContext context,
+    UserSummary targetUser,
+  ) async {
     final messenger = ScaffoldMessenger.of(context);
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -33,7 +36,7 @@ abstract final class FriendshipActionHandler {
           SnackBar(content: Text('${targetUser.nickname} 님에게 친구 요청을 보냈습니다.')),
         );
 
-        _invalidateRelatedProviders(ref, targetUser.uid);
+        _invalidateRelatedProviders(ref, targetUser.username);
         return const Result.ok(null);
       case Error(:final error):
         final errorMessage = error is AppException
@@ -50,10 +53,10 @@ abstract final class FriendshipActionHandler {
   }
 
   static Future<Result<void>> cancelRequest(
-      WidgetRef ref,
-      BuildContext context,
-      UserSummary targetUser,
-      ) async {
+    WidgetRef ref,
+    BuildContext context,
+    UserSummary targetUser,
+  ) async {
     final messenger = ScaffoldMessenger.of(context);
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -68,7 +71,7 @@ abstract final class FriendshipActionHandler {
           ),
         );
 
-        _invalidateRelatedProviders(ref, targetUser.uid);
+        _invalidateRelatedProviders(ref, targetUser.username);
         return const Result.ok(null);
       case Error(:final error):
         final errorMessage = error is AppException
@@ -85,10 +88,10 @@ abstract final class FriendshipActionHandler {
   }
 
   static Future<Result<void>> acceptRequest(
-      WidgetRef ref,
-      BuildContext context,
-      UserSummary targetUser,
-      ) async {
+    WidgetRef ref,
+    BuildContext context,
+    UserSummary targetUser,
+  ) async {
     final messenger = ScaffoldMessenger.of(context);
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -101,7 +104,7 @@ abstract final class FriendshipActionHandler {
           SnackBar(content: Text('${targetUser.nickname} 님의 친구 요청을 수락했습니다.')),
         );
 
-        _invalidateRelatedProviders(ref, targetUser.uid);
+        _invalidateRelatedProviders(ref, targetUser.username);
         return const Result.ok(null);
       case Error(:final error):
         final errorMessage = error is AppException
@@ -118,10 +121,10 @@ abstract final class FriendshipActionHandler {
   }
 
   static Future<Result<void>> declineRequest(
-      WidgetRef ref,
-      BuildContext context,
-      UserSummary targetUser,
-      ) async {
+    WidgetRef ref,
+    BuildContext context,
+    UserSummary targetUser,
+  ) async {
     final messenger = ScaffoldMessenger.of(context);
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -134,7 +137,7 @@ abstract final class FriendshipActionHandler {
           SnackBar(content: Text('${targetUser.nickname} 님의 친구 요청을 거절했습니다.')),
         );
 
-        _invalidateRelatedProviders(ref, targetUser.uid);
+        _invalidateRelatedProviders(ref, targetUser.username);
         return const Result.ok(null);
       case Error(:final error):
         final errorMessage = error is AppException
@@ -151,10 +154,10 @@ abstract final class FriendshipActionHandler {
   }
 
   static Future<Result<void>> removeFriend(
-      WidgetRef ref,
-      BuildContext context,
-      UserSummary targetUser,
-      ) async {
+    WidgetRef ref,
+    BuildContext context,
+    UserSummary targetUser,
+  ) async {
     final messenger = ScaffoldMessenger.of(context);
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -164,12 +167,10 @@ abstract final class FriendshipActionHandler {
     switch (result) {
       case Ok():
         messenger.showSnackBar(
-          SnackBar(
-            content: Text('${targetUser.nickname} 님을 친구 목록에서 삭제했습니다.'),
-          ),
+          SnackBar(content: Text('${targetUser.nickname} 님을 친구 목록에서 삭제했습니다.')),
         );
 
-        _invalidateRelatedProviders(ref, targetUser.uid);
+        _invalidateRelatedProviders(ref, targetUser.username);
         return const Result.ok(null);
       case Error(:final error):
         final errorMessage = error is AppException
@@ -186,10 +187,10 @@ abstract final class FriendshipActionHandler {
   }
 
   static Future<Result<void>> blockUser(
-      WidgetRef ref,
-      BuildContext context,
-      UserSummary targetUser,
-      ) async {
+    WidgetRef ref,
+    BuildContext context,
+    UserSummary targetUser,
+  ) async {
     final messenger = ScaffoldMessenger.of(context);
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -202,7 +203,7 @@ abstract final class FriendshipActionHandler {
           SnackBar(content: Text('${targetUser.nickname} 님을 차단했습니다.')),
         );
 
-        _invalidateRelatedProviders(ref, targetUser.uid);
+        _invalidateRelatedProviders(ref, targetUser.username);
         return const Result.ok(null);
       case Error(:final error):
         final errorMessage = error is AppException
