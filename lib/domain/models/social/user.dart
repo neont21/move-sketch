@@ -18,7 +18,12 @@ class UserSummary {
   });
 
   Map<String, dynamic> toMap() {
-    return {'uid': uid, 'username': username, 'nickname': nickname, 'imageUrl': imageUrl};
+    return {
+      'uid': uid,
+      'username': username,
+      'nickname': nickname,
+      'imageUrl': imageUrl,
+    };
   }
 
   factory UserSummary.fromMap(Map<String, dynamic> map) {
@@ -48,11 +53,13 @@ class UserSummary {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is UserSummary &&
-          runtimeType == other.runtimeType &&
-          uid == other.uid;
+          uid == other.uid &&
+          username == other.username &&
+          nickname == other.nickname &&
+          imageUrl == other.imageUrl;
 
   @override
-  int get hashCode => uid.hashCode;
+  int get hashCode => Object.hash(uid, username, nickname, imageUrl);
 }
 
 @immutable
@@ -167,8 +174,30 @@ class User {
       identical(this, other) ||
       other is User &&
           runtimeType == other.runtimeType &&
-          uid == other.uid;
+          uid == other.uid &&
+          username == other.username &&
+          email == other.email &&
+          nickname == other.nickname &&
+          imageUrl == other.imageUrl &&
+          description == other.description &&
+          selectedCharacter == other.selectedCharacter &&
+          notificationSettings == other.notificationSettings &&
+          createdAt == other.createdAt &&
+          updatedAt == other.updatedAt &&
+          deletedAt == other.deletedAt;
 
   @override
-  int get hashCode => uid.hashCode;
+  int get hashCode => Object.hash(
+    uid,
+    username,
+    email,
+    nickname,
+    imageUrl,
+    description,
+    selectedCharacter,
+    notificationSettings,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
 }
