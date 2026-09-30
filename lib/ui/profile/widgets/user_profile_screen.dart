@@ -28,6 +28,7 @@ class UserProfileScreen extends ConsumerWidget {
               return UserSheetButton(
                 targetUser: targetUser,
                 isFriend: state.isFriend,
+                isBlocked: state.isBlocked,
               );
             },
             orElse: () => const SizedBox.shrink(),

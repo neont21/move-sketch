@@ -11,11 +11,13 @@ import '../../friends/widgets/friendship_action_handler.dart';
 class UserSheetButton extends ConsumerWidget {
   final UserSummary targetUser;
   final bool isFriend;
+  final bool isBlocked;
 
   const UserSheetButton({
     super.key,
     required this.targetUser,
     required this.isFriend,
+    this.isBlocked = false,
   });
 
   List<ListTile> buildBottomSheet(BuildContext context, WidgetRef ref) {
@@ -71,42 +73,72 @@ class UserSheetButton extends ConsumerWidget {
         },
       ),
     );
-    menuItems.add(
-      ListTile(
-        title: Text('차단하기', style: TextStyle(color: colorScheme.error)),
-        onTap: () {
-          context.pop();
-          showDialog(
-            context: context,
-            builder: (dialogContext) => Dialog(
-              child: SystemAlertDialog(
-                title: '정말 차단하시겠습니까?',
-                description:
-                    '차단하시면 더이상 ${targetUser.nickname} (@${targetUser.username}) 님의 프로필과 스케치를 볼 수 없어요.',
-                confirmText: '차단',
-                onConfirm: () async {
-                  dialogContext.pop();
-                  final result = await FriendshipActionHandler.blockUser(
-                    ref,
-                    context,
-                    targetUser,
-                  );
-
-                  switch (result) {
-                    case Ok():
-                      if (context.mounted) {
-                        context.pop();
-                      }
-                    case Error():
-                      break;
-                  }
-                },
+    if (isBlocked) {
+      menuItems.add(
+        ListTile(
+          title: const Text('차단 해제'),
+          onTap: () {
+            context.pop();
+            showDialog(
+              context: context,
+              builder: (dialogContext) => Dialog(
+                child: SystemAlertDialog(
+                  title: '차단을 해제할까요?',
+                  description: '차단을 해제하면 서로의 프로필을 다시 볼 수 있어요.',
+                  confirmText: '차단 해제',
+                  onConfirm: () async {
+                    dialogContext.pop();
+                    await FriendshipActionHandler.unblockUser(
+                      ref,
+                      context,
+                      targetUser,
+                    );
+                  },
+                ),
               ),
-            ),
-          );
-        },
-      ),
-    );
+            );
+          },
+        ),
+      );
+    } else {
+      menuItems.add(
+        ListTile(
+          title: Text('차단하기', style: TextStyle(color: colorScheme.error)),
+          onTap: () {
+            context.pop();
+            showDialog(
+              context: context,
+              builder: (dialogContext) => Dialog(
+                child: SystemAlertDialog(
+                  title: '정말 차단하시겠습니까?',
+                  description:
+                      '차단하시면 더이상 ${targetUser.nickname} (@${targetUser.username}) 님의 프로필과 스케치를 볼 수 없어요.',
+                  confirmText: '차단',
+                  onConfirm: () async {
+                    dialogContext.pop();
+                    final result = await FriendshipActionHandler.blockUser(
+                      ref,
+                      context,
+                      targetUser,
+                    );
+
+                    switch (result) {
+                      case Ok():
+                        if (context.mounted) {
+                          context.pop();
+                        }
+                      case Error():
+                        break;
+                    }
+                  },
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    }
+
     return menuItems;
   }
 
