@@ -86,6 +86,10 @@ class UserProfileViewModel extends AsyncNotifier<UserProfileState> {
       Error(:final error) => throw error,
     };
 
+    if (targetUser.isDeleted) {
+      throw const NotFoundException('탈퇴한 사용자입니다.');
+    }
+
     final (friendshipResult, mutualFriendsResult, blockedUsersResult) = await (
       friendshipRepository.getFriendship(
         currentUserId: user.uid,

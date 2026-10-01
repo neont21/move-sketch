@@ -4,6 +4,51 @@ abstract final class Validators {
   static final RegExp _usernameRegex = RegExp(r'^[a-zA-Z0-9_]+$');
   static final RegExp _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
+  static const Set<String> _reservedUsernames = {
+    'admin',
+    'administrator',
+    'root',
+    'system',
+    'manager',
+    'moderator',
+    'mod',
+    'staff',
+    'official',
+    'support',
+    'help',
+    'security',
+
+    'movesketch',
+    'move_sketch',
+    'app',
+
+    'api',
+    'auth',
+    'login',
+    'logout',
+    'signup',
+    'signin',
+    'signout',
+    'register',
+    'profile',
+    'settings',
+    'feed',
+    'search',
+    'home',
+    'null',
+    'undefined',
+    'guest',
+    'anonymous',
+    'unknown',
+    'deleted',
+  };
+
+  static const List<String> _reservedPrefixes = [
+    'deleted_',
+    'admin_',
+    'system_',
+  ];
+
   static String? validateNickname(String? value) {
     if (value == null || value.trim().isEmpty) {
       return '닉네임을 입력해 주세요.';
@@ -24,6 +69,15 @@ abstract final class Validators {
     }
     if (!_usernameRegex.hasMatch(trimmedUsername)) {
       return '영문, 숫자, 밑줄(_)만 사용할 수 있습니다.';
+    }
+    final String lowercased = trimmedUsername.toLowerCase();
+    for (final prefix in _reservedPrefixes) {
+      if (lowercased.startsWith(prefix)) {
+        return "'$prefix'로 시작하는 아이디는 사용할 수 없습니다.";
+      }
+    }
+    if (_reservedUsernames.contains(lowercased)) {
+      return '시스템 예약어는 아이디로 사용할 수 없습니다.';
     }
     return null;
   }
@@ -54,9 +108,9 @@ abstract final class Validators {
   }
 
   static String? validateConfirmPassword(
-      String? confirmValue,
-      String originalPassword,
-      ) {
+    String? confirmValue,
+    String originalPassword,
+  ) {
     if (confirmValue == null || confirmValue.isEmpty) {
       return '비밀번호를 다시 입력해 주세요.';
     }

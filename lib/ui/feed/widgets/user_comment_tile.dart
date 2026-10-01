@@ -35,7 +35,7 @@ class UserCommentTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colorScheme.outline)
+        border: Border.all(color: colorScheme.outline),
       ),
       child: Text(
         message,
@@ -57,6 +57,8 @@ class UserCommentTile extends StatelessWidget {
       return _buildMaskedTile(context);
     }
 
+    final bool isAuthorDeleted = comment.author.username.startsWith('deleted_');
+
     return Padding(
       padding: (comment.isReply)
           ? const EdgeInsets.fromLTRB(16, 6, 0, 6)
@@ -75,16 +77,11 @@ class UserCommentTile extends StatelessWidget {
               ),
             ),
           ],
-          GestureDetector(
-            onTap: () {
-              context.go(Routes.feedProfile(comment.author.username));
-            },
-            child: UserAvatar(
-              username: comment.author.username,
-              imageUrl: comment.author.imageUrl,
-              onTap: () =>
-                  context.go(Routes.feedProfile(comment.author.username)),
-            ),
+          UserAvatar(
+            username: comment.author.username,
+            imageUrl: comment.author.imageUrl,
+            onTap: () =>
+                context.go(Routes.feedProfile(comment.author.username)),
           ),
           Expanded(
             child: Column(
@@ -94,9 +91,13 @@ class UserCommentTile extends StatelessWidget {
                   spacing: 12,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        context.go(Routes.feedProfile(comment.author.username));
-                      },
+                      onTap: isAuthorDeleted
+                          ? null
+                          : () {
+                              context.go(
+                                Routes.feedProfile(comment.author.username),
+                              );
+                            },
                       child: Text(
                         comment.author.nickname,
                         style: textTheme.bodyLarge,

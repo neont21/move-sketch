@@ -6,6 +6,7 @@ class UserAvatar extends StatelessWidget {
   final String? imageUrl;
   final double radius;
   final VoidCallback? onTap;
+  final bool isDeleted;
 
   const UserAvatar({
     super.key,
@@ -13,7 +14,10 @@ class UserAvatar extends StatelessWidget {
     this.imageUrl,
     this.radius = 20,
     this.onTap,
+    this.isDeleted = false,
   });
+
+  bool get _isDeletedUser => isDeleted || username.startsWith('deleted_');
 
   static int _deterministicHash(String text) {
     var hash = 0x811c9dc5;
@@ -30,7 +34,17 @@ class UserAvatar extends StatelessWidget {
 
     Widget avatar;
 
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
+    if (_isDeletedUser) {
+      avatar = ClipOval(
+        child: Image.asset(
+          'assets/default_profile.png',
+          width: diameter,
+          height: diameter,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => _buildPawAvatar(diameter),
+        ),
+      );
+    } else if (imageUrl != null && imageUrl!.isNotEmpty) {
       avatar = ClipOval(
         child: Image.network(
           imageUrl!,
@@ -44,11 +58,8 @@ class UserAvatar extends StatelessWidget {
       avatar = _buildPawAvatar(diameter);
     }
 
-    if (onTap != null) {
-      avatar = GestureDetector(
-        onTap: onTap,
-        child: avatar,
-      );
+    if (onTap != null && !_isDeletedUser) {
+      avatar = GestureDetector(onTap: onTap, child: avatar);
     }
 
     return avatar;

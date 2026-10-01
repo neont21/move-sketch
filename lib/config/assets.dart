@@ -4,7 +4,7 @@ abstract final class Assets {
   static const String logoMark = 'assets/brand/logo-mark.svg';
   static const String partsDir = 'assets/parts';
 
-  // TODO: Mock 데이터 정리 후 삭제 예정
+  // 삭제된 사용자 프로필
   static const String defaultProfile = 'assets/default_profile.png';
 
   // 배경 파츠
