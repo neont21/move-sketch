@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../../utils/validators.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 import '../view_models/auth_viewmodel.dart';
 
@@ -123,15 +124,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   enabled: !isLoading,
                   maxLength: 10,
                   autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return '닉네임을 입력해 주세요.';
-                    }
-                    if (value.trim().length > 10) {
-                      return '10자 이내로 입력해 주세요.';
-                    }
-                    return null;
-                  },
+                  validator: Validators.validateNickname,
                 ),
                 LabeledTextFormField(
                   labelText: '아이디',
@@ -140,20 +133,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   textInputAction: TextInputAction.next,
                   enabled: !isLoading,
                   autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return '아이디를 입력해 주세요.';
-                    }
-                    final username = value.trim();
-                    if (username.length < 3 || username.length > 20) {
-                      return '3자 이상 20자 이하로 입력해 주세요.';
-                    }
-                    final usernameRegex = RegExp(r'^[a-zA-Z0-9_]+$');
-                    if (!usernameRegex.hasMatch(username)) {
-                      return '영문, 숫자, 밑줄(_)만 사용할 수 있습니다.';
-                    }
-                    return null;
-                  },
+                  validator: Validators.validateUsername,
                 ),
                 LabeledTextFormField(
                   inputType: TextInputType.emailAddress,
@@ -163,18 +143,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   textInputAction: TextInputAction.next,
                   enabled: !isLoading,
                   autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return '이메일을 입력해 주세요.';
-                    }
-                    final emailRegex = RegExp(
-                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                    );
-                    if (!emailRegex.hasMatch(value.trim())) {
-                      return '올바른 이메일 형식을 입력해 주세요';
-                    }
-                    return null;
-                  },
+                  validator: Validators.validateEmail,
                 ),
                 LabeledTextFormField(
                   inputType: TextInputType.visiblePassword,
@@ -190,15 +159,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     });
                   },
                   autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '비밀번호를 입력해 주세요';
-                    }
-                    if (value.length < 8) {
-                      return '비밀번호는 8자 이상이어야 합니다';
-                    }
-                    return null;
-                  },
+                  validator: Validators.validatePassword,
                 ),
                 LabeledTextFormField(
                   inputType: TextInputType.visiblePassword,
@@ -219,15 +180,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     });
                   },
                   autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '비밀번호를 다시 입력해 주세요';
-                    }
-                    if (value != _passwordController.text) {
-                      return '비밀번호가 일치하지 않습니다';
-                    }
-                    return null;
-                  },
+                  validator: (value) => Validators.validateConfirmPassword(
+                    value,
+                    _passwordController.text,
+                  ),
                 ),
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
