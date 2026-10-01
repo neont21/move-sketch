@@ -285,6 +285,9 @@ final class AuthRepositoryRemote implements AuthRepository {
       );
       return Result.ok(null);
     } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        return const Result.error(AuthException('현재 비밀번호가 올바르지 않습니다.'));
+      }
       return Result.error(
         e.toAuthException(defaultMessage: '비밀번호 변경 중 오류가 발생했습니다.'),
       );
@@ -314,6 +317,9 @@ final class AuthRepositoryRemote implements AuthRepository {
 
       return const Result.ok(null);
     } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        return const Result.error(AuthException('비밀번호가 올바르지 않습니다.'));
+      }
       return Result.error(
         e.toAuthException(defaultMessage: '계정 삭제 중 오류가 발생했습니다.'),
       );
