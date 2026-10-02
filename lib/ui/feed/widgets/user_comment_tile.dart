@@ -6,6 +6,7 @@ import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
 import '../../core/widgets/bottom_sheet_button.dart';
 import '../../core/widgets/user_avatar.dart';
+import 'masked_comment_tile.dart';
 
 class UserCommentTile extends StatelessWidget {
   final Comment comment;
@@ -23,38 +24,16 @@ class UserCommentTile extends StatelessWidget {
     this.onDelete,
   });
 
-  Widget _buildMaskedTile(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    final String message = comment.isDeleted ? '삭제된 댓글입니다.' : '차단된 사용자의 댓글입니다.';
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: colorScheme.outline),
-      ),
-      child: Text(
-        message,
-        style: textTheme.bodySmall?.copyWith(
-          color: colorScheme.tertiaryContainer,
-          fontStyle: FontStyle.italic,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     if (comment.isDeleted || isBlocked) {
-      return _buildMaskedTile(context);
+      final String message = comment.isDeleted
+          ? '삭제된 댓글입니다.'
+          : '차단된 사용자의 댓글입니다.';
+      return MaskedCommentTile(message: message);
     }
 
     final bool isAuthorDeleted = comment.author.username.startsWith('deleted_');

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'user_card_trailing_action.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../routing/routes.dart';
-import '../../core/widgets/system_alert_dialog.dart';
 import '../../core/widgets/user_avatar.dart';
 
 class UserCard extends StatelessWidget {
@@ -62,88 +62,6 @@ class UserCard extends StatelessWidget {
     }
   }
 
-  Widget _buildTrailing(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    if (isRequested) {
-      return Row(
-        spacing: 4,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          OutlinedButton(
-            onPressed: onDecline,
-            style: OutlinedButton.styleFrom(
-              minimumSize: Size.zero,
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            ),
-            child: Text('거절', style: textTheme.bodySmall),
-          ),
-          OutlinedButton(
-            onPressed: onAccept,
-            style: OutlinedButton.styleFrom(
-              minimumSize: Size.zero,
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-            ),
-            child: Text(
-              '수락',
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onPrimary,
-              ),
-            ),
-          ),
-        ],
-      );
-    } else if (isSent) {
-      return OutlinedButton(
-        onPressed: onCancelRequest,
-        style: OutlinedButton.styleFrom(
-          minimumSize: Size.zero,
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        ),
-        child: Text('요청 취소', style: textTheme.bodySmall),
-      );
-    } else if (isFriend) {
-      return Icon(Icons.chevron_right, color: colorScheme.tertiaryContainer);
-    } else if (isBlocked) {
-      return OutlinedButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) => Dialog(
-              child: SystemAlertDialog(
-                title: '차단을 해제할까요?',
-                description: '차단을 해제하면 서로의 프로필을 다시 볼 수 있어요.',
-                confirmText: '차단 해제',
-                onConfirm: () {
-                  context.pop();
-                  onUnblock?.call();
-                },
-              ),
-            ),
-          );
-        },
-        child: Text('차단 해제', style: textTheme.bodySmall),
-      );
-    } else {
-      return OutlinedButton(
-        onPressed: onSendRequest,
-        style: OutlinedButton.styleFrom(
-          minimumSize: Size.zero,
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-        ),
-        child: Text(
-          '친구 요청',
-          style: textTheme.bodySmall?.copyWith(color: colorScheme.onPrimary),
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -157,7 +75,17 @@ class UserCard extends StatelessWidget {
       ),
       title: _buildTitle(context),
       subtitle: _buildSubtitle(context),
-      trailing: _buildTrailing(context),
+      trailing: UserCardTrailingAction(
+        isFriend: isFriend,
+        isRequested: isRequested,
+        isSent: isSent,
+        isBlocked: isBlocked,
+        onAccept: onAccept,
+        onDecline: onDecline,
+        onSendRequest: onSendRequest,
+        onCancelRequest: onCancelRequest,
+        onUnblock: onUnblock,
+      ),
     );
   }
 }
