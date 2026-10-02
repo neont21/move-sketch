@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/dependencies.dart';
 import '../../../data/repositories/auth/auth_repository.dart';
 import '../../../data/repositories/user/user_repository.dart';
 import '../../../domain/models/enums/character_type.dart';
+import '../../../domain/models/social/social_auth_result.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -149,7 +151,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     return _authRepository.sendPasswordResetEmail(email);
   }
 
-  Future<Result<User>> signInWithGoogle() async {
+  Future<Result<SocialAuthResult>> signInWithGoogle() async {
     if (state.isLoading) {
       return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
     }
@@ -164,7 +166,14 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
     switch (result) {
       case Ok(:final value):
-        state = AsyncData(value);
+        switch (value) {
+          case SocialAuthSuccess(:final user):
+            state = AsyncData(user);
+          case SocialAuthNeedsOnboarding():
+            state = const AsyncData(null);
+          case SocialAuthCanceled():
+            state = const AsyncData(null);
+        }
         return result;
       case Error(:final error):
         state = AsyncError(error, StackTrace.current);
@@ -172,7 +181,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
-  Future<Result<User>> signInWithApple() async {
+  Future<Result<SocialAuthResult>> signInWithApple() async {
     if (state.isLoading) {
       return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
     }
@@ -180,6 +189,48 @@ class AuthViewModel extends AsyncNotifier<User?> {
     state = const AsyncLoading();
 
     final result = await _authRepository.signInWithApple();
+
+    if (!ref.mounted) {
+      return result;
+    }
+
+    switch (result) {
+      case Ok(:final value):
+        switch (value) {
+          case SocialAuthSuccess(:final user):
+            state = AsyncData(user);
+          case SocialAuthNeedsOnboarding():
+            state = const AsyncData(null);
+          case SocialAuthCanceled():
+            state = const AsyncData(null);
+        }
+        return result;
+      case Error(:final error):
+        state = AsyncError(error, StackTrace.current);
+        return result;
+    }
+  }
+
+  Future<Result<User>> completeSocialSignUp({
+    required String username,
+    required String nickname,
+    required CharacterType selectedCharacter,
+    File? imageFile,
+    String? profileImageUrl,
+}) async {
+    if (state.isLoading) {
+      return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
+    }
+
+    state = const AsyncLoading();
+
+    final result = await _authRepository.completeSocialSignUp(
+      username: username,
+      nickname: nickname,
+      imageFile: imageFile,
+      profileImageUrl: profileImageUrl,
+      selectedCharacter: selectedCharacter,
+    );
 
     if (!ref.mounted) {
       return result;

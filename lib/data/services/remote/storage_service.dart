@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
-
+import 'package:http/http.dart' as http;
 import '../../../utils/exceptions.dart';
 
 class StorageService {
@@ -25,6 +25,33 @@ class StorageService {
     );
     final TaskSnapshot snapshot = await ref.putFile(
       imageFile,
+      SettableMetadata(contentType: contentType),
+    );
+
+    return await snapshot.ref.getDownloadURL();
+  }
+
+  Future<String> copyRemoteImageToProfile({
+    required String userId,
+    required String remoteUrl,
+}) async {
+    final http.Response response = await http.get(Uri.parse(remoteUrl));
+    if (response.statusCode != 200) {
+      throw const StorageException('외부 프로필 이미지를 다운로드하지 못했습니다.');
+    }
+
+    final int timestamp = DateTime.now().millisecondsSinceEpoch;
+
+    final String contentType =
+        response.headers['content-type'] ?? 'image/jpeg';
+    final String extension = contentType.contains('png') ? 'png' : 'jpg';
+
+    final Reference ref = _storage.ref().child(
+      'profiles/$userId/avatar_$timestamp.$extension',
+    );
+
+    final TaskSnapshot snapshot = await ref.putData(
+      response.bodyBytes,
       SettableMetadata(contentType: contentType),
     );
 

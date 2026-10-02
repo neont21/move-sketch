@@ -1,4 +1,6 @@
+import 'dart:io';
 import '../../../domain/models/enums/character_type.dart';
+import '../../../domain/models/social/social_auth_result.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/result.dart';
 
@@ -11,6 +13,12 @@ abstract interface class AuthRepository {
 
   /// 이메일 인증 여부를 확인한다. (cache data)
   bool get isEmailVerified;
+
+  /// 연결된 인증 수단 목록을 확인한다.
+  List<String> get linkedProviders;
+
+  /// 비밀번호 인증 수단 연결 여부를 확인하다.
+  bool get hasPasswordProvider;
 
   /// 캐싱되지 않은 이메일 인증 여부를 확인한다.
   Future<Result<bool>> checkEmailVerified();
@@ -34,10 +42,34 @@ abstract interface class AuthRepository {
   });
 
   /// Google 계정으로 로그인(회원가입)한다.
-  Future<Result<User>> signInWithGoogle();
+  Future<Result<SocialAuthResult>> signInWithGoogle();
 
   /// Apple 계정으로 로그인(회원가입)한다.
-  Future<Result<User>> signInWithApple();
+  Future<Result<SocialAuthResult>> signInWithApple();
+
+  /// 소셜 로그인 인증 후 신규 사용자의 프로필을 확정하여 가입을 완료한다.
+  Future<Result<User>> completeSocialSignUp({
+    required String username,
+    required String nickname,
+    required CharacterType selectedCharacter,
+    File? imageFile,
+    String? profileImageUrl,
+  });
+
+  /// Google 계정을 연동한다.
+  Future<Result<void>> linkGoogle();
+
+  /// Apple 계정을 연동한다.
+  Future<Result<void>> linkApple();
+
+  /// 이메일을 연동한다.
+  Future<Result<void>> linkEmailAndPassword({
+    required String email,
+    required String password,
+  });
+
+  /// 특정 인증 공급자 연동을 해제한다.
+  Future<Result<void>> unlinkProvider(String providerId);
 
   /// 현재 사용자 계정을 로그아웃한다.
   Future<Result<void>> signOut();

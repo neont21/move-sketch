@@ -41,6 +41,10 @@ class DatabaseException extends AppException {
   const DatabaseException(super.message, {super.cause});
 }
 
+class StorageException extends AppException {
+  const StorageException(super.message, {super.cause});
+}
+
 class ApiException extends AppException {
   final int? statusCode;
 

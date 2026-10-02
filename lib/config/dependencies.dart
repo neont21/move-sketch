@@ -142,6 +142,7 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepositoryRemote(
     authService: ref.watch(authServiceProvider),
     userService: ref.watch(userServiceProvider),
+    storageService: ref.watch(storageServiceProvider),
   );
 });
 

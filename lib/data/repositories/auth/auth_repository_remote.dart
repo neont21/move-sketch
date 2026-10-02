@@ -1,18 +1,28 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:firebase_auth/firebase_auth.dart' as auth show User;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../domain/models/enums/character_type.dart';
+import '../../../domain/models/social/social_auth_result.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../services/remote/auth_service.dart';
 import '../../services/remote/firestore/user_service.dart';
+import '../../services/remote/storage_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'auth_repository.dart';
 
 final class AuthRepositoryRemote implements AuthRepository {
   final AuthService authService;
   final UserService userService;
+  final StorageService storageService;
 
-  AuthRepositoryRemote({required this.authService, required this.userService});
+  AuthRepositoryRemote({
+    required this.authService,
+    required this.userService,
+    required this.storageService,
+  });
 
   @override
   String? get currentUid {
@@ -30,6 +40,12 @@ final class AuthRepositoryRemote implements AuthRepository {
 
   @override
   bool get isEmailVerified => authService.isEmailVerified;
+
+  @override
+  List<String> get linkedProviders => authService.linkedProviders;
+
+  @override
+  bool get hasPasswordProvider => authService.hasPasswordProvider;
 
   @override
   Future<Result<bool>> checkEmailVerified() async {
@@ -207,13 +223,225 @@ final class AuthRepositoryRemote implements AuthRepository {
   }
 
   @override
-  Future<Result<User>> signInWithGoogle() async {
-    return const Result.error(AuthException('Google 로그인은 준비 중입니다.'));
+  Future<Result<SocialAuthResult>> signInWithGoogle() async {
+    try {
+      final credential = await authService.signInWithGoogle();
+      if (credential == null || credential.user == null) {
+        return const Result.ok(SocialAuthCanceled());
+      }
+
+      return _handleSocialUserVerification(credential.user!);
+    } on FirebaseAuthException catch (error) {
+      return Result.error(
+        error.toAuthException(defaultMessage: 'Google 로그인 중 오류가 발생했습니다.'),
+      );
+    } on FirebaseException catch (error) {
+      return Result.error(
+        error.toAppException(defaultMessage: 'Google 로그인 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(
+        AuthException('Google 로그인 중 오류가 발생했습니다.', cause: error),
+      );
+    }
   }
 
   @override
-  Future<Result<User>> signInWithApple() async {
-    return const Result.error(AuthException('Apple 로그인은 준비 중입니다.'));
+  Future<Result<SocialAuthResult>> signInWithApple() async {
+    try {
+      final credential = await authService.signInWithApple();
+      if (credential == null || credential.user == null) {
+        return const Result.ok(SocialAuthCanceled());
+      }
+
+      return _handleSocialUserVerification(credential.user!);
+    } on SignInWithAppleAuthorizationException catch (error) {
+      if (error.code == AuthorizationErrorCode.canceled) {
+        return const Result.ok(SocialAuthCanceled());
+      }
+      return Result.error(
+        AuthException('Apple 로그인 중 오류가 발생했습니다: ${error.message}'),
+      );
+    } on FirebaseAuthException catch (error) {
+      return Result.error(
+        error.toAuthException(defaultMessage: 'Apple 로그인 중 오류가 발생했습니다.'),
+      );
+    } on FirebaseException catch (error) {
+      return Result.error(
+        error.toAppException(defaultMessage: 'Apple 로그인 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(
+        AuthException('Apple 로그인 중 오류가 발생했습니다.', cause: error),
+      );
+    }
+  }
+
+  Future<Result<SocialAuthResult>> _handleSocialUserVerification(
+    auth.User fbUser,
+  ) async {
+    final String uid = fbUser.uid;
+    final User? existingUser = await userService.getUserProfile(uid);
+
+    if (existingUser != null) {
+      if (existingUser.isDeleted) {
+        await authService.signOut();
+        return const Result.error(AuthException('탈퇴한 사용자 계정입니다.'));
+      }
+      return Result.ok(SocialAuthSuccess(existingUser));
+    }
+
+    return Result.ok(
+      SocialAuthNeedsOnboarding(
+        uid: uid,
+        email: fbUser.email,
+        defaultNickname: fbUser.displayName,
+        defaultPhotoUrl: fbUser.photoURL,
+      ),
+    );
+  }
+
+  @override
+  Future<Result<User>> completeSocialSignUp({
+    required String username,
+    required String nickname,
+    required CharacterType selectedCharacter,
+    File? imageFile,
+    String? profileImageUrl,
+  }) async {
+    final String? currentUid = authService.currentUid;
+    if (currentUid == null) {
+      return const Result.error(AuthException('인증된 소셜 계정 정보가 없습니다.'));
+    }
+
+    final String trimmedUsername = username.trim().toLowerCase();
+    if (trimmedUsername.isEmpty) {
+      return const Result.error(ValidationException('아이디를 입력해 주세요.'));
+    }
+
+    try {
+      final bool isAvailable = await userService.isUsernameAvailable(
+        trimmedUsername,
+      );
+      if (!isAvailable) {
+        return const Result.error(ValidationException('이미 사용 중인 아이디입니다.'));
+      }
+
+      String? finalImageUrl;
+      if (imageFile != null) {
+        finalImageUrl = await storageService.uploadProfileImage(
+          userId: currentUid,
+          imageFile: imageFile,
+        );
+      } else if (profileImageUrl != null && profileImageUrl.isNotEmpty) {
+        try {
+          finalImageUrl = await storageService.copyRemoteImageToProfile(
+            userId: currentUid,
+            remoteUrl: profileImageUrl,
+          );
+        } catch (_) {
+          finalImageUrl = null;
+        }
+      }
+
+      final String email = authService.currentUser?.email ?? '';
+
+      await userService.createUserDocuments(
+        uid: currentUid,
+        username: trimmedUsername,
+        nickname: nickname.trim(),
+        email: email,
+        selectedCharacterId: selectedCharacter.id,
+        imageUrl: finalImageUrl,
+      );
+
+      final User? createdUser = await userService.getUserProfile(currentUid);
+      if (createdUser == null) {
+        return const Result.error(NotFoundException('사용자 프로필을 생성하지 못했습니다.'));
+      }
+
+      return Result.ok(createdUser);
+    } on FirebaseException catch (error) {
+      return Result.error(
+        error.toAppException(defaultMessage: '프로필 설정 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(AuthException('프로필 설정 중 오류가 발생했습니다.', cause: error));
+    }
+  }
+
+  @override
+  Future<Result<void>> linkGoogle() async {
+    try {
+      await authService.linkGoogle();
+
+      return const Result.ok(null);
+    } on FirebaseAuthException catch (error) {
+      return Result.error(
+        error.toAuthException(defaultMessage: 'Google 연동 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(
+        AuthException('Google 연동 중 오류가 발생했습니다.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> linkApple() async {
+    try {
+      await authService.linkApple();
+
+      return const Result.ok(null);
+    } on SignInWithAppleAuthorizationException catch (error) {
+      if (error.code == AuthorizationErrorCode.canceled) {
+        return const Result.ok(null);
+      }
+      return Result.error(AuthException('Apple 연동 취소 또는 실패: ${error.message}'));
+    } on FirebaseAuthException catch (error) {
+      return Result.error(
+        error.toAuthException(defaultMessage: 'Apple 연동 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(
+        AuthException('Apple 연동 중 오류가 발생했습니다.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> linkEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await authService.linkEmailAndPassword(email: email, password: password);
+
+      return const Result.ok(null);
+    } on FirebaseAuthException catch (error) {
+      return Result.error(
+        error.toAuthException(defaultMessage: '이메일 및 비밀번호 연결 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(
+        AuthException('이메일 및 비밀번호 연결 중 오류가 발생했습니다.', cause: error),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> unlinkProvider(String providerId) async {
+    try {
+      await authService.unlinkProvider(providerId);
+
+      return const Result.ok(null);
+    } on FirebaseAuthException catch (error) {
+      return Result.error(
+        error.toAuthException(defaultMessage: '연동 해제 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(AuthException('연동 해제 중 오류가 발생했습니다.', cause: error));
+    }
   }
 
   @override

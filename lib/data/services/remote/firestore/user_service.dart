@@ -34,6 +34,7 @@ class UserService {
     required String nickname,
     required String email,
     String selectedCharacterId = 'bear',
+    String? imageUrl,
   }) async {
     final batch = _firestore.batch();
 
@@ -50,6 +51,7 @@ class UserService {
       'username': username,
       'nickname': nickname,
       'email': email,
+      'imageUrl': imageUrl,
       'createdAt': FieldValue.serverTimestamp(),
       'selectedCharacterId': selectedCharacterId,
     });
