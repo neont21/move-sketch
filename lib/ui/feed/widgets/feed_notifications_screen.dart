@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/models/social/app_notification.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../view_models/feed_notifications_viewmodel.dart';
 import 'notification_card.dart';
 
@@ -142,20 +143,17 @@ class _FeedNotificationsScreenState
         appBar: AppBar(title: Text('알림')),
         body: notificationsState.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(
-            child: Text(
-              error is AppException ? error.message : '알림을 불러올 수 없습니다.',
-            ),
+          error: (error, _) => ErrorRetryView.fromError(
+            error: error,
+            defaultMessage: '알림을 불러올 수 없습니다.',
+            onRetry: () => ref.invalidate(feedNotificationsViewModelProvider),
           ),
           data: (state) {
             if (state.notifications.isEmpty) {
               return const Center(child: Text('새로운 알림이 없습니다.'));
             }
             return ListView.separated(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               itemCount: state.notifications.length,
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) =>

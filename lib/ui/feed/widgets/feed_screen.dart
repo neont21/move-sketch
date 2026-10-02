@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../../history/view_models/history_viewmodel.dart';
 import '../../home/view_models/home_viewmodel.dart';
 import '../view_models/feed_notifications_viewmodel.dart';
@@ -115,17 +116,10 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       ),
       body: feedState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('피드를 불러올 수 없습니다.'),
-              TextButton(
-                onPressed: () => ref.invalidate(feedViewModelProvider),
-                child: const Text('다시 시도'),
-              ),
-            ],
-          ),
+        error: (error, _) => ErrorRetryView.fromError(
+          error: error,
+          defaultMessage: '피드를 불러올 수 없습니다.',
+          onRetry: () => ref.invalidate(feedViewModelProvider),
         ),
         data: (state) => state.sketches.isEmpty
             ? const Center(

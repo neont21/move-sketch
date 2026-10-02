@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../utils/exceptions.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../view_models/history_viewmodel.dart';
 import 'session_calendar.dart';
 import 'session_card.dart';
@@ -18,14 +18,10 @@ class HistoryScreen extends ConsumerWidget {
       appBar: AppBar(title: Text('기록')),
       body: historyState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsetsGeometry.all(20),
-            child: Text(
-              error is AppException ? error.message : '기록을 불러오는 중 오류가 발생했습니다.',
-              style: textTheme.bodyMedium,
-            ),
-          ),
+        error: (error, _) => ErrorRetryView.fromError(
+          error: error,
+          defaultMessage: '기록을 불러오는 중 오류가 발생했습니다.',
+          onRetry: () => ref.invalidate(historyViewModelProvider),
         ),
         data: (state) {
           return Padding(

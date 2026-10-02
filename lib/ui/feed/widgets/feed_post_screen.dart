@@ -7,6 +7,7 @@ import '../../../domain/models/social/user.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../../friends/widgets/user_list_dialog.dart';
 import '../../history/view_models/history_viewmodel.dart';
 import '../../home/view_models/home_viewmodel.dart';
@@ -209,10 +210,11 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
       appBar: AppBar(),
       body: feedPostState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Text(
-            error is AppException ? error.message : '게시물을 불러올 수 없습니다.',
-          ),
+        error: (error, _) => ErrorRetryView.fromError(
+          error: error,
+          defaultMessage: '게시물을 불러올 수 없습니다.',
+          onRetry: () =>
+              ref.invalidate(feedPostViewModelProvider(widget.sketchId)),
         ),
         data: (state) {
           final sketch = state.sketch;
@@ -243,7 +245,9 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                     (comment) => UserCommentTile(
                       comment: comment,
                       sketchAuthor: sketch.author,
-                      isBlocked: state.blockedUserIds.contains(comment.authorUid),
+                      isBlocked: state.blockedUserIds.contains(
+                        comment.authorUid,
+                      ),
                       onReply: (comment) => setState(() {
                         _replyTarget = comment;
                       }),

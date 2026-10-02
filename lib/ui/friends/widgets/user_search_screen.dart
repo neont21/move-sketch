@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../view_models/friends_viewmodel.dart';
 import '../view_models/user_search_viewmodel.dart';
 import 'recommend_friend_list_view.dart';
@@ -125,19 +126,11 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
                 child: searchState.when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (error, _) {
-                    final errorMessage = error is AppException
-                        ? error.message
-                        : '데이터를 불러오는 중 오류가 발생했습니다.';
-                    return Center(
-                      child: Text(
-                        errorMessage,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.error,
-                        ),
-                      ),
-                    );
-                  },
+                  error: (error, _) => ErrorRetryView.fromError(
+                    error: error,
+                    defaultMessage: '데이터를 불러오는 중 오류가 발생했습니다.',
+                    onRetry: _onSearch,
+                  ),
                   data: (state) {
                     if (state.isSearching) {
                       return const Padding(

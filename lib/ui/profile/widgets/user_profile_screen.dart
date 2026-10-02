@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../utils/exceptions.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../../friends/widgets/mutual_friends_section.dart';
 import '../view_models/user_profile_viewmodel.dart';
@@ -37,11 +37,10 @@ class UserProfileScreen extends ConsumerWidget {
       ),
       body: profileState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Text(
-            error is AppException ? error.message : '사용자 프로필을 불러오지 못했습니다.',
-            style: textTheme.bodyMedium,
-          ),
+        error: (error, _) => ErrorRetryView.fromError(
+          error: error,
+          defaultMessage: '사용자 프로필을 불러오지 못했습니다.',
+          onRetry: () => ref.invalidate(userProfileViewModelProvider(username)),
         ),
         data: (state) {
           final targetUser = state.user;
@@ -98,8 +97,12 @@ class UserProfileScreen extends ConsumerWidget {
                                 userId: state.user.uid,
                                 sketches: state.sketches,
                                 onTap: (index) {
-                                  final currentPath = GoRouterState.of(context).uri.path;
-                                  context.go('$currentPath/${state.sketches[index].id}');
+                                  final currentPath = GoRouterState.of(
+                                    context,
+                                  ).uri.path;
+                                  context.go(
+                                    '$currentPath/${state.sketches[index].id}',
+                                  );
                                 },
                               ))
                       : Center(

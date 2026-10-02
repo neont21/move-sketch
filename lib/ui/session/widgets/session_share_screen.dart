@@ -7,6 +7,7 @@ import '../../../domain/models/session/session_result.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../../feed/view_models/feed_post_viewmodel.dart';
 import '../../feed/view_models/feed_viewmodel.dart';
 import '../view_models/session_share_viewmodel.dart';
@@ -100,7 +101,7 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
 
     ref.listen<AsyncValue<SessionShareState>>(
       sessionShareViewModelProvider(widget.sessionId),
-          (prev, next) {
+      (prev, next) {
         next.whenData((data) {
           if (!_isControllerInitialized && data.caption.isNotEmpty) {
             _captionController.text = data.caption;
@@ -140,15 +141,11 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
       ),
       body: shareState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              error is AppException ? error.message : '데이터를 불러오는 중 오류가 발생했습니다.',
-              style: textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-          ),
+        error: (error, _) => ErrorRetryView.fromError(
+          error: error,
+          defaultMessage: '데이터를 불러오는 중 오류가 발생했습니다.',
+          onRetry: () =>
+              ref.invalidate(sessionShareViewModelProvider(widget.sessionId)),
         ),
         data: (state) {
           final imageProvider = _resolveSketchImage(
@@ -268,7 +265,10 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 4),
-                                Text(state.weatherInfo!.shortSummary, style: textTheme.bodyMedium),
+                                Text(
+                                  state.weatherInfo!.shortSummary,
+                                  style: textTheme.bodyMedium,
+                                ),
                               ],
                             ),
                           ),

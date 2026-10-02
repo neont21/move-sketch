@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
-import '../../../utils/exceptions.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../view_models/friends_viewmodel.dart';
 import 'my_friend_list_view.dart';
 import 'requested_friend_list_view.dart';
@@ -28,24 +28,10 @@ class FriendsListScreen extends ConsumerWidget {
       ),
       body: friendsState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  error is AppException ? error.message : '친구 목록을 불러오지 못했습니다.',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => ref.invalidate(friendsViewModelProvider),
-                  child: const Text('다시 시도'),
-                ),
-              ],
-            ),
-          ),
+        error: (error, _) => ErrorRetryView.fromError(
+          error: error,
+          defaultMessage: '친구 목록을 불러오지 못했습니다.',
+          onRetry: () => ref.invalidate(friendsViewModelProvider),
         ),
         data: (state) {
           return RefreshIndicator(

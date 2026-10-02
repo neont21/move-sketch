@@ -9,6 +9,7 @@ import '../../../utils/exceptions.dart';
 import '../../../utils/polyline_utils.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/activity_badge.dart';
+import '../../core/widgets/error_retry_view.dart';
 import '../../session/widgets/path_tracker_view.dart';
 import '../../session/widgets/sketch_card.dart';
 import '../view_models/history_details_viewmodel.dart';
@@ -162,14 +163,11 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
       ),
       error: (error, _) => Scaffold(
         appBar: AppBar(title: const Text('기록 상세')),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              error is AppException ? error.message : '기록을 불러오는 중 오류가 발생했습니다.',
-              style: textTheme.bodyMedium,
-            ),
-          ),
+        body: ErrorRetryView.fromError(
+          error: error,
+          defaultMessage: '기록을 불러오는 중 오류가 발생했습니다.',
+          onRetry: () =>
+              ref.invalidate(historyDetailsViewModelProvider(widget.sessionId)),
         ),
       ),
       data: (state) {
