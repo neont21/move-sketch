@@ -59,6 +59,27 @@ class UserService {
     await batch.commit();
   }
 
+  Future<void> updateAccountEmail({
+    required String uid,
+    required String username,
+    required String email,
+  }) async {
+    final batch = _firestore.batch();
+
+    final accountIdRef = _accountIdsRef.doc(username);
+    batch.update(accountIdRef, {
+      'email': email,
+    });
+
+    final userRef = _usersRef.doc(uid);
+    batch.update(userRef, {
+      'email': email,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    await batch.commit();
+  }
+
   Future<void> deleteUserDocuments({
     required String uid,
     required String username,

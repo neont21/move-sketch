@@ -16,6 +16,8 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
   StreamSubscription<String?>? _authSubscription;
 
+  List<String> get linkedProviders => _authRepository.linkedProviders;
+
   void _listenAuthState() {
     _authSubscription?.cancel();
 
@@ -217,7 +219,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     required CharacterType selectedCharacter,
     File? imageFile,
     String? profileImageUrl,
-}) async {
+  }) async {
     if (state.isLoading) {
       return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
     }

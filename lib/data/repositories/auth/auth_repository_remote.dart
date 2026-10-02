@@ -45,7 +45,7 @@ final class AuthRepositoryRemote implements AuthRepository {
   List<String> get linkedProviders => authService.linkedProviders;
 
   @override
-  bool get hasPasswordProvider => authService.hasPasswordProvider;
+  Map<String, String> get providerEmails => authService.providerEmails;
 
   @override
   Future<Result<bool>> checkEmailVerified() async {
@@ -179,6 +179,10 @@ final class AuthRepositoryRemote implements AuthRepository {
         );
         if (resolvedEmail == null) {
           return const Result.error(NotFoundException('존재하지 않는 아이디입니다.'));
+        } else if (resolvedEmail.trim().isEmpty) {
+          return const Result.error(
+            AuthException('소셜 로그인으로 가입된 계정입니다. 소셜 로그인으로 시도해 주세요.'),
+          );
         }
         email = resolvedEmail;
       }
@@ -344,13 +348,11 @@ final class AuthRepositoryRemote implements AuthRepository {
         }
       }
 
-      final String email = authService.currentUser?.email ?? '';
-
       await userService.createUserDocuments(
         uid: currentUid,
         username: trimmedUsername,
         nickname: nickname.trim(),
-        email: email,
+        email: '',
         selectedCharacterId: selectedCharacter.id,
         imageUrl: finalImageUrl,
       );
@@ -417,6 +419,15 @@ final class AuthRepositoryRemote implements AuthRepository {
     try {
       await authService.linkEmailAndPassword(email: email, password: password);
 
+      final user = await userService.getUserProfile(currentUid!);
+      if (user != null) {
+        await userService.updateAccountEmail(
+          uid: currentUid!,
+          username: user.username,
+          email: email.trim(),
+        );
+      }
+
       return const Result.ok(null);
     } on FirebaseAuthException catch (error) {
       return Result.error(
@@ -433,6 +444,17 @@ final class AuthRepositoryRemote implements AuthRepository {
   Future<Result<void>> unlinkProvider(String providerId) async {
     try {
       await authService.unlinkProvider(providerId);
+
+      if (providerId == 'password' && currentUid != null) {
+        final user = await userService.getUserProfile(currentUid!);
+        if (user != null) {
+          await userService.updateAccountEmail(
+            uid: currentUid!,
+            username: user.username,
+            email: '',
+          );
+        }
+      }
 
       return const Result.ok(null);
     } on FirebaseAuthException catch (error) {

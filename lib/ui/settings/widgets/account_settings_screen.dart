@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../domain/models/social/user.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
 import '../../core/widgets/system_alert_dialog.dart';
+import '../view_models/account_settings_viewmodel.dart';
 import 'delete_account_dialog.dart';
+import 'register_password_dialog.dart';
 
 class AccountSettingsScreen extends ConsumerStatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -19,6 +20,90 @@ class AccountSettingsScreen extends ConsumerStatefulWidget {
 
 class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   bool _isSigningOut = false;
+
+  Future<void> _handleLink(
+    BuildContext context,
+    WidgetRef ref, {
+    required String providerName,
+    required Future<Result<void>> Function() action,
+  }) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final result = await action();
+
+    switch (result) {
+      case Ok():
+        messenger.showSnackBar(
+          SnackBar(content: Text('$providerName 계정이 연동되었습니다.')),
+        );
+      case Error(:final error):
+        final String errorMessage = error is AppException
+            ? error.message
+            : '$providerName 연동 중 오류가 발생했습니다.';
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
+
+  Future<void> _handleUnlink(
+    BuildContext context,
+    WidgetRef ref, {
+    required String providerName,
+    required String providerId,
+    required int totalProvidersCount,
+  }) async {
+    if (totalProvidersCount <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('최소 하나의 로그인 수단은 연결되어 있어야 합니다.')),
+      );
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        child: SystemAlertDialog(
+          title: '$providerName 연동을 해제할까요?',
+          description: '연동을 해제하면 $providerName 계정으로 로그인할 수 없게 됩니다.',
+          confirmText: '연동 해제',
+          onConfirm: () => dialogContext.pop(true),
+        ),
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    final result = await ref
+        .read(accountSettingsViewModelProvider.notifier)
+        .unlinkProvider(providerId);
+
+    switch (result) {
+      case Ok():
+        messenger.showSnackBar(
+          SnackBar(content: Text('$providerName 연동이 해제되었습니다.')),
+        );
+      case Error(:final error):
+        final String errorMessage = error is AppException
+            ? error.message
+            : '$providerName 연동 해제 중 오류가 발생했습니다.';
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
 
   Future<void> _handleSignOut() async {
     if (_isSigningOut) {
@@ -61,20 +146,16 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     }
   }
 
-  void _showComingSoonSnackBar(String providerName) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$providerName 연동 기능은 준비 중입니다.')));
-  }
-
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final User? currentUser = ref.watch(currentUserProvider);
-    final String? email = currentUser?.email;
-    final bool hasEmail = email != null && email.isNotEmpty;
+    final state = ref.watch(accountSettingsViewModelProvider);
+
+    final bool isGoogleLinked = state.linkedProviders.contains('google.com');
+    final bool isAppleLinked = state.linkedProviders.contains('apple.com');
+    final bool hasPassword = state.hasPassword;
 
     return Scaffold(
       appBar: AppBar(title: Text('계정 정보')),
@@ -88,24 +169,56 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               ListTile(
                 leading: Icon(
                   Icons.g_mobiledata,
-                  color: colorScheme.tertiaryContainer,
+                  color: isGoogleLinked
+                      ? colorScheme.primary
+                      : colorScheme.tertiaryContainer,
                 ),
                 title: Text('Google', style: textTheme.bodyLarge),
+                subtitle: state.isGoogleLinked && state.googleEmail != null
+                    ? Text(state.googleEmail!, style: textTheme.labelSmall)
+                    : null,
                 trailing: OutlinedButton(
-                  onPressed: () => _showComingSoonSnackBar('Google'),
+                  onPressed: state.isProcessing
+                      ? null
+                      : () {
+                          if (isGoogleLinked) {
+                            _handleUnlink(
+                              context,
+                              ref,
+                              providerName: 'Google',
+                              providerId: 'google.com',
+                              totalProvidersCount: state.linkedProviders.length,
+                            );
+                          } else {
+                            _handleLink(
+                              context,
+                              ref,
+                              providerName: 'Google',
+                              action: () => ref
+                                  .read(
+                                    accountSettingsViewModelProvider.notifier,
+                                  )
+                                  .linkGoogle(),
+                            );
+                          }
+                        },
                   style: OutlinedButton.styleFrom(
                     minimumSize: Size.zero,
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
                       horizontal: 12,
                     ),
-                    backgroundColor: colorScheme.primary,
+                    backgroundColor: isGoogleLinked
+                        ? colorScheme.surfaceContainer
+                        : colorScheme.primary,
                     side: BorderSide(color: colorScheme.outline),
                   ),
                   child: Text(
-                    '연결하기',
+                    isGoogleLinked ? '연결 해제' : '연결하기',
                     style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimary,
+                      color: isGoogleLinked
+                          ? colorScheme.tertiaryContainer
+                          : colorScheme.onPrimary,
                     ),
                   ),
                 ),
@@ -113,24 +226,56 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               ListTile(
                 leading: Icon(
                   Icons.apple,
-                  color: colorScheme.tertiaryContainer,
+                  color: isAppleLinked
+                      ? colorScheme.primary
+                      : colorScheme.tertiaryContainer,
                 ),
                 title: Text('Apple', style: textTheme.bodyLarge),
+                subtitle: state.isAppleLinked && state.appleEmail != null
+                    ? Text(state.appleEmail!, style: textTheme.labelSmall)
+                    : null,
                 trailing: OutlinedButton(
-                  onPressed: () => _showComingSoonSnackBar('Apple'),
+                  onPressed: state.isProcessing
+                      ? null
+                      : () {
+                          if (isAppleLinked) {
+                            _handleUnlink(
+                              context,
+                              ref,
+                              providerName: 'Apple',
+                              providerId: 'apple.com',
+                              totalProvidersCount: state.linkedProviders.length,
+                            );
+                          } else {
+                            _handleLink(
+                              context,
+                              ref,
+                              providerName: 'Apple',
+                              action: () => ref
+                                  .read(
+                                    accountSettingsViewModelProvider.notifier,
+                                  )
+                                  .linkApple(),
+                            );
+                          }
+                        },
                   style: OutlinedButton.styleFrom(
                     minimumSize: Size.zero,
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
                       horizontal: 12,
                     ),
-                    backgroundColor: colorScheme.primary,
+                    backgroundColor: isAppleLinked
+                        ? colorScheme.surfaceContainer
+                        : colorScheme.primary,
                     side: BorderSide(color: colorScheme.outline),
                   ),
                   child: Text(
-                    '연결하기',
+                    isAppleLinked ? '연결 해제' : '연결하기',
                     style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimary,
+                      color: isAppleLinked
+                          ? colorScheme.tertiaryContainer
+                          : colorScheme.onPrimary,
                     ),
                   ),
                 ),
@@ -138,48 +283,57 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
               ListTile(
                 leading: Icon(
                   Icons.email,
-                  color: colorScheme.tertiaryContainer,
+                  color: hasPassword
+                      ? colorScheme.primary
+                      : colorScheme.tertiaryContainer,
                 ),
                 title: Text('email', style: textTheme.bodyLarge),
-                subtitle: hasEmail
-                    ? Text(email, style: textTheme.labelSmall)
+                subtitle: state.hasPassword && state.passwordEmail != null
+                    ? Text(state.passwordEmail!, style: textTheme.labelSmall)
                     : null,
                 trailing: OutlinedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('최소 하나의 로그인 수단은 연결되어 있어야 합니다.'),
-                      ),
-                    );
-                  },
+                  onPressed: state.isProcessing
+                      ? null
+                      : () {
+                          if (hasPassword) {
+                            _handleUnlink(
+                              context,
+                              ref,
+                              providerName: '비밀번호',
+                              providerId: 'password',
+                              totalProvidersCount: state.linkedProviders.length,
+                            );
+                          } else {
+                            showDialog<void>(
+                              context: context,
+                              builder: (dialogContext) =>
+                                  const RegisterPasswordDialog(),
+                            );
+                          }
+                        },
                   style: OutlinedButton.styleFrom(
                     minimumSize: Size.zero,
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
                       horizontal: 12,
                     ),
-                    backgroundColor: hasEmail
+                    backgroundColor: hasPassword
                         ? colorScheme.surfaceContainer
                         : colorScheme.primary,
                     side: BorderSide(color: colorScheme.outline),
                   ),
-                  child: hasEmail
-                      ? Text(
-                          '연결 해제',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.tertiaryContainer,
-                          ),
-                        )
-                      : Text(
-                          '연결하기',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
+                  child: Text(
+                    hasPassword ? '연결 해제' : '등록하기',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: hasPassword
+                          ? colorScheme.tertiaryContainer
+                          : colorScheme.onPrimary,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
-              if (hasEmail)
+              if (hasPassword)
                 ListTile(
                   onTap: () {
                     context.go(Routes.meSettingsPassword);

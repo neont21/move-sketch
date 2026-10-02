@@ -17,8 +17,8 @@ abstract interface class AuthRepository {
   /// 연결된 인증 수단 목록을 확인한다.
   List<String> get linkedProviders;
 
-  /// 비밀번호 인증 수단 연결 여부를 확인하다.
-  bool get hasPasswordProvider;
+  /// 각 인증 공급자별 연결된 이메일 주소 맵을 반환한다.
+  Map<String, String> get providerEmails;
 
   /// 캐싱되지 않은 이메일 인증 여부를 확인한다.
   Future<Result<bool>> checkEmailVerified();

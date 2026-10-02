@@ -24,10 +24,14 @@ class AuthService {
         const [];
   }
 
-  bool get hasPasswordProvider {
-    return _auth.currentUser?.providerData
-        .any((userInfo) => userInfo.providerId == 'password') ??
-        false;
+  Map<String, String> get providerEmails {
+    final user = _auth.currentUser;
+    if (user == null) return const {};
+    return {
+      for (final info in user.providerData)
+        if (info.email != null && info.email!.isNotEmpty)
+          info.providerId: info.email!,
+    };
   }
 
   Future<UserCredential> createUserWithEmailAndPassword({
