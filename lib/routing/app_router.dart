@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../domain/models/social/social_auth_result.dart';
+import '../domain/models/social/social_onboarding_profile.dart';
 import '../domain/models/social/user.dart';
 import '../ui/auth/view_models/auth_viewmodel.dart';
 import '../ui/auth/widgets/landing_screen.dart';
@@ -9,6 +11,7 @@ import '../ui/auth/widgets/login_screen.dart';
 import '../ui/auth/widgets/reset_password_screen.dart';
 import '../ui/auth/widgets/signup_complete_screen.dart';
 import '../ui/auth/widgets/signup_screen.dart';
+import '../ui/auth/widgets/social_onboarding_screen.dart';
 import '../ui/feed/widgets/feed_notifications_screen.dart';
 import '../ui/feed/widgets/feed_screen.dart';
 import '../ui/feed/widgets/feed_post_screen.dart';
@@ -348,6 +351,30 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Routes.resetPasswordRelative,
             builder: (context, state) => ResetPasswordScreen(),
+          ),
+          GoRoute(
+            path: Routes.socialOnboardingRelative,
+            redirect: (context, state) {
+              if (state.extra is! SocialAuthNeedsOnboarding) {
+                return Routes.login;
+              }
+              return null;
+            },
+            builder: (context, state) => SocialOnboardingScreen(
+              initialData: state.extra as SocialAuthNeedsOnboarding,
+            ),
+          ),
+          GoRoute(
+            path: Routes.onboardingCharacterRelative,
+            redirect: (context, state) {
+              if (state.extra is! SocialOnboardingProfile) {
+                return Routes.login;
+              }
+              return null;
+            },
+            builder: (context, state) => ChangeCharacterScreen(
+              onboardingProfile: state.extra as SocialOnboardingProfile,
+            ),
           ),
         ],
       ),

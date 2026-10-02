@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/assets.dart';
+import '../../../domain/models/social/social_auth_result.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -87,8 +88,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     switch (result) {
-      case Ok():
-        break;
+      case Ok(:final value):
+        switch (value) {
+          case SocialAuthSuccess():
+            context.go(Routes.home);
+          case SocialAuthNeedsOnboarding():
+            context.go(Routes.socialOnboarding, extra: value);
+          case SocialAuthCanceled():
+            break;
+        }
       case Error(:final error):
         final errorMessage = error is AppException
             ? error.message

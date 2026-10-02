@@ -14,6 +14,12 @@ abstract final class Routes {
   static const resetPasswordRelative = 'password';
   static const resetPassword = '$auth/$resetPasswordRelative';
 
+  static const socialOnboardingRelative = 'onboarding';
+  static const socialOnboarding = '$auth/$socialOnboardingRelative';
+
+  static const onboardingCharacterRelative = 'character';
+  static const onboardingCharacter = '$auth/$onboardingCharacterRelative';
+
   static const home = '/home';
 
   static const postRelative = 'post/:sketch_id';
