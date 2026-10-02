@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -81,6 +82,13 @@ class AuthService {
   }
 
   Future<UserCredential?> signInWithApple() async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final OAuthProvider appleProvider = OAuthProvider('apple.com')
+        ..addScope('email')
+        ..addScope('name');
+      return await _auth.signInWithProvider(appleProvider);
+    }
+
     final String rawNonce = _generateNonce();
     final String sha256Nonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
@@ -150,17 +158,25 @@ class AuthService {
       );
     }
 
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final OAuthProvider appleProvider = OAuthProvider('apple.com')
+        ..addScope('email')
+        ..addScope('name');
+      await user.linkWithProvider(appleProvider);
+      return;
+    }
+
     final String rawNonce = _generateNonce();
     final String sha256Nonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
     final AuthorizationCredentialAppleID appleCredential =
-    await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-      nonce: sha256Nonce,
-    );
+        await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+          nonce: sha256Nonce,
+        );
 
     final OAuthCredential credential = OAuthProvider(
       'apple.com',
@@ -172,7 +188,7 @@ class AuthService {
   Future<void> linkEmailAndPassword({
     required String email,
     required String password,
-})async {
+  }) async {
     final User? user = _auth.currentUser;
     if (user == null) {
       throw FirebaseAuthException(
@@ -187,7 +203,7 @@ class AuthService {
     );
 
     await user.linkWithCredential(credential);
-}
+  }
 
   Future<void> unlinkProvider(String providerId) async {
     final User? user = _auth.currentUser;
