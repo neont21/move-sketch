@@ -121,13 +121,13 @@ class _RegisterPasswordDialogState
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('비밀번호 등록', style: textTheme.titleLarge),
+                Text('비밀번호 등록', style: textTheme.headlineMedium),
                 const SizedBox(height: 8),
                 Text(
                   '이메일과 함께 로그인에 사용할 비밀번호를 입력해 주세요.',
-                  style: textTheme.bodySmall,
+                  style: textTheme.labelMedium,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 LabeledTextFormField(
                   controller: _emailController,
                   labelText: '이메일',
@@ -136,7 +136,7 @@ class _RegisterPasswordDialogState
                   autoValidateMode: AutovalidateMode.onUserInteraction,
                   validator: Validators.validateEmail,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 LabeledTextFormField(
                   controller: _passwordController,
                   labelText: '새 비밀번호',
@@ -151,7 +151,7 @@ class _RegisterPasswordDialogState
                     });
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 LabeledTextFormField(
                   controller: _confirmPasswordController,
                   labelText: '비밀번호 확인',
