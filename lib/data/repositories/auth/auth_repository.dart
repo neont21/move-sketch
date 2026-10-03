@@ -57,10 +57,10 @@ abstract interface class AuthRepository {
   });
 
   /// Google 계정을 연동한다.
-  Future<Result<void>> linkGoogle();
+  Future<Result<bool>> linkGoogle();
 
   /// Apple 계정을 연동한다.
-  Future<Result<void>> linkApple();
+  Future<Result<bool>> linkApple();
 
   /// 이메일을 연동한다.
   Future<Result<void>> linkEmailAndPassword({

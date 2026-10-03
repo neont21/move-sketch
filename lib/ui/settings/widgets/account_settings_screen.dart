@@ -20,12 +20,41 @@ class AccountSettingsScreen extends ConsumerStatefulWidget {
 
 class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   bool _isSigningOut = false;
+  late final AppLifecycleListener _lifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref
+            .read(accountSettingsViewModelProvider.notifier)
+            .checkEmailVerification();
+      }
+    });
+
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () {
+        ref
+            .read(accountSettingsViewModelProvider.notifier)
+            .checkEmailVerification();
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+
+    super.dispose();
+  }
 
   Future<void> _handleLink(
     BuildContext context,
     WidgetRef ref, {
     required String providerName,
-    required Future<Result<void>> Function() action,
+    required Future<Result<bool>> Function() action,
   }) async {
     final messenger = ScaffoldMessenger.of(context);
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -33,10 +62,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     final result = await action();
 
     switch (result) {
-      case Ok():
+      case Ok(value: true):
         messenger.showSnackBar(
           SnackBar(content: Text('$providerName 계정이 연동되었습니다.')),
         );
+      case Ok(value: false):
+        break;
       case Error(:final error):
         final String errorMessage = error is AppException
             ? error.message
@@ -288,52 +319,148 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       : colorScheme.tertiaryContainer,
                 ),
                 title: Text('email', style: textTheme.bodyLarge),
-                subtitle: state.hasPassword && state.passwordEmail != null
-                    ? Text(state.passwordEmail!, style: textTheme.labelSmall)
+                subtitle: hasPassword && state.passwordEmail != null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            state.passwordEmail!,
+                            style: textTheme.labelSmall,
+                          ),
+                          if (!state.isEmailVerified) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              '이메일 인증이 필요합니다',
+                              style: textTheme.labelSmall?.copyWith(
+                                color: colorScheme.error,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ],
+                      )
                     : null,
-                trailing: OutlinedButton(
-                  onPressed: state.isProcessing
-                      ? null
-                      : () {
-                          if (hasPassword) {
-                            _handleUnlink(
+                trailing: state.isProcessing
+                    ? null
+                    : !hasPassword
+                    ? OutlinedButton(
+                        onPressed: () {
+                          showDialog<void>(
+                            context: context,
+                            builder: (dialogContext) =>
+                                const RegisterPasswordDialog(),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 12,
+                          ),
+                          backgroundColor: colorScheme.primary,
+                          side: BorderSide(color: colorScheme.outline),
+                        ),
+                        child: Text(
+                          '등록하기',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onPrimary,
+                          ),
+                        ),
+                      )
+                    : !state.isEmailVerified
+                    // [미인증 대기 상태]: 재전송 및 연결 취소
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton(
+                            onPressed: () async {
+                              final result = await ref
+                                  .read(
+                                    accountSettingsViewModelProvider.notifier,
+                                  )
+                                  .resendVerificationEmail();
+                              if (!context.mounted) return;
+                              switch (result) {
+                                case Ok():
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('인증 메일이 재전송되었습니다.'),
+                                    ),
+                                  );
+                                case Error(:final error):
+                                  final String errorMessage =
+                                      error is AppException
+                                      ? error.message
+                                      : '인증 메일 전송에 실패했습니다.';
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(errorMessage),
+                                      backgroundColor: colorScheme.error,
+                                    ),
+                                  );
+                              }
+                            },
+                            child: Text(
+                              '재전송',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                          OutlinedButton(
+                            onPressed: () => _handleUnlink(
                               context,
                               ref,
                               providerName: '비밀번호',
                               providerId: 'password',
                               totalProvidersCount: state.linkedProviders.length,
-                            );
-                          } else {
-                            showDialog<void>(
-                              context: context,
-                              builder: (dialogContext) =>
-                                  const RegisterPasswordDialog(),
-                            );
-                          }
-                        },
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: Size.zero,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 12,
-                    ),
-                    backgroundColor: hasPassword
-                        ? colorScheme.surfaceContainer
-                        : colorScheme.primary,
-                    side: BorderSide(color: colorScheme.outline),
-                  ),
-                  child: Text(
-                    hasPassword ? '연결 해제' : '등록하기',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: hasPassword
-                          ? colorScheme.tertiaryContainer
-                          : colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 12,
+                              ),
+                              backgroundColor: colorScheme.surfaceContainer,
+                              side: BorderSide(color: colorScheme.outline),
+                            ),
+                            child: Text(
+                              '연결 취소',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.error,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    // [인증 완료 상태]: 정상 연결 해제 버튼
+                    : OutlinedButton(
+                        onPressed: () => _handleUnlink(
+                          context,
+                          ref,
+                          providerName: '비밀번호',
+                          providerId: 'password',
+                          totalProvidersCount: state.linkedProviders.length,
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 12,
+                          ),
+                          backgroundColor: colorScheme.surfaceContainer,
+                          side: BorderSide(color: colorScheme.outline),
+                        ),
+                        child: Text(
+                          '연결 해제',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.tertiaryContainer,
+                          ),
+                        ),
+                      ),
               ),
               const SizedBox(height: 16),
-              if (hasPassword)
+              if (hasPassword && state.isEmailVerified)
                 ListTile(
                   onTap: () {
                     context.go(Routes.meSettingsPassword);

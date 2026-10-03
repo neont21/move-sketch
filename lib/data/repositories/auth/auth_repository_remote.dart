@@ -27,16 +27,38 @@ final class AuthRepositoryRemote implements AuthRepository {
   @override
   String? get currentUid {
     final user = authService.currentUser;
-    if (user == null || !user.emailVerified) {
+    if (user == null) {
       return null;
     }
+
+    final hasSocialProvider = user.providerData.any(
+      (info) =>
+          info.providerId == 'google.com' || info.providerId == 'apple.com',
+    );
+    if (!hasSocialProvider && !user.emailVerified) {
+      return null;
+    }
+
     return user.uid;
   }
 
   @override
-  Stream<String?> get authStateChanges => authService.authStateChanges
-      .map((user) => (user == null || !user.emailVerified) ? null : user.uid)
-      .distinct();
+  Stream<String?> get authStateChanges =>
+      authService.authStateChanges.map((user) {
+        if (user == null) {
+          return null;
+        }
+        final hasSocialProvider = user.providerData.any(
+          (info) =>
+              info.providerId == 'google.com' || info.providerId == 'apple.com',
+        );
+
+        if (!hasSocialProvider && !user.emailVerified) {
+          return null;
+        }
+
+        return user.uid;
+      }).distinct();
 
   @override
   bool get isEmailVerified => authService.isEmailVerified;
@@ -267,6 +289,9 @@ final class AuthRepositoryRemote implements AuthRepository {
         AuthException('Apple 로그인 중 오류가 발생했습니다: ${error.message}'),
       );
     } on FirebaseAuthException catch (error) {
+      if (error.code == 'web-context-canceled') {
+        return const Result.ok(SocialAuthCanceled());
+      }
       return Result.error(
         error.toAuthException(defaultMessage: 'Apple 로그인 중 오류가 발생했습니다.'),
       );
@@ -373,11 +398,14 @@ final class AuthRepositoryRemote implements AuthRepository {
   }
 
   @override
-  Future<Result<void>> linkGoogle() async {
+  Future<Result<bool>> linkGoogle() async {
     try {
-      await authService.linkGoogle();
+      final UserCredential? credential = await authService.linkGoogle();
+      if (credential == null) {
+        return const Result.ok(false);
+      }
 
-      return const Result.ok(null);
+      return const Result.ok(true);
     } on FirebaseAuthException catch (error) {
       return Result.error(
         error.toAuthException(defaultMessage: 'Google 연동 중 오류가 발생했습니다.'),
@@ -390,17 +418,23 @@ final class AuthRepositoryRemote implements AuthRepository {
   }
 
   @override
-  Future<Result<void>> linkApple() async {
+  Future<Result<bool>> linkApple() async {
     try {
-      await authService.linkApple();
+      final UserCredential? credential = await authService.linkApple();
+      if (credential == null) {
+        return const Result.ok(false);
+      }
 
-      return const Result.ok(null);
+      return const Result.ok(true);
     } on SignInWithAppleAuthorizationException catch (error) {
       if (error.code == AuthorizationErrorCode.canceled) {
-        return const Result.ok(null);
+        return const Result.ok(false);
       }
       return Result.error(AuthException('Apple 연동 취소 또는 실패: ${error.message}'));
     } on FirebaseAuthException catch (error) {
+      if (error.code == 'web-context-canceled') {
+        return const Result.ok(false);
+      }
       return Result.error(
         error.toAuthException(defaultMessage: 'Apple 연동 중 오류가 발생했습니다.'),
       );
@@ -419,9 +453,14 @@ final class AuthRepositoryRemote implements AuthRepository {
     try {
       await authService.linkEmailAndPassword(email: email, password: password);
 
-      final user = await userService.getUserProfile(currentUid!);
+      final String? uid = authService.currentUid;
+      if (uid == null) {
+        return const Result.error(AuthException('로그인된 사용자가 없습니다.'));
+      }
+
+      final user = await userService.getUserProfile(uid);
       if (user != null) {
-        await userService.updateAccountEmail(
+        await _updateAccountEmailWithRollback(
           uid: currentUid!,
           username: user.username,
           email: email.trim(),
@@ -440,6 +479,23 @@ final class AuthRepositoryRemote implements AuthRepository {
     }
   }
 
+  Future<void> _updateAccountEmailWithRollback({
+    required String uid,
+    required String username,
+    required String email,
+  }) async {
+    try {
+      await userService.updateAccountEmail(
+        uid: uid,
+        username: username,
+        email: email,
+      );
+    } catch (_) {
+      await authService.unlinkProvider('password').catchError((_) {});
+      rethrow;
+    }
+  }
+
   @override
   Future<Result<void>> unlinkProvider(String providerId) async {
     try {
@@ -448,7 +504,7 @@ final class AuthRepositoryRemote implements AuthRepository {
       if (providerId == 'password' && currentUid != null) {
         final user = await userService.getUserProfile(currentUid!);
         if (user != null) {
-          await userService.updateAccountEmail(
+          await _unlinkPasswordWithRollback(
             uid: currentUid!,
             username: user.username,
             email: '',
@@ -463,6 +519,26 @@ final class AuthRepositoryRemote implements AuthRepository {
       );
     } catch (error) {
       return Result.error(AuthException('연동 해제 중 오류가 발생했습니다.', cause: error));
+    }
+  }
+
+  Future<void> _unlinkPasswordWithRollback({
+    required String uid,
+    required String username,
+    required String email,
+  }) async {
+    await userService.updateAccountEmail(
+      uid: uid,
+      username: username,
+      email: '',
+    );
+    try {
+      await authService.unlinkProvider('password');
+    } catch (_) {
+      await userService
+          .updateAccountEmail(uid: uid, username: username, email: email)
+          .catchError((_) {});
+      rethrow;
     }
   }
 

@@ -8,11 +8,13 @@ import '../../auth/view_models/auth_viewmodel.dart';
 class AccountSettingsState {
   final List<String> linkedProviders;
   final Map<String, String> providerEmails;
+  final bool isEmailVerified;
   final bool isProcessing;
 
   const AccountSettingsState({
     this.linkedProviders = const [],
     this.providerEmails = const {},
+    this.isEmailVerified = false,
     this.isProcessing = false,
   });
 
@@ -28,11 +30,13 @@ class AccountSettingsState {
   AccountSettingsState copyWith({
     List<String>? linkedProviders,
     Map<String, String>? providerEmails,
+    bool? isEmailVerified,
     bool? isProcessing,
   }) {
     return AccountSettingsState(
       linkedProviders: linkedProviders ?? this.linkedProviders,
       providerEmails: providerEmails ?? this.providerEmails,
+      isEmailVerified: isEmailVerified ?? this.isEmailVerified,
       isProcessing: isProcessing ?? this.isProcessing,
     );
   }
@@ -44,6 +48,7 @@ class AccountSettingsViewModel extends Notifier<AccountSettingsState> {
     state = state.copyWith(
       linkedProviders: authRepository.linkedProviders,
       providerEmails: authRepository.providerEmails,
+      isEmailVerified: authRepository.isEmailVerified,
       isProcessing: false,
     );
   }
@@ -56,18 +61,51 @@ class AccountSettingsViewModel extends Notifier<AccountSettingsState> {
     return AccountSettingsState(
       linkedProviders: authRepository.linkedProviders,
       providerEmails: authRepository.providerEmails,
+      isEmailVerified: authRepository.isEmailVerified,
     );
   }
 
-  Future<Result<void>> linkGoogle() async {
+  Future<Result<bool>> checkEmailVerification() async {
+    state = state.copyWith(isProcessing: true);
+
+    final result = await ref.read(authRepositoryProvider).checkEmailVerified();
+
+    switch (result) {
+      case Ok(:final value):
+        if (value) {
+          await ref.read(authViewModelProvider.notifier).refreshCurrentUser();
+        }
+        _syncState();
+      case Error():
+        state = state.copyWith(isProcessing: false);
+    }
+
+    return result;
+  }
+
+  Future<Result<void>> resendVerificationEmail() async {
+    state = state.copyWith(isProcessing: true);
+
+    final result = await ref
+        .read(authRepositoryProvider)
+        .resendVerificationEmail();
+
+    state = state.copyWith(isProcessing: false);
+
+    return result;
+  }
+
+  Future<Result<bool>> linkGoogle() async {
     state = state.copyWith(isProcessing: true);
 
     final result = await ref.read(authRepositoryProvider).linkGoogle();
 
     switch (result) {
-      case Ok():
+      case Ok(value: true):
         await ref.read(authViewModelProvider.notifier).refreshCurrentUser();
         _syncState();
+      case Ok(value: false):
+        break;
       case Error():
         break;
     }
@@ -76,15 +114,17 @@ class AccountSettingsViewModel extends Notifier<AccountSettingsState> {
     return result;
   }
 
-  Future<Result<void>> linkApple() async {
+  Future<Result<bool>> linkApple() async {
     state = state.copyWith(isProcessing: true);
 
     final result = await ref.read(authRepositoryProvider).linkApple();
 
     switch (result) {
-      case Ok():
+      case Ok(value: true):
         await ref.read(authViewModelProvider.notifier).refreshCurrentUser();
         _syncState();
+      case Ok(value: false):
+        break;
       case Error():
         break;
     }

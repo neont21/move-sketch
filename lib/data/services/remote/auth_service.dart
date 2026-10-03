@@ -83,7 +83,7 @@ class AuthService {
 
   Future<UserCredential?> signInWithApple() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      final OAuthProvider appleProvider = OAuthProvider('apple.com')
+      final AppleAuthProvider appleProvider = AppleAuthProvider()
         ..addScope('email')
         ..addScope('name');
       return await _auth.signInWithProvider(appleProvider);
@@ -122,7 +122,7 @@ class AuthService {
     return userCredential;
   }
 
-  Future<void> linkGoogle() async {
+  Future<UserCredential?> linkGoogle() async {
     final User? user = _auth.currentUser;
     if (user == null) {
       throw FirebaseAuthException(
@@ -140,16 +140,16 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
 
-      await user.linkWithCredential(credential);
+      return await user.linkWithCredential(credential);
     } on GoogleSignInException catch (error) {
       if (error.code == GoogleSignInExceptionCode.canceled) {
-        return;
+        return null;
       }
       rethrow;
     }
   }
 
-  Future<void> linkApple() async {
+  Future<UserCredential?> linkApple() async {
     final User? user = _auth.currentUser;
     if (user == null) {
       throw FirebaseAuthException(
@@ -159,11 +159,10 @@ class AuthService {
     }
 
     if (defaultTargetPlatform == TargetPlatform.android) {
-      final OAuthProvider appleProvider = OAuthProvider('apple.com')
+      final AppleAuthProvider appleProvider = AppleAuthProvider()
         ..addScope('email')
         ..addScope('name');
-      await user.linkWithProvider(appleProvider);
-      return;
+      return await user.linkWithProvider(appleProvider);
     }
 
     final String rawNonce = _generateNonce();
@@ -182,7 +181,7 @@ class AuthService {
       'apple.com',
     ).credential(idToken: appleCredential.identityToken, rawNonce: rawNonce);
 
-    await user.linkWithCredential(credential);
+    return await user.linkWithCredential(credential);
   }
 
   Future<void> linkEmailAndPassword({
