@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 import '../../../utils/date_time_utils.dart';
 import '../enums/notification_type.dart';
 import 'user.dart';
@@ -29,6 +30,25 @@ class AppNotification {
   String get message => '${sender.nickname} ${type.notification}';
 
   AppNotification markAsRead() => copyWith(isRead: true);
+
+  factory AppNotification.create({
+    required String recipientId,
+    required UserSummary sender,
+    required NotificationType type,
+    String? targetPostId,
+    String? targetCommentId,
+  }) {
+    return AppNotification(
+      id: const Uuid().v7(),
+      recipientId: recipientId,
+      sender: sender,
+      type: type,
+      targetPostId: targetPostId,
+      targetCommentId: targetCommentId,
+      isRead: false,
+      createdAt: DateTime.now(),
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {

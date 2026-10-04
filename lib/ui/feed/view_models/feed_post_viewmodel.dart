@@ -140,11 +140,11 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
       ),
     );
 
-    final sketchPostRepository = ref.read(sketchPostRepositoryProvider);
-    final result = await sketchPostRepository.toggleCheer(
+    final toggleCheerUseCase = ref.read(toggleCheerUseCaseProvider);
+    final result = await toggleCheerUseCase.execute(
       sketchId: sketchId,
-      userId: user.uid,
-      isCheered: !isCheered,
+      sketchAuthorId: current.sketch.authorId,
+      isCurrentlyCheered: isCheered,
     );
 
     switch (result) {
@@ -166,24 +166,21 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
       return const Result.ok(null);
     }
 
-    final user = await ref.read(authViewModelProvider.future);
-    if (user == null) {
-      return const Result.ok(null);
-    }
-
-    final comment = Comment.create(
-      sketchId: sketchId,
-      author: user.toSummary(),
-      text: text.trim(),
-      parentCommentId: parentCommentId,
-    );
+    final parentComment = parentCommentId != null
+        ? current.comments
+              .where((comment) => comment.id == parentCommentId)
+              .firstOrNull
+        : null;
 
     state = AsyncData(current.copyWith(isSubmittingComment: true));
 
-    final sketchPostRepository = ref.read(sketchPostRepositoryProvider);
-    final result = await sketchPostRepository.addComment(
+    final addCommentUseCase = ref.read(addCommentUseCaseProvider);
+    final result = await addCommentUseCase.execute(
       sketchId: sketchId,
-      comment: comment,
+      sketchAuthorId: current.sketch.authorId,
+      text: text,
+      parentCommentId: parentCommentId,
+      parentCommentAuthorId: parentComment?.authorId,
     );
 
     switch (result) {

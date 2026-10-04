@@ -1,23 +1,22 @@
 import 'dart:async';
 
 import '../../../data/repositories/auth/auth_repository.dart';
-import '../../../data/repositories/friendship/friendship_repository.dart';
 import '../../../data/repositories/notification/notification_repository.dart';
+import '../../../data/repositories/sketch_post/sketch_post_repository.dart';
 import '../../../data/repositories/user/user_repository.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../models/enums/notification_type.dart';
 import '../../models/social/app_notification.dart';
-import '../../models/social/friendship.dart';
 
-class AcceptFriendRequestUseCase {
-  final FriendshipRepository friendshipRepository;
+class ToggleCheerUseCase {
+  final SketchPostRepository sketchPostRepository;
   final AuthRepository authRepository;
   final UserRepository userRepository;
   final NotificationRepository notificationRepository;
 
-  AcceptFriendRequestUseCase({
-    required this.friendshipRepository,
+  ToggleCheerUseCase({
+    required this.sketchPostRepository,
     required this.authRepository,
     required this.userRepository,
     required this.notificationRepository,
@@ -31,10 +30,12 @@ class AcceptFriendRequestUseCase {
     return Result.ok(currentUserId);
   }
 
-  void _dispatchNotification({required String targetUserId}) {
+  void _dispatchNotification({
+    required String targetUserId,
+    required String sketchId,
+  }) {
     unawaited(() async {
       final userResult = await userRepository.getCurrentUserProfile();
-
       final senderSummary = switch (userResult) {
         Ok(:final value) => value?.toSummary(),
         Error() => null,
@@ -47,7 +48,8 @@ class AcceptFriendRequestUseCase {
       final notification = AppNotification.create(
         recipientId: targetUserId,
         sender: senderSummary,
-        type: NotificationType.acceptFriend,
+        type: NotificationType.cheer,
+        targetPostId: sketchId,
       );
 
       final sentResult = await notificationRepository.sendNotification(
@@ -64,20 +66,29 @@ class AcceptFriendRequestUseCase {
     }());
   }
 
-  Future<Result<Friendship>> execute(String targetUserId) async {
+  Future<Result<void>> execute({
+    required String sketchId,
+    required String sketchAuthorId,
+    required bool isCurrentlyCheered,
+  }) async {
     final authCheckResult = _getCurrentUserId();
 
     switch (authCheckResult) {
-      case Ok(value: final currentUserId):
-        final friendshipResult = await friendshipRepository.acceptFriendRequest(
-          currentUserId: currentUserId,
-          targetUserId: targetUserId,
+      case Ok(:final value):
+        final toggleResult = await sketchPostRepository.toggleCheer(
+          sketchId: sketchId,
+          userId: value,
+          isCheered: !isCurrentlyCheered,
         );
-
-        switch (friendshipResult) {
-          case Ok(value: final friendship):
-            _dispatchNotification(targetUserId: targetUserId);
-            return Result.ok(friendship);
+        switch (toggleResult) {
+          case Ok():
+            if (!isCurrentlyCheered) {
+              _dispatchNotification(
+                targetUserId: sketchAuthorId,
+                sketchId: sketchId,
+              );
+            }
+            return const Result.ok(null);
           case Error(:final error):
             return Result.error(error);
         }

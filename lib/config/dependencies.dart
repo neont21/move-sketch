@@ -41,12 +41,14 @@ import '../data/services/remote/weather_service.dart';
 import '../domain/use_cases/session/complete_session_use_case.dart';
 import '../domain/use_cases/session/compose_sketch_use_case.dart';
 import '../domain/use_cases/social/accept_friend_request_use_case.dart';
+import '../domain/use_cases/social/add_comment_use_case.dart';
 import '../domain/use_cases/social/block_user_use_case.dart';
 import '../domain/use_cases/social/cancel_friend_request_use_case.dart';
 import '../domain/use_cases/social/decline_friend_request_use_case.dart';
 import '../domain/use_cases/social/delete_sketch_post_use_case.dart';
 import '../domain/use_cases/social/remove_friend_use_case.dart';
 import '../domain/use_cases/social/send_friend_request_use_case.dart';
+import '../domain/use_cases/social/toggle_cheer_use_case.dart';
 import '../domain/use_cases/social/unblock_user_use_case.dart';
 import '../ui/session/render/sketch_image_renderer.dart';
 
@@ -259,11 +261,33 @@ final deleteSketchPostUseCaseProvider = Provider<DeleteSketchPostUseCase>((ref) 
   );
 });
 
+/// ToggleCheerUseCase Provider: 스케치 응원 토글 및 알림 발송 UseCase
+final toggleCheerUseCaseProvider = Provider<ToggleCheerUseCase>((ref) {
+  return ToggleCheerUseCase(
+    sketchPostRepository: ref.watch(sketchPostRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
+    userRepository: ref.watch(userRepositoryProvider),
+    notificationRepository: ref.watch(notificationRepositoryProvider),
+  );
+});
+
+/// AddCommentUseCase Provider: 댓글/답글 등록 및 대상자 알림 발송 UseCase
+final addCommentUseCaseProvider = Provider<AddCommentUseCase>((ref) {
+  return AddCommentUseCase(
+    sketchPostRepository: ref.watch(sketchPostRepositoryProvider),
+    authRepository: ref.watch(authRepositoryProvider),
+    userRepository: ref.watch(userRepositoryProvider),
+    notificationRepository: ref.watch(notificationRepositoryProvider),
+  );
+});
+
 /// SendFriendRequestUseCase Provider: 사용자에게 친구 요청을 보내는 UseCase
 final sendFriendRequestUseCaseProvider = Provider<SendFriendRequestUseCase>((ref) {
   return SendFriendRequestUseCase(
     friendshipRepository: ref.watch(friendshipRepositoryProvider),
     authRepository: ref.watch(authRepositoryProvider),
+    userRepository: ref.watch(userRepositoryProvider),
+    notificationRepository: ref.watch(notificationRepositoryProvider),
   );
 });
 
@@ -280,6 +304,8 @@ final acceptFriendRequestUseCaseProvider = Provider<AcceptFriendRequestUseCase>(
   return AcceptFriendRequestUseCase(
     friendshipRepository: ref.watch(friendshipRepositoryProvider),
     authRepository: ref.watch(authRepositoryProvider),
+    userRepository: ref.watch(userRepositoryProvider),
+    notificationRepository: ref.watch(notificationRepositoryProvider),
   );
 });
 
