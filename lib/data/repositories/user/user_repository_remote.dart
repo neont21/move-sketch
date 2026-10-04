@@ -29,14 +29,24 @@ final class UserRepositoryRemote implements UserRepository {
   @override
   Future<Result<User?>> getCurrentUserProfile() async {
     final user = authService.currentUser;
-    if (user == null || !user.emailVerified) {
+    if (user == null) {
       return const Result.error(AuthException('로그인된 사용자가 없습니다.'));
+    }
+
+    final hasSocialProvider = user.providerData.any(
+          (providerInfo) =>
+      providerInfo.providerId == 'google.com' ||
+          providerInfo.providerId == 'apple.com',
+    );
+
+    if (!hasSocialProvider && !user.emailVerified) {
+      return const Result.error(AuthException('이메일 인증이 완료되지 않은 사용자입니다.'));
     }
 
     final uid = user.uid;
     try {
-      final user = await userService.getUserProfile(uid);
-      return Result.ok(user);
+      final userProfile = await userService.getUserProfile(uid);
+      return Result.ok(userProfile);
     } on FirebaseException catch (e) {
       return Result.error(
         e.toAppException(defaultMessage: '사용자 프로필을 가져오는 중 오류가 발생했습니다.'),
