@@ -624,6 +624,12 @@ final class AuthRepositoryRemote implements AuthRepository {
       return const Result.error(AuthException('로그인된 사용자가 없습니다.'));
     }
 
+    if (!isEmailVerified) {
+      return const Result.error(
+        AuthException('이메일 인증이 완료되지 않은 계정은 비밀번호로 계정을 삭제할 수 없습니다.'),
+      );
+    }
+
     try {
       await authService.reauthenticate(currentPassword: currentPassword);
       await _executeAccountDeletion(uid: uid, username: username);

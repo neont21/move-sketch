@@ -229,7 +229,7 @@ class _DeleteAccountDialogState extends ConsumerState<DeleteAccountDialog> {
 
     final accountSettingsState = ref.watch(accountSettingsViewModelProvider);
     final List<String> availableProviders =
-        accountSettingsState.linkedProviders;
+        accountSettingsState.verifiedLinkedProviders;
 
     if (_selectedProviderId == null ||
         !availableProviders.contains(_selectedProviderId)) {

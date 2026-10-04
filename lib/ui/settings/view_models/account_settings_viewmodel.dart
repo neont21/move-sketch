@@ -27,24 +27,25 @@ class AccountSettingsState {
   bool get isAppleLinked => linkedProviders.contains('apple.com');
   String? get appleEmail => providerEmails['apple.com'];
 
+  List<String> get verifiedLinkedProviders {
+    return linkedProviders.where((String providerId) {
+      if (providerId == 'password') {
+        return isEmailVerified;
+      }
+      return true;
+    }).toList();
+  }
+
+  bool get hasVerifiedPassword => verifiedLinkedProviders.contains('password');
+
   bool canUnlink(String providerId) {
     if (providerId == 'password' && !isEmailVerified) {
       return true;
     }
 
-    final Iterable<String> remainingValidProviders = linkedProviders.where((
-      String existingProviderId,
-    ) {
-      if (existingProviderId == providerId) {
-        return false;
-      }
-      if (existingProviderId == 'password') {
-        return isEmailVerified;
-      }
-      return true;
-    });
-
-    return remainingValidProviders.isNotEmpty;
+    return verifiedLinkedProviders.any(
+          (String existingProviderId) => existingProviderId != providerId,
+    );
   }
 
   AccountSettingsState copyWith({

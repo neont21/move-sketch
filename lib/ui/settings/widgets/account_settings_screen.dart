@@ -458,7 +458,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           ),
                         ],
                       )
-                    // [인증 완료 상태]: 정상 연결 해제 버튼
                     : OutlinedButton(
                         onPressed: () => _handleUnlink(
                           context,
@@ -484,7 +483,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       ),
               ),
               const SizedBox(height: 16),
-              if (hasPassword && state.isEmailVerified)
+              if (state.verifiedLinkedProviders.contains('password'))
                 ListTile(
                   onTap: () {
                     context.go(Routes.meSettingsPassword);
