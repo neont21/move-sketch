@@ -136,6 +136,35 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     }
   }
 
+  Future<void> _handleCancelPendingEmail(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final messenger = ScaffoldMessenger.of(context);
+
+    final Result<void> result = await ref
+        .read(accountSettingsViewModelProvider.notifier)
+        .unlinkProvider('password');
+
+    switch (result) {
+      case Ok():
+        messenger.showSnackBar(
+          const SnackBar(content: Text('이메일 등록이 취소되었습니다.')),
+        );
+      case Error(:final error):
+        final String errorMessage = error is AppException
+            ? error.message
+            : '이메일 등록 취소 중 오류가 발생했습니다.';
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+    }
+  }
+
   Future<void> _handleSignOut() async {
     if (_isSigningOut) {
       return;
@@ -368,7 +397,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         ),
                       )
                     : !state.isEmailVerified
-                    // [미인증 대기 상태]: 재전송 및 연결 취소
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -379,7 +407,11 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                     accountSettingsViewModelProvider.notifier,
                                   )
                                   .resendVerificationEmail();
-                              if (!context.mounted) return;
+
+                              if (!context.mounted) {
+                                return;
+                              }
+
                               switch (result) {
                                 case Ok():
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -388,8 +420,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                     ),
                                   );
                                 case Error(:final error):
-                                  final String errorMessage =
-                                      error is AppException
+                                  final errorMessage = error is AppException
                                       ? error.message
                                       : '인증 메일 전송에 실패했습니다.';
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -408,13 +439,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                             ),
                           ),
                           OutlinedButton(
-                            onPressed: () => _handleUnlink(
-                              context,
-                              ref,
-                              providerName: '비밀번호',
-                              providerId: 'password',
-                              totalProvidersCount: state.linkedProviders.length,
-                            ),
+                            onPressed: () => _handleCancelPendingEmail(context, ref),
                             style: OutlinedButton.styleFrom(
                               minimumSize: Size.zero,
                               padding: const EdgeInsets.symmetric(

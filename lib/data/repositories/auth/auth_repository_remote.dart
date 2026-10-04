@@ -504,7 +504,7 @@ final class AuthRepositoryRemote implements AuthRepository {
       if (providerId == 'password' && currentUid != null) {
         final user = await userService.getUserProfile(currentUid!);
         if (user != null) {
-          await _unlinkPasswordWithRollback(
+          await userService.updateAccountEmail(
             uid: currentUid!,
             username: user.username,
             email: '',
@@ -519,26 +519,6 @@ final class AuthRepositoryRemote implements AuthRepository {
       );
     } catch (error) {
       return Result.error(AuthException('연동 해제 중 오류가 발생했습니다.', cause: error));
-    }
-  }
-
-  Future<void> _unlinkPasswordWithRollback({
-    required String uid,
-    required String username,
-    required String email,
-  }) async {
-    await userService.updateAccountEmail(
-      uid: uid,
-      username: username,
-      email: '',
-    );
-    try {
-      await authService.unlinkProvider('password');
-    } catch (_) {
-      await userService
-          .updateAccountEmail(uid: uid, username: username, email: email)
-          .catchError((_) {});
-      rethrow;
     }
   }
 
