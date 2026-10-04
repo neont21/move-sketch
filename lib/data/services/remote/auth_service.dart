@@ -292,6 +292,69 @@ class AuthService {
     await user.reauthenticateWithCredential(credential);
   }
 
+  Future<UserCredential?> reauthenticateWithGoogle() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: '로그인된 사용자가 없습니다.',
+      );
+    }
+
+    try {
+      final GoogleSignInAccount account = await GoogleSignIn.instance
+          .authenticate();
+      final GoogleSignInAuthentication googleAuth = account.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      return await user.reauthenticateWithCredential(credential);
+    } on GoogleSignInException catch (error) {
+      if (error.code == GoogleSignInExceptionCode.canceled) {
+        return null;
+      }
+      rethrow;
+    }
+  }
+
+  Future<UserCredential?> reauthenticateWithApple() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: '로그인된 사용자가 없습니다.',
+      );
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final AppleAuthProvider appleAuthProvider = AppleAuthProvider()
+        ..addScope('email')
+        ..addScope('name');
+
+      return await user.reauthenticateWithProvider(appleAuthProvider);
+    }
+
+    final String rawNonce = _generateNonce();
+    final String sha256Nonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+    final AuthorizationCredentialAppleID appleCredential =
+        await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+          nonce: sha256Nonce,
+        );
+
+    final OAuthCredential credential = OAuthProvider(
+      'apple.com',
+    ).credential(idToken: appleCredential.identityToken, rawNonce: rawNonce);
+
+    return await user.reauthenticateWithCredential(credential);
+  }
+
   Future<void> deleteCurrentUser() async {
     await _auth.currentUser?.delete();
   }

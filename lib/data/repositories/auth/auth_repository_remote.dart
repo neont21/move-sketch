@@ -626,8 +626,16 @@ final class AuthRepositoryRemote implements AuthRepository {
     }
   }
 
+  Future<void> _executeAccountDeletion({
+    required String uid,
+    required String username,
+  }) async {
+    await userService.deleteUserDocuments(uid: uid, username: username);
+    await authService.deleteCurrentUser();
+  }
+
   @override
-  Future<Result<void>> deleteAccount({
+  Future<Result<void>> deleteAccountWithPassword({
     required String currentPassword,
     required String username,
   }) async {
@@ -638,23 +646,92 @@ final class AuthRepositoryRemote implements AuthRepository {
 
     try {
       await authService.reauthenticate(currentPassword: currentPassword);
-      await userService.deleteUserDocuments(uid: uid, username: username);
-      await authService.deleteCurrentUser();
+      await _executeAccountDeletion(uid: uid, username: username);
 
       return const Result.ok(null);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'wrong-password' || error.code == 'invalid-credential') {
         return const Result.error(AuthException('비밀번호가 올바르지 않습니다.'));
       }
       return Result.error(
-        e.toAuthException(defaultMessage: '계정 삭제 중 오류가 발생했습니다.'),
+        error.toAuthException(defaultMessage: '계정 삭제 중 오류가 발생했습니다.'),
       );
-    } on FirebaseException catch (e) {
+    } on FirebaseException catch (error) {
       return Result.error(
-        e.toAppException(defaultMessage: '계정 삭제 중 오류가 발생했습니다.'),
+        error.toAppException(defaultMessage: '계정 삭제 중 오류가 발생했습니다.'),
       );
-    } catch (e) {
-      return Result.error(AuthException('계정 삭제 중 오류가 발생했습니다.', cause: e));
+    } catch (error) {
+      return Result.error(AuthException('계정 삭제 중 오류가 발생했습니다.', cause: error));
+    }
+  }
+
+  @override
+  Future<Result<bool>> deleteAccountWithGoogle({
+    required String username,
+  }) async {
+    final uid = currentUid;
+    if (uid == null) {
+      return const Result.error(AuthException('로그인된 사용자가 없습니다.'));
+    }
+
+    try {
+      final credential = await authService.reauthenticateWithGoogle();
+      if (credential == null) {
+        return const Result.ok(false);
+      }
+
+      await _executeAccountDeletion(uid: uid, username: username);
+
+      return const Result.ok(true);
+    } on FirebaseAuthException catch (error) {
+      return Result.error(
+        error.toAuthException(defaultMessage: 'Google 재인증 중 오류가 발생했습니다.'),
+      );
+    } on FirebaseException catch (error) {
+      return Result.error(
+        error.toAppException(defaultMessage: '계정 삭제 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(AuthException('계정 삭제 중 오류가 발생했습니다.', cause: error));
+    }
+  }
+
+  @override
+  Future<Result<bool>> deleteAccountWithApple({
+    required String username,
+  }) async {
+    final uid = currentUid;
+    if (uid == null) {
+      return const Result.error(AuthException('로그인된 사용자가 없습니다.'));
+    }
+
+    try {
+      final credential = await authService.reauthenticateWithApple();
+      if (credential == null) {
+        return const Result.ok(false);
+      }
+
+      await _executeAccountDeletion(uid: uid, username: username);
+
+      return const Result.ok(true);
+    } on SignInWithAppleAuthorizationException catch (error) {
+      if (error.code == AuthorizationErrorCode.canceled) {
+        return const Result.ok(false);
+      }
+      return Result.error(AuthException('Apple 재인증 실패: ${error.message}'));
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'web-context-canceled') {
+        return const Result.ok(false);
+      }
+      return Result.error(
+        error.toAuthException(defaultMessage: 'Apple 재인증 중 오류가 발생했습니다.'),
+      );
+    } on FirebaseException catch (error) {
+      return Result.error(
+        error.toAppException(defaultMessage: '계정 삭제 중 오류가 발생했습니다.'),
+      );
+    } catch (error) {
+      return Result.error(AuthException('계정 삭제 중 오류가 발생했습니다.', cause: error));
     }
   }
 }

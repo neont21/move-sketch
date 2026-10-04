@@ -87,8 +87,18 @@ abstract interface class AuthRepository {
   });
 
   /// 비밀번호 인증을 통해 계정을 삭제한다.
-  Future<Result<void>> deleteAccount({
+  Future<Result<void>> deleteAccountWithPassword({
     required String currentPassword,
+    required String username,
+  });
+
+  /// Google 재인증을 거쳐 계정을 삭제한다.
+  Future<Result<bool>> deleteAccountWithGoogle({
+    required String username,
+  });
+
+  /// Apple 재인증을 거쳐 계정을 삭제한다.
+  Future<Result<bool>> deleteAccountWithApple({
     required String username,
   });
 }

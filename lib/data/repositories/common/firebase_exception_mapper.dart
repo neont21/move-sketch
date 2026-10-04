@@ -42,6 +42,10 @@ extension FirebaseAuthExceptionMapper on FirebaseAuthException {
         cause: this,
       ),
       'user-not-found' => AuthException('가입되지 않은 계정입니다.', cause: this),
+      'user-mismatch' => AuthException(
+        '현재 로그인된 계정과 일치하지 않는 소셜 계정입니다.',
+        cause: this,
+      ),
       'wrong-password' => AuthException('비밀번호가 올바르지 않습니다.', cause: this),
       'invalid-credential' => AuthException(
         defaultMessage != null

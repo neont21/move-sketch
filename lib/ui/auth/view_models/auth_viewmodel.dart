@@ -285,7 +285,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     );
   }
 
-  Future<Result<void>> deleteAccount({
+  Future<Result<void>> deleteAccountWithPassword({
     required String currentPassword,
     required String username,
   }) async {
@@ -295,7 +295,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
     state = const AsyncLoading();
 
-    final result = await _authRepository.deleteAccount(
+    final result = await _authRepository.deleteAccountWithPassword(
       currentPassword: currentPassword,
       username: username,
     );
@@ -307,11 +307,67 @@ class AuthViewModel extends AsyncNotifier<User?> {
     switch (result) {
       case Ok():
         state = const AsyncData(null);
-        return result;
       case Error(:final error):
         state = AsyncError(error, StackTrace.current);
-        return result;
     }
+
+    return result;
+  }
+
+  Future<Result<bool>> deleteAccountWithGoogle({
+    required String username,
+  }) async {
+    if (state.isLoading) {
+      return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
+    }
+
+    state = const AsyncLoading();
+
+    final result = await _authRepository.deleteAccountWithGoogle(
+      username: username,
+    );
+
+    if (!ref.mounted) {
+      return result;
+    }
+
+    switch (result) {
+      case Ok(value: true):
+        state = const AsyncData(null);
+      case Ok(value: false):
+        state = AsyncData(ref.read(currentUserProvider));
+      case Error(:final error):
+        state = AsyncError(error, StackTrace.current);
+    }
+    return result;
+  }
+
+  Future<Result<bool>> deleteAccountWithApple({
+    required String username,
+  }) async {
+    if (state.isLoading) {
+      return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
+    }
+
+    state = const AsyncLoading();
+
+    final result = await _authRepository.deleteAccountWithApple(
+      username: username,
+    );
+
+    if (!ref.mounted) {
+      return result;
+    }
+
+    switch (result) {
+      case Ok(value: true):
+        state = const AsyncData(null);
+      case Ok(value: false):
+        state = AsyncData(ref.read(currentUserProvider));
+      case Error(:final error):
+        state = AsyncError(error, StackTrace.current);
+    }
+    return result;
   }
 }
 
