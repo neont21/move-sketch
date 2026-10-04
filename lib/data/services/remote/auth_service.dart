@@ -213,10 +213,22 @@ class AuthService {
       );
     }
 
-    if (user.providerData.length <= 1) {
+    final Iterable<UserInfo> remainingValidProviders = user.providerData.where((
+      UserInfo providerInfo,
+    ) {
+      if (providerInfo.providerId == providerId) {
+        return false;
+      }
+      if (providerInfo.providerId == 'password') {
+        return user.emailVerified;
+      }
+      return true;
+    });
+
+    if (remainingValidProviders.isEmpty) {
       throw FirebaseAuthException(
         code: 'cannot-unlink-last-provider',
-        message: '유일한 로그인 수단은 연결 해제할 수 없습니다.',
+        message: '유효한 로그인 수단이 최소 하나는 유지되어야 하므로 연결을 해제할 수 없습니다.',
       );
     }
 

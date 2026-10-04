@@ -86,11 +86,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     WidgetRef ref, {
     required String providerName,
     required String providerId,
-    required int totalProvidersCount,
   }) async {
-    if (totalProvidersCount <= 1) {
+    final state = ref.read(accountSettingsViewModelProvider);
+
+    if (!state.canUnlink(providerId)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('최소 하나의 로그인 수단은 연결되어 있어야 합니다.')),
+        const SnackBar(content: Text('최소 하나의 인증된 로그인 수단은 연결되어 있어야 합니다.')),
       );
       return;
     }
@@ -247,7 +248,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                               ref,
                               providerName: 'Google',
                               providerId: 'google.com',
-                              totalProvidersCount: state.linkedProviders.length,
                             );
                           } else {
                             _handleLink(
@@ -304,7 +304,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                               ref,
                               providerName: 'Apple',
                               providerId: 'apple.com',
-                              totalProvidersCount: state.linkedProviders.length,
                             );
                           } else {
                             _handleLink(
@@ -439,7 +438,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                             ),
                           ),
                           OutlinedButton(
-                            onPressed: () => _handleCancelPendingEmail(context, ref),
+                            onPressed: () =>
+                                _handleCancelPendingEmail(context, ref),
                             style: OutlinedButton.styleFrom(
                               minimumSize: Size.zero,
                               padding: const EdgeInsets.symmetric(
@@ -465,7 +465,6 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           ref,
                           providerName: '비밀번호',
                           providerId: 'password',
-                          totalProvidersCount: state.linkedProviders.length,
                         ),
                         style: OutlinedButton.styleFrom(
                           minimumSize: Size.zero,
