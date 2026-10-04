@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:move_sketch/ui/auth/view_models/auth_viewmodel.dart';
 import '../../../domain/models/social/comment.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../routing/routes.dart';
@@ -8,7 +10,7 @@ import '../../core/widgets/bottom_sheet_button.dart';
 import '../../core/widgets/user_avatar.dart';
 import 'masked_comment_tile.dart';
 
-class UserCommentTile extends StatelessWidget {
+class UserCommentTile extends ConsumerWidget {
   final Comment comment;
   final UserSummary sketchAuthor;
   final bool isBlocked;
@@ -25,7 +27,7 @@ class UserCommentTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -37,6 +39,9 @@ class UserCommentTile extends StatelessWidget {
     }
 
     final bool isAuthorDeleted = comment.author.username.startsWith('deleted_');
+
+    final currentUser = ref.watch(currentUserProvider);
+    final isMe = currentUser != null && currentUser.uid == comment.authorId;
 
     return Padding(
       padding: (comment.isReply)
@@ -59,8 +64,13 @@ class UserCommentTile extends StatelessWidget {
           UserAvatar(
             username: comment.author.username,
             imageUrl: comment.author.imageUrl,
-            onTap: () =>
-                context.go(Routes.feedProfile(comment.author.username)),
+            onTap: () {
+              if (isMe) {
+                context.go(Routes.me);
+              } else {
+                context.go(Routes.feedProfile(comment.author.username));
+              }
+            },
           ),
           Expanded(
             child: Column(
@@ -73,9 +83,13 @@ class UserCommentTile extends StatelessWidget {
                       onTap: isAuthorDeleted
                           ? null
                           : () {
-                              context.go(
-                                Routes.feedProfile(comment.author.username),
-                              );
+                              if (isMe) {
+                                context.go(Routes.me);
+                              } else {
+                                context.go(
+                                  Routes.feedProfile(comment.author.username),
+                                );
+                              }
                             },
                       child: Text(
                         comment.author.nickname,

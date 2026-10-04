@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:move_sketch/ui/auth/view_models/auth_viewmodel.dart';
 import '../../../domain/models/social/sketch_post.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
@@ -9,7 +11,7 @@ import '../../core/widgets/user_avatar.dart';
 import '../../session/widgets/sketch_card.dart';
 import 'feed_post_metadata.dart';
 
-class FeedPostCard extends StatelessWidget {
+class FeedPostCard extends ConsumerWidget {
   final SketchPost sketch;
   final bool isDetail;
   final VoidCallback? onDelete;
@@ -29,9 +31,12 @@ class FeedPostCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final bool isAuthorDeleted = sketch.author.username.startsWith('deleted_');
+
+    final currentUser = ref.watch(currentUserProvider);
+    final bool isMe = currentUser != null && currentUser.uid == sketch.authorId;
 
     final metaText = [
       sketch.locationTag,
@@ -48,8 +53,13 @@ class FeedPostCard extends StatelessWidget {
             UserAvatar(
               username: sketch.author.username,
               imageUrl: sketch.author.imageUrl,
-              onTap: () =>
-                  context.go(Routes.feedProfile(sketch.author.username)),
+              onTap: () {
+                if (isMe) {
+                  context.go(Routes.me);
+                } else {
+                  context.go(Routes.feedProfile(sketch.author.username));
+                }
+              },
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,8 +71,14 @@ class FeedPostCard extends StatelessWidget {
                       onTap: isAuthorDeleted
                           ? null
                           : () {
-                        context.go(Routes.feedProfile(sketch.author.username));
-                      },
+                              if (isMe) {
+                                context.go(Routes.me);
+                              } else {
+                                context.go(
+                                  Routes.feedProfile(sketch.author.username),
+                                );
+                              }
+                            },
                       child: Text(
                         sketch.author.nickname,
                         style: textTheme.bodyLarge,
