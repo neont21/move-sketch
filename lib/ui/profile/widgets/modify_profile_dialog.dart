@@ -270,7 +270,7 @@ class _ModifyProfileDialogState extends ConsumerState<ModifyProfileDialog> {
                   controller: _descriptionController,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (value) => _handleSave(),
-                  maxLength: 30,
+                  maxLength: 20,
                 ),
               ],
             ),
