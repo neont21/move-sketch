@@ -40,7 +40,13 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
   Future<Result<SketchPost?>> getPostById(String sketchId) async {
     try {
       final sketchPost = await sketchPostService.getPostById(sketchId);
-      return Result.ok(sketchPost);
+      if (sketchPost == null) {
+        return const Result.ok(null);
+      }
+
+      final hydratedPost = await _hydratePostsWithLatestAuthors([sketchPost]);
+
+      return Result.ok(hydratedPost.first);
     } on FirebaseException catch (e) {
       return Result.error(
         e.toAppException(defaultMessage: '스케치 조회 중 오류가 발생했습니다.'),
@@ -64,7 +70,9 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
         lastCreatedAt: lastCreatedAt,
       );
 
-      return Result.ok(sketchPosts);
+      final hydratedPosts = await _hydratePostsWithLatestAuthors(sketchPosts);
+
+      return Result.ok(hydratedPosts);
     } on FirebaseException catch (e) {
       return Result.error(
         e.toAppException(defaultMessage: '피드 조회 중 오류가 발생했습니다.'),
@@ -87,7 +95,9 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
         lastCreatedAt: lastCreatedAt,
       );
 
-      return Result.ok(sketchPosts);
+      final hydratedPosts = await _hydratePostsWithLatestAuthors(sketchPosts);
+
+      return Result.ok(hydratedPosts);
     } on FirebaseException catch (e) {
       return Result.error(
         e.toAppException(defaultMessage: '스케치 조회 중 오류가 발생했습니다.'),
@@ -210,7 +220,12 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
   Future<Result<List<Comment>>> getComments(String sketchId) async {
     try {
       final comments = await sketchPostService.getComments(sketchId);
-      return Result.ok(comments);
+
+      final hydratedComments = await _hydrateCommentsWithLatestAuthors(
+        comments,
+      );
+
+      return Result.ok(hydratedComments);
     } on FirebaseException catch (e) {
       return Result.error(
         e.toAppException(defaultMessage: '댓글 조회 중 오류가 발생했습니다.'),
@@ -238,5 +253,47 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
     } catch (e) {
       return Result.error(DatabaseException('댓글 삭제 중 오류가 발생했습니다.', cause: e));
     }
+  }
+
+  Future<List<SketchPost>> _hydratePostsWithLatestAuthors(
+    List<SketchPost> posts,
+  ) async {
+    if (posts.isEmpty) {
+      return posts;
+    }
+
+    final authorIds = posts.map((post) => post.authorId).toList();
+    final userSummaries = await userService.getUserSummaries(authorIds);
+    final summaryMap = {
+      for (final summary in userSummaries) summary.uid: summary,
+    };
+
+    return posts.map((post) {
+      final latestSummary = summaryMap[post.authorId];
+      if (latestSummary == null) {
+        return post;
+      }
+      return post.copyWith(author: latestSummary);
+    }).toList();
+  }
+
+  Future<List<Comment>> _hydrateCommentsWithLatestAuthors(List<Comment> comments) async {
+    if (comments.isEmpty) {
+      return comments;
+    }
+
+    final authorIds = comments.map((comment) => comment.authorId).toList();
+    final userSummaries = await userService.getUserSummaries(authorIds);
+    final summaryMap = {
+      for (final summary in userSummaries) summary.uid: summary,
+    };
+
+    return comments.map((comment) {
+      final lastSummary = summaryMap[comment.authorId];
+      if (lastSummary == null) {
+        return comment;
+      }
+      return comment.copyWith(author: lastSummary);
+    }).toList();
   }
 }

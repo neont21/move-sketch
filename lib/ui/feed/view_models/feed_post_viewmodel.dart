@@ -51,7 +51,7 @@ class FeedPostViewModel extends AsyncNotifier<FeedPostState> {
     Set<String> blockedUserIds,
   ) {
     bool isActive(Comment comment) =>
-        !comment.isDeleted && !blockedUserIds.contains(comment.authorUid);
+        !comment.isDeleted && !blockedUserIds.contains(comment.authorId);
     final roots = rawComments.where((comment) => !comment.isReply).toList();
     final replies = rawComments.where((comment) => comment.isReply).toList();
 

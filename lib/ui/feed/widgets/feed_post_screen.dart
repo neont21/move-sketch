@@ -246,7 +246,7 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                       comment: comment,
                       sketchAuthor: sketch.author,
                       isBlocked: state.blockedUserIds.contains(
-                        comment.authorUid,
+                        comment.authorId,
                       ),
                       onReply: (comment) => setState(() {
                         _replyTarget = comment;

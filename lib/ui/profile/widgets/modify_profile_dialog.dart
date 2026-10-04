@@ -11,6 +11,7 @@ import '../../auth/view_models/auth_viewmodel.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 import '../../core/widgets/user_avatar.dart';
+import '../../feed/view_models/feed_viewmodel.dart';
 
 class ModifyProfileDialog extends ConsumerStatefulWidget {
   final User user;
@@ -139,6 +140,7 @@ class _ModifyProfileDialogState extends ConsumerState<ModifyProfileDialog> {
     switch (result) {
       case Ok():
         await ref.read(authViewModelProvider.notifier).refreshCurrentUser();
+        ref.invalidate(feedViewModelProvider);
 
         if (!mounted) {
           return;
