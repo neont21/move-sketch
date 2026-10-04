@@ -31,6 +31,7 @@ class FeedPostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final bool isAuthorDeleted = sketch.author.username.startsWith('deleted_');
 
     final metaText = [
       sketch.locationTag,
@@ -57,7 +58,9 @@ class FeedPostCard extends StatelessWidget {
                   spacing: 8,
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: isAuthorDeleted
+                          ? null
+                          : () {
                         context.go(Routes.feedProfile(sketch.author.username));
                       },
                       child: Text(

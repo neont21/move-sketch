@@ -263,7 +263,10 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
     }
 
     final authorIds = posts.map((post) => post.authorId).toList();
-    final userSummaries = await userService.getUserSummaries(authorIds);
+    final userSummaries = await userService.getUserSummaries(
+      authorIds,
+      includeDeleted: true,
+    );
     final summaryMap = {
       for (final summary in userSummaries) summary.uid: summary,
     };
@@ -277,13 +280,18 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
     }).toList();
   }
 
-  Future<List<Comment>> _hydrateCommentsWithLatestAuthors(List<Comment> comments) async {
+  Future<List<Comment>> _hydrateCommentsWithLatestAuthors(
+    List<Comment> comments,
+  ) async {
     if (comments.isEmpty) {
       return comments;
     }
 
     final authorIds = comments.map((comment) => comment.authorId).toList();
-    final userSummaries = await userService.getUserSummaries(authorIds);
+    final userSummaries = await userService.getUserSummaries(
+      authorIds,
+      includeDeleted: true,
+    );
     final summaryMap = {
       for (final summary in userSummaries) summary.uid: summary,
     };

@@ -67,9 +67,7 @@ class UserService {
     final batch = _firestore.batch();
 
     final accountIdRef = _accountIdsRef.doc(username);
-    batch.update(accountIdRef, {
-      'email': email,
-    });
+    batch.update(accountIdRef, {'email': email});
 
     final userRef = _usersRef.doc(uid);
     batch.update(userRef, {
@@ -130,9 +128,15 @@ class UserService {
     return user;
   }
 
-  Future<List<UserSummary>> getUserSummaries(List<String> uids) async {
+  Future<List<UserSummary>> getUserSummaries(
+    List<String> uids, {
+    bool includeDeleted = false,
+  }) async {
     final uniqueUids = uids.toSet().toList();
-    if (uniqueUids.isEmpty) return [];
+    if (uniqueUids.isEmpty) {
+      return [];
+    }
+
     final chunks = <List<String>>[];
     for (var i = 0; i < uniqueUids.length; i += 30) {
       chunks.add(
@@ -142,14 +146,16 @@ class UserService {
         ),
       );
     }
+
     final futures = chunks.map((chunk) {
       return _usersRef.where(FieldPath.documentId, whereIn: chunk).get();
     });
+
     final snapshots = await Future.wait(futures);
     return snapshots
         .expand((s) => s.docs)
         .map((doc) => User.fromMap(doc.data(), uid: doc.id))
-        .where((user) => !user.isDeleted)
+        .where((user) => includeDeleted || !user.isDeleted)
         .map((user) => user.toSummary())
         .toList();
   }

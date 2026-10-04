@@ -25,6 +25,7 @@ class BottomSheetButton extends ConsumerWidget {
 
   List<ListTile> _buildItems(BuildContext context, UserSummary currentUser) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final bool isAuthorDeleted = author.username.startsWith('deleted_');
 
     List<ListTile> menuItems = [];
 
@@ -85,33 +86,36 @@ class BottomSheetButton extends ConsumerWidget {
           },
         ),
       );
-      menuItems.add(
-        ListTile(
-          title: Text('차단하기', style: TextStyle(color: colorScheme.error)),
-          onTap: () {
-            context.pop();
-            showDialog(
-              context: context,
-              builder: (context) => Dialog(
-                child: SystemAlertDialog(
-                  title: '정말 차단하시겠습니까?',
-                  description: '차단하시면 더이상 ${author.nickname} (@${author.username}) 님의 프로필과 스케치를 볼 수 없어요.',
-                  confirmText: '차단',
-                  onConfirm: () {
-                    context.pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${author.nickname} 님을 차단하였습니다.'),
-                        duration: Duration(seconds: 3),
-                      ),
-                    );
-                  },
+      if (!isAuthorDeleted) {
+        menuItems.add(
+          ListTile(
+            title: Text('차단하기', style: TextStyle(color: colorScheme.error)),
+            onTap: () {
+              context.pop();
+              showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  child: SystemAlertDialog(
+                    title: '정말 차단하시겠습니까?',
+                    description:
+                        '차단하시면 더이상 ${author.nickname} (@${author.username}) 님의 프로필과 스케치를 볼 수 없어요.',
+                    confirmText: '차단',
+                    onConfirm: () {
+                      context.pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${author.nickname} 님을 차단하였습니다.'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-      );
+              );
+            },
+          ),
+        );
+      }
     }
     return menuItems;
   }

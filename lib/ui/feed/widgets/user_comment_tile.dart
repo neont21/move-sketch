@@ -86,7 +86,7 @@ class UserCommentTile extends StatelessWidget {
                       comment.createdAt.formattedFeedTime,
                       style: textTheme.labelMedium,
                     ),
-                    if (!comment.isReply && onReply != null)
+                    if (!comment.isReply && !isAuthorDeleted && onReply != null)
                       GestureDetector(
                         onTap: () {
                           onReply!(comment);
