@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -50,15 +51,22 @@ final class PushNotificationRepositoryRemote
       final String? currentToken = await firebaseMessagingService.getToken();
       if (currentToken != null) {
         await userService.updateFcmToken(uid: userId, fcmToken: currentToken);
+        FirebaseCrashlytics.instance.log('FCM 기기 토큰 최초 발급 및 Firestore 동기화 완료');
       }
 
       await _tokenRefreshSubscription?.cancel();
       _tokenRefreshSubscription = firebaseMessagingService.onTokenRefresh
           .listen((token) async {
+            FirebaseCrashlytics.instance.log('FCM 기기 토큰 갱신 이벤트 수신');
             try {
               await userService.updateFcmToken(uid: userId, fcmToken: token);
-            } catch (e) {
-              // TODO: Firebase Crashlytics: Push Token Refresh Update Error
+            } catch (e, trace) {
+              FirebaseCrashlytics.instance.recordError(
+                e,
+                trace,
+                reason: 'FCM 토큰 갱신 시 Firestore 저장 실패 (userId: $userId)',
+                fatal: false,
+              );
             }
           });
 

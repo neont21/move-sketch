@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:http/http.dart' as http;
 
 class GeocodingService {
@@ -71,8 +72,13 @@ class GeocodingService {
           }
         }
       }
-    } catch (_) {
-      // TODO: Firebase Crashlytics: Geocoding Error
+    } catch (e, trace) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        trace,
+        reason: 'Nominatim 역지오코딩 통신 오류 (lat: $latitude, lon: $longitude)',
+        fatal: false,
+      );
     }
 
     return '알 수 없는 위치';

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,9 +58,13 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
     switch (result) {
       case Ok():
         state = state.copyWith(isInitialized: true);
-        break;
-      case Error():
-        // TODO: Firebase Crashlytics: Push Notification Init Error
+      case Error(:final error):
+        FirebaseCrashlytics.instance.recordError(
+          error,
+          StackTrace.current,
+          reason: 'FCM 푸시 알림 초기화 실패 (사용자: $userId)',
+          fatal: false,
+        );
         return;
     }
 
@@ -86,6 +91,10 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
+    FirebaseCrashlytics.instance.log(
+      'FCM 포그라운드 메시지 수신: type=${message.data['type']}, targetSketchId=${message.data['targetSketchId']}',
+    );
+
     final isSessionRunning = await _isSessionOngoing();
     if (isSessionRunning) {
       return;
@@ -167,8 +176,11 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
   }
 
   void _navigateToRoute(String destinationRoute) {
+    FirebaseCrashlytics.instance.log('푸시 알림 딥링크 네비게이션 시도: route=$destinationRoute');
+
     final context = rootNavigatorKey.currentContext;
     if (context == null) {
+      FirebaseCrashlytics.instance.log('네비게이션 실패: rootNavigatorKey.currentContext가 null임');
       return;
     }
 
@@ -187,10 +199,13 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
     switch (result) {
       case Ok():
         state = state.copyWith(isInitialized: false);
-        break;
-      case Error():
-        // TODO: Firebase Crashlytics: Push Token Invalidation Error
-        break;
+      case Error(:final error):
+        FirebaseCrashlytics.instance.recordError(
+          error,
+          StackTrace.current,
+          reason: 'FCM 기기 토큰 무효화 실패 (사용자: $userId)',
+          fatal: false,
+        );
     }
   }
 }
