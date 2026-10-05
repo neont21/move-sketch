@@ -9,6 +9,7 @@ import '../../../domain/models/social/social_auth_result.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../core/view_models/push_notification_viewmodel.dart';
 
 class AuthViewModel extends AsyncNotifier<User?> {
   AuthRepository get _authRepository => ref.read(authRepositoryProvider);
@@ -42,6 +43,10 @@ class AuthViewModel extends AsyncNotifier<User?> {
           Ok(:final value) => AsyncData(value),
           Error() => const AsyncData(null),
         };
+
+        if (state.value != null) {
+          ref.read(pushNotificationViewModelProvider.notifier).initialize(uid);
+        }
       }
     });
   }
@@ -60,10 +65,16 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
 
     final profileResult = await _userRepository.getCurrentUserProfile();
-    return switch (profileResult) {
+    final user = switch (profileResult) {
       Ok(:final value) => value,
       Error() => null,
     };
+
+    if (user != null) {
+      ref.read(pushNotificationViewModelProvider.notifier).initialize(user.uid);
+    }
+
+    return user;
   }
 
   Future<Result<User>> refreshCurrentUser() async {
@@ -103,6 +114,9 @@ class AuthViewModel extends AsyncNotifier<User?> {
     switch (result) {
       case Ok(:final value):
         state = AsyncData(value);
+        ref
+            .read(pushNotificationViewModelProvider.notifier)
+            .initialize(value.uid);
         return result;
       case Error():
         state = AsyncData(null);
@@ -138,6 +152,9 @@ class AuthViewModel extends AsyncNotifier<User?> {
     switch (result) {
       case Ok(:final value):
         state = AsyncData(value);
+        ref
+            .read(pushNotificationViewModelProvider.notifier)
+            .initialize(value.uid);
         return result;
       case Error(:final error):
         state = AsyncError(error, StackTrace.current);
@@ -171,6 +188,9 @@ class AuthViewModel extends AsyncNotifier<User?> {
         switch (value) {
           case SocialAuthSuccess(:final user):
             state = AsyncData(user);
+            ref
+                .read(pushNotificationViewModelProvider.notifier)
+                .initialize(user.uid);
           case SocialAuthNeedsOnboarding():
             state = const AsyncData(null);
           case SocialAuthCanceled():
@@ -201,6 +221,9 @@ class AuthViewModel extends AsyncNotifier<User?> {
         switch (value) {
           case SocialAuthSuccess(:final user):
             state = AsyncData(user);
+            ref
+                .read(pushNotificationViewModelProvider.notifier)
+                .initialize(user.uid);
           case SocialAuthNeedsOnboarding():
             state = const AsyncData(null);
           case SocialAuthCanceled():
@@ -241,6 +264,9 @@ class AuthViewModel extends AsyncNotifier<User?> {
     switch (result) {
       case Ok(:final value):
         state = AsyncData(value);
+        ref
+            .read(pushNotificationViewModelProvider.notifier)
+            .initialize(value.uid);
         return result;
       case Error(:final error):
         state = AsyncError(error, StackTrace.current);
@@ -254,6 +280,13 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
 
     state = const AsyncLoading();
+
+    final currentUid = state.value?.uid ?? _authRepository.currentUid;
+    if (currentUid != null) {
+      await ref
+          .read(pushNotificationViewModelProvider.notifier)
+          .clearPushToken(currentUid);
+    }
 
     final result = await _authRepository.signOut();
 
@@ -295,6 +328,13 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
     state = const AsyncLoading();
 
+    final currentUid = state.value?.uid ?? _authRepository.currentUid;
+    if (currentUid != null) {
+      await ref
+          .read(pushNotificationViewModelProvider.notifier)
+          .clearPushToken(currentUid);
+    }
+
     final result = await _authRepository.deleteAccountWithPassword(
       currentPassword: currentPassword,
       username: username,
@@ -323,6 +363,13 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
     state = const AsyncLoading();
 
+    final currentUid = state.value?.uid ?? _authRepository.currentUid;
+    if (currentUid != null) {
+      await ref
+          .read(pushNotificationViewModelProvider.notifier)
+          .clearPushToken(currentUid);
+    }
+
     final result = await _authRepository.deleteAccountWithGoogle(
       username: username,
     );
@@ -350,6 +397,13 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
 
     state = const AsyncLoading();
+
+    final currentUid = state.value?.uid ?? _authRepository.currentUid;
+    if (currentUid != null) {
+      await ref
+          .read(pushNotificationViewModelProvider.notifier)
+          .clearPushToken(currentUid);
+    }
 
     final result = await _authRepository.deleteAccountWithApple(
       username: username,

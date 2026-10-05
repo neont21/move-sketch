@@ -245,4 +245,14 @@ class UserService {
 
     return userMap.values.take(limit).map((user) => user.toSummary()).toList();
   }
+
+  Future<void> updateFcmToken({
+    required String uid,
+    required String? fcmToken,
+}) async {
+    await _usersRef.doc(uid).update({
+      'fcmToken': fcmToken,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

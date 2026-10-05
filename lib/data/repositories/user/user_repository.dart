@@ -36,4 +36,7 @@ abstract interface class UserRepository {
     required String query,
     int limit = 20,
   });
+
+  /// 현재 사용자의 FCM 기기 등록 토큰을 갱신하거나 무효화(null)한다.
+  Future<Result<void>> updateFcmToken(String? fcmToken);
 }

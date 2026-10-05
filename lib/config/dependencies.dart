@@ -11,6 +11,8 @@ import '../data/repositories/location/location_repository.dart';
 import '../data/repositories/location/location_repository_local.dart';
 import '../data/repositories/notification/notification_repository.dart';
 import '../data/repositories/notification/notification_repository_remote.dart';
+import '../data/repositories/notification/push_notification_repository.dart';
+import '../data/repositories/notification/push_notification_repository_remote.dart';
 import '../data/repositories/report/report_repository.dart';
 import '../data/repositories/report/report_repository_remote.dart';
 import '../data/repositories/session/session_repository.dart';
@@ -28,6 +30,7 @@ import '../data/services/hardware/location_service.dart';
 import '../data/services/local/database/app_database.dart';
 import '../data/services/local/session_service.dart';
 import '../data/services/remote/auth_service.dart';
+import '../data/services/remote/firebase_messaging_service.dart';
 import '../data/services/remote/firestore/friendship_service.dart';
 import '../data/services/remote/firestore/notification_service.dart';
 import '../data/services/remote/firestore/report_service.dart';
@@ -127,6 +130,11 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
 });
 
+/// FirebaseMessagingService Provider: FCM SDK 기반 기기 토큰 및 푸시 수신
+final firebaseMessagingServiceProvider = Provider<FirebaseMessagingService>((ref) {
+  return FirebaseMessagingService();
+});
+
 /// ReportService Provider: Firestore 기반 신고 접수 저장
 final reportServiceProvider = Provider<ReportService>((ref) {
   return ReportService();
@@ -218,6 +226,20 @@ final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   return NotificationRepositoryRemote(
     notificationService: ref.watch(notificationServiceProvider),
   );
+});
+
+/// PushNotificationRepository Provider: 푸시 알림 관리 저장소
+/// FCM 기기 토큰과 Firestore 사용자 문서 간의 동기화 및 푸시 스트림 관리
+final pushNotificationRepositoryProvider =
+Provider<PushNotificationRepository>((ref) {
+  final firebaseMessagingService = ref.watch(firebaseMessagingServiceProvider);
+  final userService = ref.watch(userServiceProvider);
+  final repository = PushNotificationRepositoryRemote(
+    firebaseMessagingService: firebaseMessagingService,
+    userService: userService,
+  );
+  ref.onDispose(repository.dispose);
+  return repository;
 });
 
 /// ReportRepository Provider: 게시물/댓글/사용자 신고 접수 저장소

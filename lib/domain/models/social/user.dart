@@ -73,6 +73,7 @@ class User {
   final CharacterType selectedCharacter;
 
   final NotificationSettings notificationSettings;
+  final String? fcmToken;
 
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -90,6 +91,7 @@ class User {
     this.description,
     this.selectedCharacter = CharacterType.bear,
     this.notificationSettings = const NotificationSettings(),
+    this.fcmToken,
   });
 
   bool get isDeleted => deletedAt != null;
@@ -113,6 +115,7 @@ class User {
       'description': description,
       'selectedCharacterId': selectedCharacter.id,
       'notificationSettings': notificationSettings.toMap(),
+      'fcmToken': fcmToken,
       'createdAt': createdAt.toUtc().toIso8601String(),
       'updatedAt': updatedAt?.toUtc().toIso8601String(),
       'deletedAt': deletedAt?.toUtc().toIso8601String(),
@@ -135,6 +138,7 @@ class User {
               map['notificationSettings'] as Map<String, dynamic>,
             )
           : const NotificationSettings(),
+      fcmToken: map['fcmToken'] as String?,
       createdAt: parseDateTime(map['createdAt']).toLocal(),
       updatedAt: tryParseDateTime(map['updatedAt'])?.toLocal(),
       deletedAt: tryParseDateTime(map['deletedAt'])?.toLocal(),
@@ -150,6 +154,7 @@ class User {
     ValueGetter<String?>? description,
     CharacterType? selectedCharacter,
     NotificationSettings? notificationSettings,
+    String? fcmToken,
     DateTime? createdAt,
     ValueGetter<DateTime?>? updatedAt,
     ValueGetter<DateTime?>? deletedAt,
@@ -163,6 +168,7 @@ class User {
       description: description != null ? description() : this.description,
       selectedCharacter: selectedCharacter ?? this.selectedCharacter,
       notificationSettings: notificationSettings ?? this.notificationSettings,
+      fcmToken: fcmToken ?? this.fcmToken,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt != null ? updatedAt() : this.updatedAt,
       deletedAt: deletedAt != null ? deletedAt() : this.deletedAt,
@@ -182,6 +188,7 @@ class User {
           description == other.description &&
           selectedCharacter == other.selectedCharacter &&
           notificationSettings == other.notificationSettings &&
+          fcmToken == other.fcmToken &&
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt &&
           deletedAt == other.deletedAt;
@@ -196,6 +203,7 @@ class User {
     description,
     selectedCharacter,
     notificationSettings,
+    fcmToken,
     createdAt,
     updatedAt,
     deletedAt,

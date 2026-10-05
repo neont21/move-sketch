@@ -38,20 +38,27 @@ import '../ui/settings/widgets/terms_of_service_screen.dart';
 import '../ui/shell/widgets/move_sketch_shell.dart';
 import 'routes.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
+
 final GlobalKey<NavigatorState> _homeNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'home',
 );
+
 final GlobalKey<NavigatorState> _feedNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'feed',
 );
+
 final GlobalKey<NavigatorState> _historyNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'history');
+
 final GlobalKey<NavigatorState> _meNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'me',
 );
+
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>(debugLabel: 'scaffoldMessenger');
 
 class RouterRefreshListenable extends ChangeNotifier {
   RouterRefreshListenable(Ref ref) {
@@ -66,7 +73,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(refreshListenable.dispose);
 
   return GoRouter(
-    navigatorKey: _rootNavigatorKey,
+    navigatorKey: rootNavigatorKey,
     refreshListenable: refreshListenable,
     initialLocation: Routes.landing,
     redirect: (context, state) {
@@ -108,7 +115,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => LandingScreen(),
       ),
       StatefulShellRoute.indexedStack(
-        parentNavigatorKey: _rootNavigatorKey,
+        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state, navigationShell) =>
             MoveSketchShell(navigationShell: navigationShell),
         branches: [

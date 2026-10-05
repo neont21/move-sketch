@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/social/notification_settings.dart';
@@ -34,8 +35,8 @@ final class UserRepositoryRemote implements UserRepository {
     }
 
     final hasSocialProvider = user.providerData.any(
-          (providerInfo) =>
-      providerInfo.providerId == 'google.com' ||
+      (providerInfo) =>
+          providerInfo.providerId == 'google.com' ||
           providerInfo.providerId == 'apple.com',
     );
 
@@ -207,6 +208,28 @@ final class UserRepositoryRemote implements UserRepository {
       );
     } catch (e) {
       return Result.error(DatabaseException('사용자 검색 중 오류가 발생했습니다.', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<void>> updateFcmToken(String? fcmToken) async {
+    final uid = authService.currentUid;
+    if (uid == null) {
+      return const Result.error(AuthException('로그인된 사용자가 없습니다.'));
+    }
+
+    try {
+      await userService.updateFcmToken(uid: uid, fcmToken: fcmToken);
+
+      return const Result.ok(null);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: 'FCM 토큰 갱신 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('FCM 토큰 갱신 중 오류가 발생했습니다.', cause: e),
+      );
     }
   }
 }

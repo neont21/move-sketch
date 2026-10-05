@@ -23,6 +23,7 @@ class MoveSketchApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: ref.watch(routerProvider),
       title: '무브스케치',
       theme: MoveSketchTheme.lightTheme,
