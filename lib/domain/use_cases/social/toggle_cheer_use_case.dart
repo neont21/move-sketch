@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
 import '../../../data/repositories/auth/auth_repository.dart';
 import '../../../data/repositories/notification/notification_repository.dart';
 import '../../../data/repositories/sketch_post/sketch_post_repository.dart';
@@ -59,9 +61,13 @@ class ToggleCheerUseCase {
       switch (sentResult) {
         case Ok():
           break;
-        case Error():
-          // TODO: Firebase Crashlytics: notification fail
-          break;
+        case Error(:final error):
+          FirebaseCrashlytics.instance.recordError(
+            error,
+            StackTrace.current,
+            reason: '스케치 응원 알림 전송 실패 (target: $targetUserId, sketch: $sketchId)',
+            fatal: false,
+          );
       }
     }());
   }

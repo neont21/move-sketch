@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
 import '../../../data/repositories/auth/auth_repository.dart';
 import '../../../data/repositories/friendship/friendship_repository.dart';
 import '../../../data/repositories/notification/notification_repository.dart';
@@ -57,9 +59,13 @@ class AcceptFriendRequestUseCase {
       switch (sentResult) {
         case Ok():
           break;
-        case Error():
-          // TODO: Firebase Crashlytics: notification fail
-          break;
+        case Error(:final error):
+          FirebaseCrashlytics.instance.recordError(
+            error,
+            StackTrace.current,
+            reason: '친구 수락 알림 전송 실패 (target: $targetUserId)',
+            fatal: false,
+          );
       }
     }());
   }

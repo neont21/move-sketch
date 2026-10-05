@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart' hide ActivityType;
@@ -46,7 +47,10 @@ class SessionTrackingState {
   double get distanceInKm => distanceInMeters / 1000.0;
   bool get isValidSession => distanceInMeters >= 10.0 && pathPoints.length >= 3;
 
-  factory SessionTrackingState.fromSession(TrackingSession session, {LocationPoint? initialLocation}) {
+  factory SessionTrackingState.fromSession(
+    TrackingSession session, {
+    LocationPoint? initialLocation,
+  }) {
     return SessionTrackingState(
       session: session,
       elapsedDuration: session.elapsedDuration,
@@ -282,8 +286,13 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
           (point) {
             _onNewLocationPoint(point);
           },
-          onError: (error) {
-            // TODO: Firebase Crashlytics: GPS Stream Error
+          onError: (error, trace) {
+            FirebaseCrashlytics.instance.recordError(
+              error,
+              trace,
+              reason: '운동 세션 GPS 위치 스트림 오류',
+              fatal: false,
+            );
           },
         );
   }
@@ -313,6 +322,9 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     _startTimer();
     _startLocationTracking();
 
+    FirebaseCrashlytics.instance.log(
+      '운동 세션 트래킹 시작: sessionId=${session.id}, activityType=${session.activityType.name}',
+    );
     final initialLoc = await ref
         .read(locationRepositoryProvider)
         .getLastKnownLocation();
@@ -329,6 +341,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       return;
     }
 
+    FirebaseCrashlytics.instance.log('운동 세션 일시정지 (sessionId=${current.session.id})');
     final sessionRepository = ref.read(sessionRepositoryProvider);
     await sessionRepository.pauseSession(current.session.id);
 
@@ -346,6 +359,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       return;
     }
 
+    FirebaseCrashlytics.instance.log('운동 세션 재개 (sessionId=${current.session.id})');
     final sessionRepository = ref.read(sessionRepositoryProvider);
     await sessionRepository.resumeSession(current.session.id);
 
@@ -366,6 +380,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     _timer?.cancel();
     _locationSubscription?.cancel();
 
+    FirebaseCrashlytics.instance.log('운동 세션 폐기 (sessionId=${current.session.id})');
     final sessionRepository = ref.read(sessionRepositoryProvider);
     await sessionRepository.discardSession(current.session.id);
   }
