@@ -52,6 +52,7 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
   Future<WeatherInfo?> _fetchWeather() async {
     final locationRepository = ref.read(locationRepositoryProvider);
     final weatherRepository = ref.read(weatherRepositoryProvider);
+    final geocodingRepository = ref.read(geocodingRepositoryProvider);
 
     double latitude;
     double longitude;
@@ -66,14 +67,26 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
         longitude = 126.9780;
     }
 
-    final weatherResult = await weatherRepository.getCurrentWeather(
+    final (weatherResult, koreanAddress) = await (
+    weatherRepository.getCurrentWeather(
       latitude: latitude,
       longitude: longitude,
-    );
-    return switch (weatherResult) {
-      Ok(:final value) => value,
-      Error() => null,
-    };
+    ),
+    geocodingRepository.reverseGeocode(
+      latitude: latitude,
+      longitude: longitude,
+    ),
+    ).wait;
+
+    switch (weatherResult) {
+      case Ok(:final value):
+        final finalCityName = (koreanAddress != '알 수 없는 위치' && koreanAddress.isNotEmpty)
+            ? koreanAddress
+            : value.cityName;
+        return value.copyWith(cityName: finalCityName);
+      case Error():
+        return null;
+    }
   }
 
   Future<SessionResult?> _fetchLatestResult(String userId) async {

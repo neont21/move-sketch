@@ -21,7 +21,7 @@ class WeatherInfo {
 
   String get shortSummary => '$condition ${temperature.round()}℃';
 
-  String get summaryWithCity => '$cityName $condition ${temperature.round()}℃';
+  String get summaryWithCity => '$cityName · $condition ${temperature.round()}℃';
 
   String get recommendation {
     if (condition.contains('뇌우') ||
