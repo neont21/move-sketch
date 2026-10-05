@@ -96,23 +96,6 @@ class UserCommentTile extends ConsumerWidget {
                         style: textTheme.bodyLarge,
                       ),
                     ),
-                    Text(
-                      comment.createdAt.formattedFeedTime,
-                      style: textTheme.labelMedium,
-                    ),
-                    if (!comment.isReply && !isAuthorDeleted && onReply != null)
-                      GestureDetector(
-                        onTap: () {
-                          onReply!(comment);
-                        },
-                        child: Text(
-                          '답글',
-                          style: textTheme.labelMedium?.copyWith(
-                            color: colorScheme.secondary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
                     const Spacer(),
                     BottomSheetButton(
                       author: comment.author,
@@ -130,6 +113,29 @@ class UserCommentTile extends ConsumerWidget {
                     textAlign: TextAlign.justify,
                   ),
                 ),
+                const SizedBox(height: 8,),
+                Row(
+                  spacing: 12,
+                  children: [
+                    Text(
+                      comment.createdAt.formattedFeedTime,
+                      style: textTheme.labelMedium,
+                    ),
+                    if (!comment.isReply && !isAuthorDeleted && onReply != null)
+                      GestureDetector(
+                        onTap: () {
+                          onReply!(comment);
+                        },
+                        child: Text(
+                          '답글',
+                          style: textTheme.labelMedium?.copyWith(
+                            color: colorScheme.secondary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                  ],
+                )
               ],
             ),
           ),
