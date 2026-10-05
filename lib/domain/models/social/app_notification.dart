@@ -10,7 +10,7 @@ class AppNotification {
   final String recipientId;
   final UserSummary sender;
   final NotificationType type;
-  final String? targetPostId;
+  final String? targetSketchId;
   final String? targetCommentId;
   final bool isRead;
   final DateTime createdAt;
@@ -21,7 +21,7 @@ class AppNotification {
     required this.sender,
     required this.type,
     required this.createdAt,
-    this.targetPostId,
+    this.targetSketchId,
     this.targetCommentId,
     this.isRead = false,
   });
@@ -35,7 +35,7 @@ class AppNotification {
     required String recipientId,
     required UserSummary sender,
     required NotificationType type,
-    String? targetPostId,
+    String? targetSketchId,
     String? targetCommentId,
   }) {
     return AppNotification(
@@ -43,7 +43,7 @@ class AppNotification {
       recipientId: recipientId,
       sender: sender,
       type: type,
-      targetPostId: targetPostId,
+      targetSketchId: targetSketchId,
       targetCommentId: targetCommentId,
       isRead: false,
       createdAt: DateTime.now(),
@@ -56,7 +56,7 @@ class AppNotification {
       'recipientId': recipientId,
       'sender': sender.toMap(),
       'type': type.name,
-      'targetPostId': targetPostId,
+      'targetSketchId': targetSketchId,
       'targetCommentId': targetCommentId,
       'isRead': isRead,
       'createdAt': createdAt.toUtc().toIso8601String(),
@@ -69,7 +69,7 @@ class AppNotification {
       recipientId: map['recipientId'] as String,
       sender: UserSummary.fromMap(map['sender'] as Map<String, dynamic>),
       type: NotificationType.fromString(map['type'] as String?),
-      targetPostId: map['targetPostId'] as String?,
+      targetSketchId: map['targetSketchId'] as String?,
       targetCommentId: map['targetCommentId'] as String?,
       isRead: map['isRead'] as bool? ?? false,
       createdAt: parseDateTime(map['createdAt']).toLocal(),
@@ -81,7 +81,7 @@ class AppNotification {
     String? recipientId,
     UserSummary? sender,
     NotificationType? type,
-    String? targetPostId,
+    String? targetSketchId,
     String? targetCommentId,
     bool? isRead,
     DateTime? createdAt,
@@ -91,7 +91,7 @@ class AppNotification {
       recipientId: recipientId ?? this.recipientId,
       sender: sender ?? this.sender,
       type: type ?? this.type,
-      targetPostId: targetPostId ?? this.targetPostId,
+      targetSketchId: targetSketchId ?? this.targetSketchId,
       targetCommentId: targetCommentId ?? this.targetCommentId,
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,

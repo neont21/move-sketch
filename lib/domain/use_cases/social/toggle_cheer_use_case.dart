@@ -49,7 +49,7 @@ class ToggleCheerUseCase {
         recipientId: targetUserId,
         sender: senderSummary,
         type: NotificationType.cheer,
-        targetPostId: sketchId,
+        targetSketchId: sketchId,
       );
 
       final sentResult = await notificationRepository.sendNotification(

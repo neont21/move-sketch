@@ -91,7 +91,6 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
       return;
     }
 
-    final String? title = message.notification?.title;
     final String? body = message.notification?.body;
     if (body == null) {
       return;
@@ -100,7 +99,6 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
     final String destinationRoute = _determineDestinationRoute(message);
 
     _showInAppNotificationSnackBar(
-      title: title,
       body: body,
       destinationRoute: destinationRoute,
     );
@@ -126,16 +124,16 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
       typeString,
     );
 
-    final String? targetPostId =
-        (message.data['targetPostId'] ?? message.data['sketchId']) as String?;
+    final String? targetSketchId =
+        (message.data['targetSketchId'] ?? message.data['sketchId']) as String?;
     final String? senderUsername = message.data['senderUsername'] as String?;
 
     return switch (notificationType) {
       NotificationType.comment ||
       NotificationType.reply ||
       NotificationType.cheer =>
-        (targetPostId != null && targetPostId.isNotEmpty)
-            ? Routes.feedNotificationPost(targetPostId)
+        (targetSketchId != null && targetSketchId.isNotEmpty)
+            ? Routes.feedNotificationPost(targetSketchId)
             : Routes.feedNotifications,
       NotificationType.requestFriend || NotificationType.acceptFriend =>
         (senderUsername != null && senderUsername.isNotEmpty)
@@ -146,7 +144,6 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
   }
 
   void _showInAppNotificationSnackBar({
-    String? title,
     required String body,
     required String destinationRoute,
   }) {
@@ -158,7 +155,7 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
-        content: Text(title != null ? '$title: $body' : body),
+        content: Text(body),
         action: SnackBarAction(
           label: '보기',
           onPressed: () {

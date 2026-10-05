@@ -44,7 +44,7 @@ class AddCommentUseCase {
         recipientId: targetUserId,
         sender: sender,
         type: type,
-        targetPostId: sketchId,
+        targetSketchId: sketchId,
         targetCommentId: commentId,
       );
 
