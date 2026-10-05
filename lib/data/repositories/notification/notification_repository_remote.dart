@@ -34,21 +34,17 @@ final class NotificationRepositoryRemote implements NotificationRepository {
   }
 
   @override
-  Future<Result<bool>> hasUnreadNotifications(String currentUserId) async {
-    try {
-      final hasUnread = await notificationService.hasUnreadNotifications(
-        currentUserId,
-      );
-      return Result.ok(hasUnread);
-    } on FirebaseException catch (e) {
-      return Result.error(
-        e.toAppException(defaultMessage: '안 읽은 알림 조회 중 오류가 발생했습니다.'),
-      );
-    } catch (e) {
-      return Result.error(
-        DatabaseException('안 읽은 알림 조회 중 오류가 발생했습니다.', cause: e),
-      );
-    }
+  Stream<bool> watchHasUnreadNotifications(String currentUserId) {
+    return notificationService
+        .watchHasUnreadNotifications(currentUserId)
+        .handleError((error) {
+          if (error is FirebaseException) {
+            throw error.toAppException(
+              defaultMessage: '안 읽은 알림 조회 중 오류가 발생했습니다.',
+            );
+          }
+          throw DatabaseException('안 읽은 알림 조회 중 오류가 발생했습니다.', cause: error);
+        });
   }
 
   @override

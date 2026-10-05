@@ -60,6 +60,15 @@ class NotificationService {
     }).toList();
   }
 
+  Stream<bool> watchHasUnreadNotifications(String userId) {
+    return _notificationsRef
+        .where('recipientId', isEqualTo: userId)
+        .where('isRead', isEqualTo: false)
+        .limit(1)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.isNotEmpty);
+  }
+
   Future<void> markAsRead(String notificationId) async {
     await _notificationsRef.doc(notificationId).update({
       'isRead': true,

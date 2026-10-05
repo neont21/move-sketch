@@ -9,8 +9,8 @@ abstract interface class NotificationRepository {
     DateTime? lastCreatedAt,
   });
 
-  /// 안 읽은 알림의 존재 여부를 확인한다. (피드 탭 > 상단 인디케이터)
-  Future<Result<bool>> hasUnreadNotifications(String currentUserId);
+  /// 안 읽은 알림의 존재 여부를 구독한다. (피드 탭 > 상단 인디케이터)
+  Stream<bool> watchHasUnreadNotifications(String currentUserId);
 
   /// 특정 알림을 읽음 처리한다.
   Future<Result<void>> markAsRead(String notificationId);

@@ -175,21 +175,15 @@ final feedNotificationsViewModelProvider =
       return FeedNotificationsViewModel();
     });
 
-final hasUnreadNotificationsProvider = FutureProvider.autoDispose<bool>((
+final hasUnreadNotificationsProvider = StreamProvider.autoDispose<bool>((
   ref,
-) async {
+) async* {
   final user = await ref.watch(authViewModelProvider.future);
   if (user == null) {
-    return false;
+    yield false;
+    return;
   }
 
   final notificationRepository = ref.read(notificationRepositoryProvider);
-  final result = await notificationRepository.hasUnreadNotifications(user.uid);
-
-  switch (result) {
-    case Ok(:final value):
-      return value;
-    case Error():
-      return false;
-  }
+  yield* notificationRepository.watchHasUnreadNotifications(user.uid);
 });
