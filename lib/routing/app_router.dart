@@ -6,7 +6,6 @@ import '../domain/models/social/social_auth_result.dart';
 import '../domain/models/social/social_onboarding_profile.dart';
 import '../domain/models/social/user.dart';
 import '../ui/auth/view_models/auth_viewmodel.dart';
-import '../ui/auth/widgets/landing_screen.dart';
 import '../ui/auth/widgets/login_screen.dart';
 import '../ui/auth/widgets/reset_password_screen.dart';
 import '../ui/auth/widgets/signup_complete_screen.dart';
@@ -75,7 +74,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     refreshListenable: refreshListenable,
-    initialLocation: Routes.landing,
+    initialLocation: Routes.home,
     redirect: (context, state) {
       final authState = ref.read(authViewModelProvider);
 
@@ -87,7 +86,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
 
       final isPublicRoute =
-          location == Routes.landing ||
           location.startsWith(Routes.auth) ||
           location == Routes.privacy ||
           location == Routes.tos ||
@@ -98,7 +96,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       final isAuthRoute =
-          location == Routes.landing ||
           location == Routes.auth ||
           location == Routes.login ||
           location == Routes.resetPassword;
@@ -111,8 +108,8 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(
-        path: Routes.landing,
-        builder: (context, state) => LandingScreen(),
+        path: '/',
+        redirect: (context, state) => Routes.home,
       ),
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: rootNavigatorKey,
