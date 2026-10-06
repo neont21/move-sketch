@@ -56,3 +56,8 @@ android/app/*.keystore
 
 # Environment variables
 env*.json
+
+# Firebase Hosting deployment cache
+.firebase/
+# Android Gradle build outputs
+/android/build/

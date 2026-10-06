@@ -37,6 +37,7 @@ class MoveSketchApp extends ConsumerWidget {
       routerConfig: ref.watch(routerProvider),
       title: '무브스케치',
       theme: MoveSketchTheme.lightTheme,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

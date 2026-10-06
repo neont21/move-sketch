@@ -139,7 +139,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ? NetworkImage(latestResult.resultSketchImageUrl!)
                         : const AssetImage(Assets.sampleSketch),
                     caption: latestResult != null
-                        ? latestResult.endedAt.formattedDateDot
+                        ? '${latestResult.endedAt.formattedDateDot} ${latestResult.activityType.label}'
                         : '첫 장을 기다리는 중',
                     isHome: true,
                   ),
