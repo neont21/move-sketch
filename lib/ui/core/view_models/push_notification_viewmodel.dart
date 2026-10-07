@@ -95,6 +95,13 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
       'FCM 포그라운드 메시지 수신: type=${message.data['type']}, targetSketchId=${message.data['targetSketchId']}',
     );
 
+    final notificationType = NotificationType.fromString(
+      message.data['type'] as String?,
+    );
+    if (notificationType == NotificationType.reminder) {
+      return;
+    }
+
     final isSessionRunning = await _isSessionOngoing();
     if (isSessionRunning) {
       return;
@@ -148,6 +155,7 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
         (senderUsername != null && senderUsername.isNotEmpty)
             ? Routes.feedNotificationProfile(senderUsername)
             : Routes.feedNotifications,
+      NotificationType.reminder => Routes.sessionStart,
       NotificationType.unknown => Routes.feedNotifications,
     };
   }

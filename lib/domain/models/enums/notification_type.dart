@@ -13,6 +13,10 @@ enum NotificationType {
     notification: '님이 친구 요청을 수락했어요.',
     base: '/feed/notifications/profile/',
   ),
+  reminder(
+    notification: '오늘의 운동을 시작해 볼까요?',
+    base: '/session-start'
+  ),
   unknown(notification: '님의 알 수 없는 알림.', base: '/');
 
   final String notification;
