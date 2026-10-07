@@ -4,6 +4,7 @@ import '../../../config/dependencies.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../profile/view_models/my_profile_viewmodel.dart';
 import '../../profile/view_models/user_profile_viewmodel.dart';
 import '../../settings/view_models/blocked_users_viewmodel.dart';
 import '../view_models/friends_viewmodel.dart';
@@ -15,9 +16,10 @@ abstract final class FriendshipActionHandler {
     String targetUsername,
   ) {
     ref.invalidate(friendsViewModelProvider);
-    ref.invalidate(userSearchViewModelProvider);
+    ref.invalidate(myProfileViewModelProvider);
     ref.invalidate(userProfileViewModelProvider(targetUsername));
     ref.invalidate(blockedUsersViewModelProvider);
+    ref.read(userSearchViewModelProvider.notifier).refreshFriendshipStatus();
   }
 
   static Future<Result<void>> sendRequest(

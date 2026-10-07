@@ -151,6 +151,61 @@ class UserSearchViewModel extends AsyncNotifier<UserSearchState> {
         return Result.error(error);
     }
   }
+
+  Future<void> refreshFriendshipStatus() async {
+    final current = state.value;
+    if (current == null) {
+      return;
+    }
+
+    final user = await ref.read(authViewModelProvider.future);
+    if (user == null) {
+      return;
+    }
+
+    final friendshipRepository = ref.read(friendshipRepositoryProvider);
+
+    final (
+      recommendedResult,
+      friendsResult,
+      sentRequestsResult,
+      receivedRequestsResult,
+    ) = await (
+      friendshipRepository.getRecommendedFriends(user.uid),
+      friendshipRepository.getFriends(user.uid),
+      friendshipRepository.getSentFriendRequests(user.uid),
+      friendshipRepository.getReceivedFriendRequests(user.uid),
+    ).wait;
+
+    final recommendedUsers = switch (recommendedResult) {
+      Ok(:final value) => value,
+      Error() => current.recommendedUsers,
+    };
+
+    final friendIds = switch (friendsResult) {
+      Ok(:final value) => value.map((target) => target.uid).toSet(),
+      Error() => current.friendIds,
+    };
+
+    final sentRequestIds = switch (sentRequestsResult) {
+      Ok(:final value) => value.map((target) => target.uid).toSet(),
+      Error() => current.sentRequestIds,
+    };
+
+    final receivedRequestIds = switch (receivedRequestsResult) {
+      Ok(:final value) => value.map((target) => target.uid).toSet(),
+      Error() => current.receivedRequestIds,
+    };
+
+    state = AsyncData(
+      current.copyWith(
+        recommendedUsers: recommendedUsers,
+        friendIds: friendIds,
+        sentRequestIds: sentRequestIds,
+        receivedRequestIds: receivedRequestIds,
+      ),
+    );
+  }
 }
 
 final userSearchViewModelProvider =
