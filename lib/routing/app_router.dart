@@ -158,6 +158,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                           final username = state.pathParameters['username']!;
                           return UserProfileScreen(username: username);
                         },
+                        routes: <RouteBase>[
+                          GoRoute(
+                            path: Routes.userProfilePostRelative,
+                            builder: (BuildContext context, GoRouterState state) {
+                              final String sketchIdentifier =
+                              state.pathParameters['sketch_id']!;
+                              return FeedPostScreen(sketchId: sketchIdentifier);
+                            },
+                          ),
+                        ],
                       ),
                     ],
                   ),
