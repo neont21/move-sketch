@@ -10,6 +10,8 @@ import '../../../utils/result.dart';
 import '../../core/widgets/error_retry_view.dart';
 import '../../feed/view_models/feed_post_viewmodel.dart';
 import '../../feed/view_models/feed_viewmodel.dart';
+import '../../history/view_models/history_details_viewmodel.dart';
+import '../../history/view_models/history_viewmodel.dart';
 import '../view_models/session_share_viewmodel.dart';
 import 'sketch_card.dart';
 
@@ -61,13 +63,28 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
 
     switch (result) {
       case Ok():
+        ref.invalidate(feedViewModelProvider);
+        ref.invalidate(historyViewModelProvider);
+        ref.invalidate(historyDetailsViewModelProvider(widget.sessionId));
+
+        final currentMatchedLocation = GoRouterState.of(
+          context,
+        ).matchedLocation;
+        final isNavigatedFromHistory = currentMatchedLocation.startsWith(
+          Routes.history,
+        );
+
         if (state.isEdit && context.canPop()) {
           ref.invalidate(feedPostViewModelProvider(widget.sessionId));
-          ref.invalidate(feedViewModelProvider);
           context.pop();
         } else {
-          ref.invalidate(feedViewModelProvider);
-          context.go(Routes.feedPost(widget.sessionId));
+          final router = GoRouter.of(context);
+
+          if (isNavigatedFromHistory) {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          }
+
+          router.go(Routes.feedPost(widget.sessionId));
         }
       case Error(:final error):
         final errorMessage = error is AppException
