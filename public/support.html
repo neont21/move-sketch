@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>무브스케치(MoveSketch) 고객 지원 및 도움말</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #212121;
+            --secondary-text: #616161;
+            --brand-color: #E65100;
+            --card-bg: #FFF8F5;
+            --border-color: #EEEEEE;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --text-color: #E0E0E0;
+                --secondary-text: #9E9E9E;
+                --brand-color: #FF8A65;
+                --card-bg: #1E1E1E;
+                --border-color: #333333;
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+        header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 8px;
+            color: var(--brand-color);
+        }
+        .meta {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--brand-color);
+            padding-left: 10px;
+        }
+        p, li {
+            font-size: 0.98rem;
+        }
+        .info-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px 20px;
+            margin: 20px 0;
+        }
+        .contact-button {
+            display: inline-block;
+            background-color: var(--brand-color);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .faq-item {
+            margin-bottom: 20px;
+        }
+        .faq-question {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+        .faq-answer {
+            color: var(--secondary-text);
+            margin: 0;
+        }
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+            text-align: center;
+        }
+        a {
+            color: var(--brand-color);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>무브스케치 고객 지원 (Support)</h1>
+        <div class="meta">MoveSketch 고객 지원 센터 및 자주 묻는 질문(FAQ)</div>
+    </header>
+
+    <main>
+        <section>
+            <h2>1. 개발자 문의 및 고객 지원</h2>
+            <p>무브스케치를 이용해 주셔서 감사합니다. 앱 이용 중 발생한 오류 제보, 피드백, 기능 제안 또는 계정 관련 문의는 아래 담당자 이메일로 접수해 주시면 신속하게 답변해 드리겠습니다.</p>
+            <div class="info-box">
+                <strong>담당자:</strong> 정주원 (무브스케치 개발 및 운영팀)<br>
+                <strong>지원 이메일:</strong> neont21@gmail.com<br>
+                <strong>운영 시간:</strong> 상시 접수 (순차 회신)<br>
+                <a href="mailto:neont21@gmail.com?subject=[무브스케치 문의]" class="contact-button">이메일로 문의하기</a>
+            </div>
+        </section>
+
+        <section>
+            <h2>2. 자주 묻는 질문 (FAQ)</h2>
+            <div class="faq-item">
+                <div class="faq-question">Q. 운동 기록 중 화면이 꺼져도 경로가 계속 기록되나요?</div>
+                <div class="faq-answer">네, 무브스케치는 백그라운드 위치 추적 기능을 지원하므로 화면이 꺼지거나 다른 앱을 사용하는 중에도 정상적으로 운동 궤적이 기록됩니다. 단, 기기의 '위치 서비스 권한'이 '항상 허용'으로 설정되어 있어야 합니다.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Q. 피드에 운동 경로를 공유하면 제 집 주소 등 민감한 위치가 노출되나요?</div>
+                <div class="faq-answer">아닙니다. 무브스케치는 사용자의 사생활 보호를 위해 세부 궤적 좌표를 공개하지 않으며, 사용자가 직접 선택한 대표 지점(출발/경유/도착지 중 1곳)의 개략적 지명만 표기하는 안심 마스킹 기능을 기본 적용하고 있습니다.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Q. 회원 탈퇴 및 데이터 삭제는 어떻게 하나요?</div>
+                <div class="faq-answer">앱 내 [설정] 메뉴의 계정 관리 화면에서 즉시 회원 탈퇴 및 계정 삭제를 진행하실 수 있습니다. 탈퇴 시 사용자의 모든 운동 기록과 개인 데이터는 즉시 복구 불가능한 상태로 영구 파기됩니다.</div>
+            </div>
+        </section>
+
+        <section>
+            <h2>3. 관련 정책 안내</h2>
+            <p>
+                • <a href="/privacy.html">개인정보 처리방침 (Privacy Policy)</a><br>
+                • <a href="/terms.html">이용약관 (Terms of Service)</a>
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        &copy; 2026 MoveSketch. All rights reserved.
+    </footer>
+</div>
+</body>
+</html>
