@@ -4,6 +4,7 @@ export type NotificationType =
   | "cheer"
   | "requestFriend"
   | "acceptFriend"
+  | "reminder"
   | "unknown";
 
 export interface SenderSummary {
