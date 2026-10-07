@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:http/http.dart' as http;
 import '../../../domain/models/weather/weather_info.dart';
 import '../../../utils/exceptions.dart';
@@ -46,11 +47,25 @@ final class WeatherRepositoryRemote implements WeatherRepository {
       return Result.error(NetworkException('날씨 서버 응답 시간이 초과되었습니다.', cause: e));
     } on HttpException catch (e) {
       return Result.error(NetworkException(e.message, cause: e));
-    } on FormatException catch (e) {
+    }on FormatException catch (e, trace) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        trace,
+        reason: 'OpenWeatherMap 응답 데이터 역직렬화 실패',
+        fatal: false,
+      );
       return Result.error(
         NetworkException('날씨 데이터 형식이 올바르지 않거나 API 키가 설정되지 않았습니다.', cause: e),
       );
-    } on ApiException catch (e) {
+    } on ApiException catch (e, trace) {
+      if (e.statusCode == 401) {
+        FirebaseCrashlytics.instance.recordError(
+          e,
+          trace,
+          reason: 'OpenWeatherMap API 인증 실패 (API Key 검증 필요)',
+          fatal: false,
+        );
+      }
       final exception = switch (e.statusCode) {
         401 => const NetworkException('유효하지 않은 날씨 API 키입니다.'),
         404 => const NotFoundException('해당 위치의 날씨 정보를 찾을 수 없습니다.'),
