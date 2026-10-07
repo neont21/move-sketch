@@ -31,16 +31,30 @@ class SketchImageRenderer {
         );
         final dst = Rect.fromLTWH(0, 0, width, height);
 
-        final paint = ui.Paint()..isAntiAlias = true;
+        final basePaint = ui.Paint()..isAntiAlias = true;
         if (part.supportsTint &&
             composition.tintColors.containsKey(part.slot)) {
-          final tintInt = composition.tintColors[part.slot]!;
-          paint.colorFilter = ui.ColorFilter.mode(
-            ui.Color(tintInt),
-            ui.BlendMode.hue,
-          );
+          final tintColorValue = composition.tintColors[part.slot]!;
+          final tintPaint = ui.Paint()
+            ..isAntiAlias = true
+            ..colorFilter = ui.ColorFilter.mode(
+              ui.Color(tintColorValue),
+              ui.BlendMode.color,
+            );
+
+          canvas.saveLayer(dst, basePaint);
+
+          canvas.drawImageRect(image, src, dst, tintPaint);
+
+          final maskPaint = ui.Paint()
+            ..isAntiAlias = true
+            ..blendMode = ui.BlendMode.dstIn;
+          canvas.drawImageRect(image, src, dst, maskPaint);
+
+          canvas.restore();
+        } else {
+          canvas.drawImageRect(image, src, dst, basePaint);
         }
-        canvas.drawImageRect(image, src, dst, paint);
         drawnAny = true;
       } catch (_) {
         // 아직 추가되지 않은 에셋이나 로드 실패 파일은 무시하고 안전하게 진행
