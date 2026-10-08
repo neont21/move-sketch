@@ -23,6 +23,44 @@ class SessionTrackingScreen extends ConsumerWidget {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
+  void _onActionTriggered(
+    BuildContext context,
+    WidgetRef ref,
+    SessionTrackingState state,
+  ) async {
+    if (!state.isValidSession) {
+      final messenger = ScaffoldMessenger.of(context);
+      final colorScheme = Theme.of(context).colorScheme;
+      await ref
+          .read(sessionTrackingViewModelProvider.notifier)
+          .discardSession();
+      if (!context.mounted) return;
+      context.go(Routes.home);
+      messenger.showSnackBar(
+        SnackBar(
+          content: const Text('운동 기록이 너무 짧아 저장되지 않았습니다.'),
+          backgroundColor: colorScheme.secondary,
+        ),
+      );
+      return;
+    }
+    context.go(Routes.sessionResult(state.session.id));
+  }
+
+  void _onEarlyReleased(BuildContext context) {
+    final messenger = ScaffoldMessenger.of(context);
+
+    final double bottomMargin = MediaQuery.viewPaddingOf(context).bottom + 80;
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(
+        content: const Text('종료하려면 3초 이상 길게 눌러 주세요.'),
+        duration: const Duration(seconds: 2),
+        margin: EdgeInsets.fromLTRB(20, 0, 20, bottomMargin),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -164,36 +202,10 @@ class SessionTrackingScreen extends ConsumerWidget {
                             height: 60,
                             child: HoldButton(
                               title: '종료',
-                              onActionTriggered: () async {
-                                if (!state.isValidSession) {
-                                  final messenger = ScaffoldMessenger.of(
-                                    context,
-                                  );
-                                  final colorScheme = Theme.of(
-                                    context,
-                                  ).colorScheme;
-                                  await ref
-                                      .read(
-                                        sessionTrackingViewModelProvider
-                                            .notifier,
-                                      )
-                                      .discardSession();
-                                  if (!context.mounted) return;
-                                  context.go(Routes.home);
-                                  messenger.showSnackBar(
-                                    SnackBar(
-                                      content: const Text(
-                                        '운동 기록이 너무 짧아 저장되지 않았습니다.',
-                                      ),
-                                      backgroundColor: colorScheme.secondary,
-                                    ),
-                                  );
-                                  return;
-                                }
-                                context.go(
-                                  Routes.sessionResult(state.session.id),
-                                );
-                              },
+                              onActionTriggered: () =>
+                                  _onActionTriggered(context, ref, state),
+                              onEarlyRelease: () =>
+                                  _onEarlyReleased(context),
                             ),
                           ),
                         ),

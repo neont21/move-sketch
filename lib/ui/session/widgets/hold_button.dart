@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 class HoldButton extends StatefulWidget {
   final String title;
   final VoidCallback onActionTriggered;
+  final VoidCallback? onEarlyRelease;
+
   const HoldButton({
     super.key,
     required this.title,
     required this.onActionTriggered,
+    this.onEarlyRelease,
   });
 
   @override
@@ -46,8 +49,18 @@ class _HoldButtonState extends State<HoldButton>
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: (_) => _animationController.forward(),
-      onTapUp: (_) => _animationController.reverse(),
-      onTapCancel: () => _animationController.reverse(),
+      onTapUp: (_) {
+        if (!_animationController.isCompleted) {
+          widget.onEarlyRelease?.call();
+        }
+        _animationController.reverse();
+      },
+      onTapCancel: () {
+        if (!_animationController.isCompleted) {
+          widget.onEarlyRelease?.call();
+        }
+        _animationController.reverse();
+      },
       child: AnimatedBuilder(
         animation: _animationController,
         builder: (context, child) {
