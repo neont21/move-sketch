@@ -5,21 +5,27 @@ class WeeklyIndicator extends StatelessWidget {
 
   const WeeklyIndicator({super.key, required this.isDone});
 
-  List<Container> generateIndicator(ColorScheme colorScheme) {
-    List<Container> indicator = [];
-    for (var i = 0; i < 7; i++) {
-      indicator.add(
-        Container(
-          height: isDone[i] ? 20 : 10,
-          width: 8,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: isDone[i] ? colorScheme.primary : colorScheme.outlineVariant,
+  SizedBox _buildIndicator(ColorScheme colorScheme) {
+    return SizedBox(
+      height: 16,
+      child: Row(
+        spacing: 8,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: List.generate(
+          7,
+          (index) => Container(
+            width: 8,
+            height: isDone[index] ? 16 : 8,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              color: isDone[index]
+                  ? colorScheme.primary
+                  : colorScheme.outlineVariant,
+            ),
           ),
         ),
-      );
-    }
-    return indicator;
+      ),
+    );
   }
 
   @override
@@ -34,10 +40,10 @@ class WeeklyIndicator extends StatelessWidget {
 
     return Row(
       spacing: 8,
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(message, style: textTheme.bodyLarge),
-        ...generateIndicator(colorScheme),
+        _buildIndicator(colorScheme),
       ],
     );
   }
