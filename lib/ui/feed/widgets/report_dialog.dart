@@ -108,6 +108,7 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
               children: ReportType.values.map((reason) {
                 return RadioListTile<ReportType>(
                   dense: true,
+                  visualDensity: VisualDensity.compact,
                   contentPadding: EdgeInsets.zero,
                   activeColor: colorScheme.primary,
                   title: Text(reason.label, style: textTheme.bodyMedium),
@@ -119,7 +120,9 @@ class _ReportDialogState extends ConsumerState<ReportDialog> {
           if (_reportType == ReportType.other)
             TextField(
               maxLength: 60,
-              maxLines: 4,
+              maxLines: 2,
+              minLines: 1,
+              controller: _descriptionController,
               decoration: InputDecoration(
                 hintText: '신고 사유를 간략히 적어주세요.',
                 hintStyle: textTheme.labelMedium,
