@@ -61,9 +61,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               const SizedBox(height: 8.0),
               Text(
                 '시행일자: 2026년 10월 6일 | 버전: 1.0.0',
-                style: textTheme.labelMedium?.copyWith(
-                  color: colorScheme.outline,
-                ),
+                style: textTheme.labelMedium,
               ),
               const Divider(height: 32.0),
               _buildSection(
