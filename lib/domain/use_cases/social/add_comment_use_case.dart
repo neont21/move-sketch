@@ -119,6 +119,16 @@ class AddCommentUseCase {
                   type: NotificationType.reply,
                 );
               }
+              if (sketchAuthorId != currentUserId &&
+                  sketchAuthorId != parentCommentAuthorId) {
+                _dispatchNotification(
+                  targetUserId: sketchAuthorId,
+                  sketchId: sketchId,
+                  commentId: savedComment.id,
+                  sender: currentUser,
+                  type: NotificationType.comment,
+                );
+              }
             } else {
               if (sketchAuthorId != currentUserId) {
                 _dispatchNotification(
