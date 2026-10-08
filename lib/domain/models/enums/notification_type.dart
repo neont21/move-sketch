@@ -17,6 +17,10 @@ enum NotificationType {
     notification: '오늘의 운동을 시작해 볼까요?',
     base: '/session-start'
   ),
+  notice(
+    notification: '새로운 공지사항이 등록되었어요.',
+    base: '/feed/notifications/notices/'
+  ),
   unknown(notification: '님의 알 수 없는 알림.', base: '/');
 
   final String notification;

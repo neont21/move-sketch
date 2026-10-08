@@ -143,6 +143,7 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
     final String? targetSketchId =
         (message.data['targetSketchId'] ?? message.data['sketchId']) as String?;
     final String? senderUsername = message.data['senderUsername'] as String?;
+    final String? targetNoticeId = message.data['targetNoticeId'] as String?;
 
     return switch (notificationType) {
       NotificationType.comment ||
@@ -156,6 +157,10 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
             ? Routes.feedNotificationProfile(senderUsername)
             : Routes.feedNotifications,
       NotificationType.reminder => Routes.sessionStart,
+      NotificationType.notice =>
+      (targetNoticeId != null && targetNoticeId.isNotEmpty)
+          ? Routes.feedNotificationNotice(targetNoticeId)
+          : Routes.feedNotifications,
       NotificationType.unknown => Routes.feedNotifications,
     };
   }

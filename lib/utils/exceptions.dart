@@ -45,6 +45,10 @@ class StorageException extends AppException {
   const StorageException(super.message, {super.cause});
 }
 
+class ExternalAppException extends AppException {
+  const ExternalAppException(super.message, {super.cause});
+}
+
 class ApiException extends AppException {
   final int? statusCode;
 

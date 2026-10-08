@@ -30,6 +30,10 @@ abstract final class Routes {
   static const feedNotificationsRelative = 'notifications';
   static const feedNotifications = '$feed/$feedNotificationsRelative';
 
+  static const noticeRelative = 'notice/:notice_id';
+  static String feedNotificationNotice(String noticeId) =>
+      '$feedNotifications/notice/$noticeId';
+
   static String feedNotificationPost(String sketchId) =>
       '$feedNotifications/post/$sketchId';
   static String feedNotificationProfile(String username) =>

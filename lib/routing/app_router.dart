@@ -14,6 +14,7 @@ import '../ui/auth/widgets/social_onboarding_screen.dart';
 import '../ui/feed/widgets/feed_notifications_screen.dart';
 import '../ui/feed/widgets/feed_screen.dart';
 import '../ui/feed/widgets/feed_post_screen.dart';
+import '../ui/feed/widgets/notice_detail_screen.dart';
 import '../ui/friends/widgets/friends_list_screen.dart';
 import '../ui/friends/widgets/user_search_screen.dart';
 import '../ui/history/widgets/history_details_screen.dart';
@@ -107,10 +108,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        redirect: (context, state) => Routes.home,
-      ),
+      GoRoute(path: '/', redirect: (context, state) => Routes.home),
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state, navigationShell) =>
@@ -158,16 +156,23 @@ final routerProvider = Provider<GoRouter>((ref) {
                           final username = state.pathParameters['username']!;
                           return UserProfileScreen(username: username);
                         },
-                        routes: <RouteBase>[
+                        routes: [
                           GoRoute(
                             path: Routes.userProfilePostRelative,
-                            builder: (BuildContext context, GoRouterState state) {
-                              final String sketchIdentifier =
-                              state.pathParameters['sketch_id']!;
-                              return FeedPostScreen(sketchId: sketchIdentifier);
+                            builder: (context, state) {
+                              final sketchId =
+                                  state.pathParameters['sketch_id']!;
+                              return FeedPostScreen(sketchId: sketchId);
                             },
                           ),
                         ],
+                      ),
+                      GoRoute(
+                        path: Routes.noticeRelative,
+                        builder: (context, state) {
+                          final noticeId = state.pathParameters['notice_id']!;
+                          return NoticeDetailScreen(noticeId: noticeId);
+                        },
                       ),
                     ],
                   ),

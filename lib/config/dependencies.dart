@@ -9,6 +9,8 @@ import '../data/repositories/geocoding/geocoding_repository.dart';
 import '../data/repositories/geocoding/geocoding_repository_remote.dart';
 import '../data/repositories/location/location_repository.dart';
 import '../data/repositories/location/location_repository_local.dart';
+import '../data/repositories/notification/notice_repository.dart';
+import '../data/repositories/notification/notice_repository_remote.dart';
 import '../data/repositories/notification/notification_repository.dart';
 import '../data/repositories/notification/notification_repository_remote.dart';
 import '../data/repositories/notification/push_notification_repository.dart';
@@ -32,6 +34,7 @@ import '../data/services/local/session_service.dart';
 import '../data/services/remote/auth_service.dart';
 import '../data/services/remote/firebase_messaging_service.dart';
 import '../data/services/remote/firestore/friendship_service.dart';
+import '../data/services/remote/firestore/notice_service.dart';
 import '../data/services/remote/firestore/notification_service.dart';
 import '../data/services/remote/firestore/report_service.dart';
 import '../data/services/remote/firestore/session_result_service.dart';
@@ -130,6 +133,11 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
 });
 
+/// NoticeService: Firestore 기반 공지사항 알림 관리
+final noticeServiceProvider = Provider<NoticeService>((ref) {
+  return NoticeService();
+});
+
 /// FirebaseMessagingService Provider: FCM SDK 기반 기기 토큰 및 푸시 수신
 final firebaseMessagingServiceProvider = Provider<FirebaseMessagingService>((ref) {
   return FirebaseMessagingService();
@@ -225,6 +233,14 @@ final friendshipRepositoryProvider = Provider<FriendshipRepository>((ref) {
 final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   return NotificationRepositoryRemote(
     notificationService: ref.watch(notificationServiceProvider),
+  );
+});
+
+/// NoticeRepository Provider: 공지사항 상세 정보 저장소
+/// 공지사항 알림의 상세 내역 제공
+final noticeRepositoryProvider = Provider<NoticeRepository>((ref) {
+  return NoticeRepositoryRemote(
+    noticeService: ref.watch(noticeServiceProvider),
   );
 });
 

@@ -30,6 +30,11 @@ class NotificationCard extends StatelessWidget {
         return Routes.feedNotificationProfile(notification.sender.username);
       case NotificationType.reminder:
         return Routes.sessionStart;
+      case NotificationType.notice:
+        if (notification.targetNoticeId != null) {
+          return Routes.feedNotificationNotice(notification.targetNoticeId!);
+        }
+        return null;
       case NotificationType.unknown:
         return null;
     }

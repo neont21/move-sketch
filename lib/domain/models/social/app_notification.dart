@@ -12,6 +12,7 @@ class AppNotification {
   final NotificationType type;
   final String? targetSketchId;
   final String? targetCommentId;
+  final String? targetNoticeId;
   final bool isRead;
   final DateTime createdAt;
 
@@ -23,11 +24,18 @@ class AppNotification {
     required this.createdAt,
     this.targetSketchId,
     this.targetCommentId,
+    this.targetNoticeId,
     this.isRead = false,
   });
 
   String get senderUid => sender.uid;
-  String get message => '${sender.nickname} ${type.notification}';
+  String get message {
+    return switch (type) {
+      NotificationType.notice => type.notification,
+      NotificationType.reminder => type.notification,
+      _ => '${sender.nickname} ${type.notification}',
+    };
+  }
 
   AppNotification markAsRead() => copyWith(isRead: true);
 
@@ -58,6 +66,7 @@ class AppNotification {
       'type': type.name,
       'targetSketchId': targetSketchId,
       'targetCommentId': targetCommentId,
+      'targetNoticeId': targetNoticeId,
       'isRead': isRead,
       'createdAt': createdAt.toUtc().toIso8601String(),
     };
@@ -71,6 +80,7 @@ class AppNotification {
       type: NotificationType.fromString(map['type'] as String?),
       targetSketchId: map['targetSketchId'] as String?,
       targetCommentId: map['targetCommentId'] as String?,
+      targetNoticeId: map['targetNoticeId'] as String?,
       isRead: map['isRead'] as bool? ?? false,
       createdAt: parseDateTime(map['createdAt']).toLocal(),
     );
