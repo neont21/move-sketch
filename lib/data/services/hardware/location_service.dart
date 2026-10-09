@@ -21,10 +21,6 @@ class LocationService {
   }
 
   Future<bool> checkAndRequestPermission() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return false;
-    }
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -33,6 +29,10 @@ class LocationService {
       }
     }
     if (permission == LocationPermission.deniedForever) {
+      return false;
+    }
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
       return false;
     }
     return true;

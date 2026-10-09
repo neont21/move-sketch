@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import '../../../config/dependencies.dart';
 import '../../../domain/models/enums/activity_type.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
@@ -12,6 +13,49 @@ import 'mission_card.dart';
 
 class SessionStartScreen extends ConsumerWidget {
   const SessionStartScreen({super.key});
+
+  void _startSession(BuildContext context, WidgetRef ref) async {
+    final locationRepository = ref.read(locationRepositoryProvider);
+    final hasPermission = await locationRepository.checkAndRequestPermission();
+
+    if (!hasPermission) {
+      if (context.mounted) {
+        final colorScheme = Theme.of(context).colorScheme;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('운동 경로를 측정하려면 위치 권한과 GPS 활성화가 필요합니다.'),
+            backgroundColor: colorScheme.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    final user = await ref.read(authViewModelProvider.future);
+    if (user == null) {
+      return;
+    }
+
+    final result = await ref
+        .read(sessionStartViewModelProvider.notifier)
+        .startSession(user.uid);
+
+    if (!context.mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok():
+        context.go(Routes.sessionTracking);
+      case Error(:final error):
+        final errorMessage = error is AppException
+            ? error.message
+            : '세션 시작 중 오류가 발생했습니다.';
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -101,34 +145,7 @@ class SessionStartScreen extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: state.isLoading
                       ? null
-                      : () async {
-                          final user = await ref.read(
-                            authViewModelProvider.future,
-                          );
-                          if (user == null) {
-                            return;
-                          }
-
-                          final result = await ref
-                              .read(sessionStartViewModelProvider.notifier)
-                              .startSession(user.uid);
-
-                          if (!context.mounted) {
-                            return;
-                          }
-
-                          switch (result) {
-                            case Ok():
-                              context.go(Routes.sessionTracking);
-                            case Error(:final error):
-                              final errorMessage = error is AppException
-                                  ? error.message
-                                  : '세션 시작 중 오류가 발생했습니다.';
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(errorMessage)),
-                              );
-                          }
-                        },
+                      : () => _startSession(context, ref),
                   child: state.isLoading
                       ? const SizedBox(
                           width: 24,
