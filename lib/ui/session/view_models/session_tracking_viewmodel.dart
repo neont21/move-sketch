@@ -18,6 +18,7 @@ import '../../../utils/result.dart';
 class SessionTrackingState {
   final TrackingSession session;
   final Duration elapsedDuration;
+  final Duration movingDuration;
   final double distanceInMeters;
   final int caloriesBurned;
   final int? currentPaceInSeconds;
@@ -32,6 +33,7 @@ class SessionTrackingState {
   const SessionTrackingState({
     required this.session,
     this.elapsedDuration = Duration.zero,
+    this.movingDuration = Duration.zero,
     this.distanceInMeters = 0.0,
     this.caloriesBurned = 0,
     this.currentPaceInSeconds,
@@ -47,13 +49,52 @@ class SessionTrackingState {
   double get distanceInKm => distanceInMeters / 1000.0;
   bool get isValidSession => distanceInMeters >= 10.0 && pathPoints.length >= 3;
 
+  static Duration calculateMovingDurationFromPoints(
+    List<LocationPoint> points,
+  ) {
+    if (points.length < 2) {
+      return Duration.zero;
+    }
+
+    int totalMovingSeconds = 0;
+    for (var i = 1; i < points.length; i++) {
+      final previousPoint = points[i - 1];
+      final currentPoint = points[i];
+
+      final timeDiffSec = currentPoint.timestamp
+          .difference(previousPoint.timestamp)
+          .inSeconds;
+
+      if (timeDiffSec <= 0 || timeDiffSec > 60) {
+        continue;
+      }
+
+      final segmentDistance = Geolocator.distanceBetween(
+        previousPoint.latitude,
+        previousPoint.longitude,
+        currentPoint.latitude,
+        currentPoint.longitude,
+      );
+
+      final speedMps = segmentDistance / timeDiffSec;
+      if (segmentDistance >= 1.5 && speedMps >= 0.5) {
+        totalMovingSeconds += timeDiffSec;
+      }
+    }
+
+    return Duration(seconds: totalMovingSeconds);
+  }
+
   factory SessionTrackingState.fromSession(
     TrackingSession session, {
     LocationPoint? initialLocation,
   }) {
+    final restoredMovingDuration = calculateMovingDurationFromPoints(session.pathPoints);
+
     return SessionTrackingState(
       session: session,
       elapsedDuration: session.elapsedDuration,
+      movingDuration: restoredMovingDuration,
       distanceInMeters: session.distanceInMeters,
       caloriesBurned: session.caloriesBurned,
       averagePaceInSeconds: session.averagePaceInSeconds,
@@ -68,6 +109,7 @@ class SessionTrackingState {
   SessionTrackingState copyWith({
     TrackingSession? session,
     Duration? elapsedDuration,
+    Duration? movingDuration,
     double? distanceInMeters,
     int? caloriesBurned,
     ValueGetter<int?>? currentPaceInSeconds,
@@ -82,6 +124,7 @@ class SessionTrackingState {
     return SessionTrackingState(
       session: session ?? this.session,
       elapsedDuration: elapsedDuration ?? this.elapsedDuration,
+      movingDuration: movingDuration ?? this.movingDuration,
       distanceInMeters: distanceInMeters ?? this.distanceInMeters,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
       currentPaceInSeconds: currentPaceInSeconds != null
@@ -151,7 +194,15 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         return;
       }
 
-      final newDuration = current.elapsedDuration + const Duration(seconds: 1);
+      final newElapsedDuration = current.elapsedDuration + const Duration(seconds: 1);
+
+      final lastPoint = current.pathPoints.lastOrNull;
+      final isCurrentlyMoving = lastPoint != null &&
+          (lastPoint.speed != null && lastPoint.speed! >= 0.5);
+      final newMovingDuration = isCurrentlyMoving
+          ? current.movingDuration + const Duration(seconds: 1)
+          : current.movingDuration;
+
       final newCalories = switch (current.session.activityType) {
         ActivityType.jogging => (current.distanceInKm * 60).round(),
         ActivityType.riding => (current.distanceInKm * 30).round(),
@@ -161,14 +212,15 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         missions: current.missions,
         activityType: current.session.activityType,
         distanceInKm: current.distanceInKm,
-        elapsedDuration: newDuration,
+        elapsedDuration: newMovingDuration,
         averagePaceInSeconds: current.averagePaceInSeconds,
         averageSpeedKmh: current.averageSpeedKmh,
       );
 
       state = AsyncData(
         current.copyWith(
-          elapsedDuration: newDuration,
+          elapsedDuration: newElapsedDuration,
+          movingDuration: newMovingDuration,
           caloriesBurned: newCalories,
           missions: updatedMissions,
         ),
@@ -188,6 +240,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
     final lastPoint = current.pathPoints.lastOrNull;
     double deltaDistance = 0.0;
+    int elapsedSecondsDelta = 0;
+    int movingSecondsDelta = 0;
 
     if (lastPoint != null) {
       deltaDistance = Geolocator.distanceBetween(
@@ -196,6 +250,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         point.latitude,
         point.longitude,
       );
+
       if (deltaDistance < 1.5) {
         return;
       }
@@ -203,14 +258,30 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       final timeDiffSec = point.timestamp
           .difference(lastPoint.timestamp)
           .inSeconds;
+
       if (timeDiffSec > 0 && (deltaDistance / timeDiffSec) > 35.0) {
         return;
+      }
+
+      if (timeDiffSec > 0) {
+        elapsedSecondsDelta = timeDiffSec;
+        final speedMps = deltaDistance / timeDiffSec;
+
+        if (deltaDistance >= 1.5 && speedMps >= 0.5) {
+          movingSecondsDelta = timeDiffSec;
+        } else {
+          deltaDistance = 0.0;
+        }
       }
     }
 
     final newDistance = current.distanceInMeters + deltaDistance;
     final newDistanceInKm = newDistance / 1000.0;
-    final totalSeconds = current.elapsedDuration.inSeconds;
+    final newElapsedDuration =
+        current.elapsedDuration + Duration(seconds: elapsedSecondsDelta);
+    final newMovingDuration =
+        current.movingDuration + Duration(seconds: movingSecondsDelta);
+    final activeSeconds = newMovingDuration.inSeconds;
 
     int? avgPace;
     int? curPace;
@@ -219,8 +290,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
     switch (current.session.activityType) {
       case ActivityType.jogging:
-        if (newDistance > 30 && totalSeconds > 0) {
-          avgPace = (totalSeconds / newDistanceInKm).round();
+        if (newDistance > 30 && activeSeconds > 0) {
+          avgPace = (activeSeconds / newDistanceInKm).round();
         }
         if (point.speed != null && point.speed! > 0.5) {
           curPace = (1000.0 / point.speed!).round();
@@ -228,8 +299,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
           curPace = avgPace;
         }
       case ActivityType.riding:
-        if (totalSeconds > 0) {
-          avgSpeed = newDistanceInKm / (totalSeconds / 3600.0);
+        if (activeSeconds > 0) {
+          avgSpeed = newDistanceInKm / (activeSeconds / 3600.0);
         }
         if (point.speed != null && point.speed! >= 0) {
           curSpeed = point.speed! * 3.6;
@@ -244,12 +315,14 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       missions: current.missions,
       activityType: current.session.activityType,
       distanceInKm: newDistanceInKm,
-      elapsedDuration: current.elapsedDuration,
+      elapsedDuration: newMovingDuration,
       averagePaceInSeconds: avgPace,
       averageSpeedKmh: avgSpeed,
     );
     state = AsyncData(
       current.copyWith(
+        elapsedDuration: newElapsedDuration,
+        movingDuration: newMovingDuration,
         distanceInMeters: newDistance,
         pathPoints: updatedPoints,
         currentPaceInSeconds: () => curPace,
@@ -264,7 +337,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     sessionRepository.recordPoint(
       sessionId: current.session.id,
       point: point,
-      elapsedDuration: current.elapsedDuration,
+      elapsedDuration: newElapsedDuration,
       totalDistanceInMeters: newDistance,
       caloriesBurned: current.caloriesBurned,
       averagePaceInSeconds: avgPace,
@@ -341,7 +414,9 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       return;
     }
 
-    FirebaseCrashlytics.instance.log('운동 세션 일시정지 (sessionId=${current.session.id})');
+    FirebaseCrashlytics.instance.log(
+      '운동 세션 일시정지 (sessionId=${current.session.id})',
+    );
     final sessionRepository = ref.read(sessionRepositoryProvider);
     await sessionRepository.pauseSession(current.session.id);
 
@@ -359,7 +434,9 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       return;
     }
 
-    FirebaseCrashlytics.instance.log('운동 세션 재개 (sessionId=${current.session.id})');
+    FirebaseCrashlytics.instance.log(
+      '운동 세션 재개 (sessionId=${current.session.id})',
+    );
     final sessionRepository = ref.read(sessionRepositoryProvider);
     await sessionRepository.resumeSession(current.session.id);
 
@@ -380,7 +457,9 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     _timer?.cancel();
     _locationSubscription?.cancel();
 
-    FirebaseCrashlytics.instance.log('운동 세션 폐기 (sessionId=${current.session.id})');
+    FirebaseCrashlytics.instance.log(
+      '운동 세션 폐기 (sessionId=${current.session.id})',
+    );
     final sessionRepository = ref.read(sessionRepositoryProvider);
     await sessionRepository.discardSession(current.session.id);
   }
