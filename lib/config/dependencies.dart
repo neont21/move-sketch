@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 
 import '../data/repositories/auth/auth_repository.dart';
 import '../data/repositories/auth/auth_repository_remote.dart';
+import '../data/repositories/common/app_version_repository.dart';
+import '../data/repositories/common/app_version_repository_remote.dart';
 import '../data/repositories/friendship/friendship_repository.dart';
 import '../data/repositories/friendship/friendship_repository_remote.dart';
 import '../data/repositories/geocoding/geocoding_repository.dart';
@@ -33,6 +35,7 @@ import '../data/services/local/database/app_database.dart';
 import '../data/services/local/session_service.dart';
 import '../data/services/remote/auth_service.dart';
 import '../data/services/remote/firebase_messaging_service.dart';
+import '../data/services/remote/firestore/app_version_service.dart';
 import '../data/services/remote/firestore/friendship_service.dart';
 import '../data/services/remote/firestore/notice_service.dart';
 import '../data/services/remote/firestore/notification_service.dart';
@@ -74,12 +77,10 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
   return database;
 });
 
-
 /// SketchImageRenderer Provider: 스케치 컴포지션의 오프스크린 캔버스 PNG 렌더러
 final sketchImageRendererProvider = Provider<SketchImageRenderer>((ref) {
   return const SketchImageRenderer();
 });
-
 
 /// SessionService Provider: 로컬 운동 세션 및 GPS 좌표 입출력
 final sessionServiceProvider = Provider<SessionService>((ref) {
@@ -139,7 +140,9 @@ final noticeServiceProvider = Provider<NoticeService>((ref) {
 });
 
 /// FirebaseMessagingService Provider: FCM SDK 기반 기기 토큰 및 푸시 수신
-final firebaseMessagingServiceProvider = Provider<FirebaseMessagingService>((ref) {
+final firebaseMessagingServiceProvider = Provider<FirebaseMessagingService>((
+  ref,
+) {
   return FirebaseMessagingService();
 });
 
@@ -153,6 +156,10 @@ final geocodingServiceProvider = Provider<GeocodingService>((ref) {
   return GeocodingService(client: ref.watch(httpClientProvider));
 });
 
+/// AppVersionService Provider: 앱 버전 확인
+final appVersionServiceProvider = Provider<AppVersionService>((ref) {
+  return AppVersionService();
+});
 
 /// AuthRepository Provider: 계정 인증 및 세션 관리 저장소
 /// 아이디 기반 로그인 및 자동 사용자 정보 매핑 제공
@@ -185,7 +192,9 @@ final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
 
 /// SessionResultRepository Provider: 완료된 운동 세션 결과물 저장소
 /// 세션 통계 데이터와 이미지를 원격 저장소에 보관하고 개인 캘린더 기록 제공
-final sessionResultRepositoryProvider = Provider<SessionResultRepository>((ref) {
+final sessionResultRepositoryProvider = Provider<SessionResultRepository>((
+  ref,
+) {
   return SessionResultRepositoryRemote(
     sessionResultService: ref.watch(sessionResultServiceProvider),
     storageService: ref.watch(storageServiceProvider),
@@ -246,17 +255,20 @@ final noticeRepositoryProvider = Provider<NoticeRepository>((ref) {
 
 /// PushNotificationRepository Provider: 푸시 알림 관리 저장소
 /// FCM 기기 토큰과 Firestore 사용자 문서 간의 동기화 및 푸시 스트림 관리
-final pushNotificationRepositoryProvider =
-Provider<PushNotificationRepository>((ref) {
-  final firebaseMessagingService = ref.watch(firebaseMessagingServiceProvider);
-  final userService = ref.watch(userServiceProvider);
-  final repository = PushNotificationRepositoryRemote(
-    firebaseMessagingService: firebaseMessagingService,
-    userService: userService,
-  );
-  ref.onDispose(repository.dispose);
-  return repository;
-});
+final pushNotificationRepositoryProvider = Provider<PushNotificationRepository>(
+  (ref) {
+    final firebaseMessagingService = ref.watch(
+      firebaseMessagingServiceProvider,
+    );
+    final userService = ref.watch(userServiceProvider);
+    final repository = PushNotificationRepositoryRemote(
+      firebaseMessagingService: firebaseMessagingService,
+      userService: userService,
+    );
+    ref.onDispose(repository.dispose);
+    return repository;
+  },
+);
 
 /// ReportRepository Provider: 게시물/댓글/사용자 신고 접수 저장소
 /// 신고 대상 및 신고 사유에 대한 보고
@@ -274,6 +286,13 @@ final geocodingRepositoryProvider = Provider<GeocodingRepository>((ref) {
   );
 });
 
+/// AppVersionRepository Provider: 앱 버전 조회
+/// 업데이트가 필요한지 확인하기 위한 기준점 파악
+final appVersionRepositoryProvider = Provider<AppVersionRepository>((ref) {
+  return AppVersionRepositoryRemote(
+    appVersionService: ref.watch(appVersionServiceProvider),
+  );
+});
 
 /// CompleteSessionUseCase Provider: 운동 세션 완료 절차 조율하는 복합 UseCase
 /// 세션 완료 처리 후 원격 저장 성공 시 로컬 임시 세션 데이터 삭제
@@ -292,7 +311,9 @@ final composeSketchUseCaseProvider = Provider<ComposeSketchUseCase>((ref) {
 
 /// DeleteSketchPostUseCase Provider: 스케치 삭제 후 공유 상태를 변경하는 UseCase
 /// 스케치 삭제 후 삭제된 스케치에 해당하는 세션 결과의 공유 상태를 공유되지 않음으로 변환
-final deleteSketchPostUseCaseProvider = Provider<DeleteSketchPostUseCase>((ref) {
+final deleteSketchPostUseCaseProvider = Provider<DeleteSketchPostUseCase>((
+  ref,
+) {
   return DeleteSketchPostUseCase(
     sketchPostRepository: ref.watch(sketchPostRepositoryProvider),
     sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
@@ -320,7 +341,9 @@ final addCommentUseCaseProvider = Provider<AddCommentUseCase>((ref) {
 });
 
 /// SendFriendRequestUseCase Provider: 사용자에게 친구 요청을 보내는 UseCase
-final sendFriendRequestUseCaseProvider = Provider<SendFriendRequestUseCase>((ref) {
+final sendFriendRequestUseCaseProvider = Provider<SendFriendRequestUseCase>((
+  ref,
+) {
   return SendFriendRequestUseCase(
     friendshipRepository: ref.watch(friendshipRepositoryProvider),
     authRepository: ref.watch(authRepositoryProvider),
@@ -330,30 +353,35 @@ final sendFriendRequestUseCaseProvider = Provider<SendFriendRequestUseCase>((ref
 });
 
 /// CancelFriendRequestUseCase Provider: 사용자에게 보낸 친구 요청을 취소하는 UseCase
-final cancelFriendRequestUseCaseProvider = Provider<CancelFriendRequestUseCase>((ref) {
-  return CancelFriendRequestUseCase(
-    friendshipRepository: ref.watch(friendshipRepositoryProvider),
-    authRepository: ref.watch(authRepositoryProvider),
-  );
-});
+final cancelFriendRequestUseCaseProvider = Provider<CancelFriendRequestUseCase>(
+  (ref) {
+    return CancelFriendRequestUseCase(
+      friendshipRepository: ref.watch(friendshipRepositoryProvider),
+      authRepository: ref.watch(authRepositoryProvider),
+    );
+  },
+);
 
 /// AcceptFriendRequestUseCase Provider: 사용자로부터 받은 친구 요청을 수락하는 UseCase
-final acceptFriendRequestUseCaseProvider = Provider<AcceptFriendRequestUseCase>((ref) {
-  return AcceptFriendRequestUseCase(
-    friendshipRepository: ref.watch(friendshipRepositoryProvider),
-    authRepository: ref.watch(authRepositoryProvider),
-    userRepository: ref.watch(userRepositoryProvider),
-    notificationRepository: ref.watch(notificationRepositoryProvider),
-  );
-});
+final acceptFriendRequestUseCaseProvider = Provider<AcceptFriendRequestUseCase>(
+  (ref) {
+    return AcceptFriendRequestUseCase(
+      friendshipRepository: ref.watch(friendshipRepositoryProvider),
+      authRepository: ref.watch(authRepositoryProvider),
+      userRepository: ref.watch(userRepositoryProvider),
+      notificationRepository: ref.watch(notificationRepositoryProvider),
+    );
+  },
+);
 
 /// DeclineFriendRequestUseCase Provider: 사용자로부터 받은 친구 요청을 거절하는 UseCase
-final declineFriendRequestUseCaseProvider = Provider<DeclineFriendRequestUseCase>((ref) {
-  return DeclineFriendRequestUseCase(
-    friendshipRepository: ref.watch(friendshipRepositoryProvider),
-    authRepository: ref.watch(authRepositoryProvider),
-  );
-});
+final declineFriendRequestUseCaseProvider =
+    Provider<DeclineFriendRequestUseCase>((ref) {
+      return DeclineFriendRequestUseCase(
+        friendshipRepository: ref.watch(friendshipRepositoryProvider),
+        authRepository: ref.watch(authRepositoryProvider),
+      );
+    });
 
 /// RemoveFriendUseCase Provider: 사용자를 친구 목록에저 제거하는 UseCase
 final removeFriendUseCaseProvider = Provider<RemoveFriendUseCase>((ref) {

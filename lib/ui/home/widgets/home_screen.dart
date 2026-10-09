@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:move_sketch/config/dependencies.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../../config/assets.dart';
+import '../../../domain/models/enums/update_type.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
+import '../../../utils/result.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
+import '../../core/widgets/update_dialog.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../view_models/home_viewmodel.dart';
 import '../../session/widgets/sketch_card.dart';
@@ -43,6 +48,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  Future<void> _checkAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final currentBuildNumber = int.tryParse(packageInfo.buildNumber) ?? 1;
+
+    final appVersionRepository = ref.read(appVersionRepositoryProvider);
+    final result = await appVersionRepository.getVersionPolicy();
+
+    if (!mounted) {
+      return;
+    }
+
+    switch (result) {
+      case Ok(:final value):
+        final updateType = value.checkUpdateType(currentBuildNumber);
+        if (updateType == UpdateType.none) {
+          return;
+        }
+
+        final isForceUpdate = updateType == UpdateType.force;
+        showDialog(
+          context: context,
+          barrierDismissible: !isForceUpdate,
+          builder: (dialogContext) => Dialog(
+            child: UpdateDialog(policy: value, isForceUpdate: isForceUpdate),
+          ),
+        );
+      case Error():
+        break;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +86,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _formattedDate = DateTime.now().formattedHeaderDate;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAppVersion();
+
       final session = ref.read(homeViewModelProvider).value?.uncompletedSession;
       if (session != null) {
         _showSessionResumeDialog(session);
