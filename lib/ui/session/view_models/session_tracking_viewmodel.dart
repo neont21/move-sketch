@@ -194,6 +194,25 @@ class SessionTrackingState {
 class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
   Timer? _timer;
   StreamSubscription<LocationPoint>? _locationSubscription;
+  DateTime? _lastTickTime;
+
+  Duration _consumeElapsedDelta(SessionTrackingState current) {
+    if (current.isPaused) {
+      _lastTickTime = null;
+      return Duration.zero;
+    }
+
+    final now = DateTime.now();
+    if (_lastTickTime == null) {
+      _lastTickTime = now;
+      return Duration.zero;
+    }
+
+    final elapsedDelta = now.difference(_lastTickTime!);
+    _lastTickTime = now;
+
+    return elapsedDelta;
+  }
 
   List<MissionInstance> _evaluateMissions({
     required List<MissionInstance> missions,
@@ -231,6 +250,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
   void _startTimer() {
     _timer?.cancel();
+    _lastTickTime = DateTime.now();
+
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       final current = state.value;
 
@@ -238,16 +259,9 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         return;
       }
 
+      final elapsedDelta = _consumeElapsedDelta(current);
       final newElapsedDuration =
-          current.elapsedDuration + const Duration(seconds: 1);
-
-      final lastPoint = current.pathPoints.lastOrNull;
-      final isCurrentlyMoving =
-          lastPoint != null &&
-          (lastPoint.speed != null && lastPoint.speed! >= 0.5);
-      final newMovingDuration = isCurrentlyMoving
-          ? current.movingDuration + const Duration(seconds: 1)
-          : current.movingDuration;
+          current.elapsedDuration + elapsedDelta;
 
       final newCalories = switch (current.session.activityType) {
         ActivityType.jogging =>
@@ -262,7 +276,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         missions: current.missions,
         activityType: current.session.activityType,
         distanceInKm: current.distanceInKm,
-        elapsedDuration: newMovingDuration,
+        elapsedDuration: current.movingDuration,
         averagePaceInSeconds: current.averagePaceInSeconds,
         averageSpeedKmh: current.averageSpeedKmh,
       );
@@ -270,7 +284,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       state = AsyncData(
         current.copyWith(
           elapsedDuration: newElapsedDuration,
-          movingDuration: newMovingDuration,
+          movingDuration: current.movingDuration,
           caloriesBurned: newCalories,
           missions: updatedMissions,
         ),
@@ -291,7 +305,6 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     final lastPoint = current.pathPoints.lastOrNull;
     double deltaDistance = 0.0;
     double deltaElevationGain = 0.0;
-    int elapsedSecondsDelta = 0;
     int movingSecondsDelta = 0;
 
     if (lastPoint != null) {
@@ -315,7 +328,6 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       }
 
       if (timeDiffSec > 0) {
-        elapsedSecondsDelta = timeDiffSec;
         final speedMps = deltaDistance / timeDiffSec;
 
         if (deltaDistance >= 1.5 && speedMps >= 0.5) {
@@ -338,8 +350,10 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     final newDistance = current.distanceInMeters + deltaDistance;
     final newDistanceInKm = newDistance / 1000.0;
     final newElevationGain = current.elevationGainMeters + deltaElevationGain;
+
+    final elapsedDelta = _consumeElapsedDelta(current);
     final newElapsedDuration =
-        current.elapsedDuration + Duration(seconds: elapsedSecondsDelta);
+        current.elapsedDuration + elapsedDelta;
     final newMovingDuration =
         current.movingDuration + Duration(seconds: movingSecondsDelta);
     final activeSeconds = newMovingDuration.inSeconds;
@@ -490,9 +504,14 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     final sessionRepository = ref.read(sessionRepositoryProvider);
     await sessionRepository.pauseSession(current.session.id);
 
+    final elapsedDelta = _consumeElapsedDelta(current);
+    final newElapsedDuration = current.elapsedDuration + elapsedDelta;
+    _lastTickTime = null;
+
     state = AsyncData(
       current.copyWith(
         isPaused: true,
+        elapsedDuration: newElapsedDuration,
         session: current.session.copyWith(status: SessionStatus.pausedManual),
       ),
     );
@@ -509,6 +528,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     );
     final sessionRepository = ref.read(sessionRepositoryProvider);
     await sessionRepository.resumeSession(current.session.id);
+
+    _lastTickTime = DateTime.now();
 
     state = AsyncData(
       current.copyWith(
