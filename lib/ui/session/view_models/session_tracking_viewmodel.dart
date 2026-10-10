@@ -28,7 +28,6 @@ class SessionTrackingState {
   final double? averageSpeedKmh;
   final List<LocationPoint> pathPoints;
   final List<MissionInstance> missions;
-  final bool isPaused;
   final LocationPoint? initialLocation;
 
   const SessionTrackingState({
@@ -44,12 +43,16 @@ class SessionTrackingState {
     this.averageSpeedKmh,
     this.pathPoints = const [],
     this.missions = const [],
-    this.isPaused = false,
     this.initialLocation,
   });
 
   double get distanceInKm => distanceInMeters / 1000.0;
   bool get isValidSession => distanceInMeters >= 10.0 && pathPoints.length >= 3;
+
+  SessionStatus get status => session.status;
+  bool get isPaused => session.status.isPaused;
+  bool get isPausedAuto => session.status.isPausedAuto;
+  bool get isPausedManual => session.status.isPausedManual;
 
   static Duration calculateMovingDurationFromPoints(
     List<LocationPoint> points,
@@ -143,7 +146,6 @@ class SessionTrackingState {
       averageSpeedKmh: session.averageSpeedKmh,
       pathPoints: session.pathPoints,
       missions: session.missions,
-      isPaused: session.isPaused,
       initialLocation: initialLocation,
     );
   }
@@ -185,7 +187,6 @@ class SessionTrackingState {
           : this.averageSpeedKmh,
       pathPoints: pathPoints ?? this.pathPoints,
       missions: missions ?? this.missions,
-      isPaused: isPaused ?? this.isPaused,
       initialLocation: initialLocation ?? this.initialLocation,
     );
   }
@@ -492,7 +493,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     );
   }
 
-  Future<void> pauseSession() async {
+  Future<void> pauseSessionManually() async {
     final current = state.value;
     if (current == null || current.isPaused) {
       return;
@@ -502,7 +503,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       '운동 세션 일시정지 (sessionId=${current.session.id})',
     );
     final sessionRepository = ref.read(sessionRepositoryProvider);
-    await sessionRepository.pauseSession(current.session.id);
+    await sessionRepository.pauseSession(current.session.id, isAuto: false);
 
     final elapsedDelta = _consumeElapsedDelta(current);
     final newElapsedDuration = current.elapsedDuration + elapsedDelta;

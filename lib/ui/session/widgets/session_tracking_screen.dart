@@ -166,7 +166,7 @@ class SessionTrackingScreen extends ConsumerWidget {
                               final notifier = ref.read(
                                 sessionTrackingViewModelProvider.notifier,
                               );
-                              await notifier.pauseSession();
+                              await notifier.pauseSessionManually();
                               if (!context.mounted) {
                                 return;
                               }

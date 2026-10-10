@@ -10,6 +10,8 @@ enum SessionStatus {
   bool get isActive => this == SessionStatus.active;
   bool get isPaused =>
       this == SessionStatus.pausedAuto || this == SessionStatus.pausedManual;
+  bool get isPausedAuto => this == SessionStatus.pausedAuto;
+  bool get isPausedManual => this == SessionStatus.pausedManual;
   bool get isOngoing => isActive || isPaused;
   bool get isEnded =>
       this == SessionStatus.completed || this == SessionStatus.aborted;
