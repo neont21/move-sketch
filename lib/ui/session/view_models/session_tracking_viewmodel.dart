@@ -193,12 +193,15 @@ class SessionTrackingState {
 }
 
 class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
+  static const Duration _autoPauseThreshold = Duration(seconds: 3);
+
   Timer? _timer;
   StreamSubscription<LocationPoint>? _locationSubscription;
   DateTime? _lastTickTime;
+  DateTime? _lastMovedAt;
 
   Duration _consumeElapsedDelta(SessionTrackingState current) {
-    if (current.isPaused) {
+    if (current.isPausedManual) {
       _lastTickTime = null;
       return Duration.zero;
     }
@@ -252,17 +255,34 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
   void _startTimer() {
     _timer?.cancel();
     _lastTickTime = DateTime.now();
+    _lastMovedAt = DateTime.now();
 
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       final current = state.value;
 
-      if (current == null || current.isPaused) {
+      if (current == null || current.isPausedManual) {
         return;
       }
 
       final elapsedDelta = _consumeElapsedDelta(current);
-      final newElapsedDuration =
-          current.elapsedDuration + elapsedDelta;
+      final newElapsedDuration = current.elapsedDuration + elapsedDelta;
+
+      final bool shouldAutoPause =
+          current.session.isActive &&
+          _lastMovedAt != null &&
+          DateTime.now().difference(_lastMovedAt!) >= _autoPauseThreshold;
+
+      final updatedStatus = shouldAutoPause ? SessionStatus.pausedAuto : current.status;
+
+      if (shouldAutoPause) {
+        FirebaseCrashlytics.instance.log(
+          '운동 세션 자동 일시정지 감지 (sessionId=${current.session.id})',
+        );
+        ref.read(sessionRepositoryProvider).pauseSession(
+          current.session.id,
+          isAuto: true,
+        );
+      }
 
       final newCalories = switch (current.session.activityType) {
         ActivityType.jogging =>
@@ -288,6 +308,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
           movingDuration: current.movingDuration,
           caloriesBurned: newCalories,
           missions: updatedMissions,
+          session: current.session.copyWith(status: updatedStatus),
         ),
       );
     });
@@ -295,7 +316,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
   void _onNewLocationPoint(LocationPoint point) {
     final current = state.value;
-    if (current == null || current.isPaused) {
+    if (current == null || current.isPausedManual) {
       return;
     }
 
@@ -333,6 +354,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
         if (deltaDistance >= 1.5 && speedMps >= 0.5) {
           movingSecondsDelta = timeDiffSec;
+          _lastMovedAt = DateTime.now();
 
           if (lastPoint.altitude != null && point.altitude != null) {
             final altitudeDifference = point.altitude! - lastPoint.altitude!;
@@ -348,22 +370,32 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       }
     }
 
+    final bool shouldAutoResume = current.status.isPausedAuto && movingSecondsDelta > 0;
+
+    final updatedStatus = shouldAutoResume ? SessionStatus.active : current.status;
+
+    if (shouldAutoResume) {
+      FirebaseCrashlytics.instance.log(
+        '운동 세션 자동 재개 감지 (sessionId=${current.session.id})',
+      );
+      ref.read(sessionRepositoryProvider).resumeSession(current.session.id);
+    }
+
     final newDistance = current.distanceInMeters + deltaDistance;
     final newDistanceInKm = newDistance / 1000.0;
     final newElevationGain = current.elevationGainMeters + deltaElevationGain;
 
     final elapsedDelta = _consumeElapsedDelta(current);
-    final newElapsedDuration =
-        current.elapsedDuration + elapsedDelta;
+    final newElapsedDuration = current.elapsedDuration + elapsedDelta;
     final newMovingDuration =
         current.movingDuration + Duration(seconds: movingSecondsDelta);
     final activeSeconds = newMovingDuration.inSeconds;
 
     final newCalories = switch (current.session.activityType) {
       ActivityType.jogging =>
-          ((newDistanceInKm * 60) + (newElevationGain * 0.10)).round(),
+        ((newDistanceInKm * 60) + (newElevationGain * 0.10)).round(),
       ActivityType.riding =>
-          ((newDistanceInKm * 30) + (newElevationGain * 0.05)).round(),
+        ((newDistanceInKm * 30) + (newElevationGain * 0.05)).round(),
     };
 
     int? avgPace;
@@ -415,6 +447,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         currentSpeedKmh: () => curSpeed,
         averageSpeedKmh: () => avgSpeed,
         missions: updatedMissions,
+        session: current.session.copyWith(status: updatedStatus),
       ),
     );
 
@@ -495,7 +528,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
   Future<void> pauseSessionManually() async {
     final current = state.value;
-    if (current == null || current.isPaused) {
+    if (current == null || current.isPausedManual) {
       return;
     }
 
@@ -531,6 +564,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     await sessionRepository.resumeSession(current.session.id);
 
     _lastTickTime = DateTime.now();
+    _lastMovedAt = DateTime.now();
 
     state = AsyncData(
       current.copyWith(

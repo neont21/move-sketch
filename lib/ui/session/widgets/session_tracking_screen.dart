@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../view_models/session_tracking_viewmodel.dart';
+import 'blink_duration_text.dart';
 import 'hold_button.dart';
 import 'path_tracker_view.dart';
 import 'session_pause_dialog.dart';
@@ -106,48 +107,36 @@ class SessionTrackingScreen extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '움직인 시간\n',
-                                style: textTheme.bodyMedium,
-                              ),
-                              TextSpan(
-                                text: _formatDuration(state.elapsedDuration),
-                                style: textTheme.headlineLarge,
-                              ),
-                            ],
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('움직인 시간', style: textTheme.bodyMedium),
+                            BlinkingDurationText(
+                              text: _formatDuration(state.elapsedDuration),
+                              style: textTheme.headlineLarge,
+                              isBlinking: state.isPausedAuto,
+                            ),
+                          ],
                         ),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '이동 거리\n',
-                                style: textTheme.bodyMedium,
-                              ),
-                              TextSpan(
-                                text:
-                                    '${state.distanceInKm.toStringAsFixed(2)}km',
-                                style: textTheme.headlineLarge,
-                              ),
-                            ],
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('이동 거리', style: textTheme.bodyMedium),
+                            Text(
+                              '${state.distanceInKm.toStringAsFixed(2)}km',
+                              style: textTheme.headlineLarge,
+                            ),
+                          ],
                         ),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '소모 칼로리\n',
-                                style: textTheme.bodyMedium,
-                              ),
-                              TextSpan(
-                                text: '${state.caloriesBurned}kcal',
-                                style: textTheme.headlineLarge,
-                              ),
-                            ],
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('소모 칼로리', style: textTheme.bodyMedium),
+                            Text(
+                              '${state.caloriesBurned}kcal',
+                              style: textTheme.headlineLarge,
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -204,8 +193,7 @@ class SessionTrackingScreen extends ConsumerWidget {
                               title: '종료',
                               onActionTriggered: () =>
                                   _onActionTriggered(context, ref, state),
-                              onEarlyRelease: () =>
-                                  _onEarlyReleased(context),
+                              onEarlyRelease: () => _onEarlyReleased(context),
                             ),
                           ),
                         ),
