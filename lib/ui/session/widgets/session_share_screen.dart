@@ -176,89 +176,67 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
           final locationDisplayText = rawTag == '알 수 없는 위치'
               ? rawTag
               : '$rawTag 인근';
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Center(
-                child: Column(
-                  spacing: 20,
-                  children: [
-                    SketchCard(imageProvider: imageProvider),
-                    Text(
-                      '위치 태그 선택',
-                      style: textTheme.labelSmall?.copyWith(
-                        color: colorScheme.secondary,
-                      ),
-                    ),
-                    AnimatedToggleSwitch<int>.size(
-                      current: state.locationIndex,
-                      values: const [0, 1, 2],
-                      onChanged: (i) {
-                        ref
-                            .read(
-                              sessionShareViewModelProvider(
-                                widget.sessionId,
-                              ).notifier,
-                            )
-                            .selectTag(i);
-                      },
-                      selectedIconScale: 1.0,
-                      height: 40,
-                      indicatorSize: const Size(80, 32),
-                      style: ToggleStyle(
-                        backgroundColor: colorScheme.outline,
-                        borderColor: colorScheme.outline,
-                        indicatorColor: colorScheme.primary,
-                        borderRadius: BorderRadius.circular(80),
-                      ),
-                      borderWidth: 4,
-                      iconBuilder: (value) {
-                        final label = switch (value) {
-                          0 => '출발지',
-                          1 => '경유지',
-                          2 => '도착지',
-                          _ => '위치',
-                        };
-                        return Center(
-                          child: Text(
-                            label,
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: (value == state.locationIndex)
-                                  ? colorScheme.onPrimary
-                                  : colorScheme.tertiaryFixed,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: colorScheme.outline),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.location_pin,
-                                color: colorScheme.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                locationDisplayText,
-                                style: textTheme.bodyMedium,
-                              ),
-                            ],
-                          ),
+
+          return SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Center(
+                  child: Column(
+                    spacing: 20,
+                    children: [
+                      SketchCard(imageProvider: imageProvider),
+                      Text(
+                        '위치 태그 선택',
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.secondary,
                         ),
-                        if (state.weatherInfo != null)
+                      ),
+                      AnimatedToggleSwitch<int>.size(
+                        current: state.locationIndex,
+                        values: const [0, 1, 2],
+                        onChanged: (i) {
+                          ref
+                              .read(
+                                sessionShareViewModelProvider(
+                                  widget.sessionId,
+                                ).notifier,
+                              )
+                              .selectTag(i);
+                        },
+                        selectedIconScale: 1.0,
+                        height: 40,
+                        indicatorSize: const Size(80, 32),
+                        style: ToggleStyle(
+                          backgroundColor: colorScheme.outline,
+                          borderColor: colorScheme.outline,
+                          indicatorColor: colorScheme.primary,
+                          borderRadius: BorderRadius.circular(80),
+                        ),
+                        borderWidth: 4,
+                        iconBuilder: (value) {
+                          final label = switch (value) {
+                            0 => '출발지',
+                            1 => '경유지',
+                            2 => '도착지',
+                            _ => '위치',
+                          };
+                          return Center(
+                            child: Text(
+                              label,
+                              style: textTheme.bodyLarge?.copyWith(
+                                color: (value == state.locationIndex)
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.tertiaryFixed,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
@@ -271,47 +249,73 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.network(
-                                  state.weatherInfo!.iconUrl,
-                                  width: 20,
-                                  height: 20,
-                                  errorBuilder: (_, _, _) => Icon(
-                                    Icons.wb_sunny,
-                                    size: 20,
-                                    color: colorScheme.primary,
-                                  ),
+                                Icon(
+                                  Icons.location_pin,
+                                  color: colorScheme.primary,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  state.weatherInfo!.shortSummary,
+                                  locationDisplayText,
                                   style: textTheme.bodyMedium,
                                 ),
                               ],
                             ),
                           ),
-                      ],
-                    ),
-                    TextField(
-                      controller: _captionController,
-                      keyboardType: TextInputType.multiline,
-                      maxLines: 4,
-                      minLines: 4,
-                      maxLength: 60,
-                      style: textTheme.bodyMedium,
-                      onChanged: (text) {
-                        ref
-                            .read(
-                              sessionShareViewModelProvider(
-                                widget.sessionId,
-                              ).notifier,
-                            )
-                            .updateCaption(text);
-                      },
-                      decoration: const InputDecoration(
-                        hintText: '오늘의 한마디를 적어보세요. (선택)',
+                          if (state.weatherInfo != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: colorScheme.outline),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.network(
+                                    state.weatherInfo!.iconUrl,
+                                    width: 20,
+                                    height: 20,
+                                    errorBuilder: (_, _, _) => Icon(
+                                      Icons.wb_sunny,
+                                      size: 20,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    state.weatherInfo!.shortSummary,
+                                    style: textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ],
+                      TextField(
+                        controller: _captionController,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: 4,
+                        minLines: 4,
+                        maxLength: 60,
+                        style: textTheme.bodyMedium,
+                        onChanged: (text) {
+                          ref
+                              .read(
+                                sessionShareViewModelProvider(
+                                  widget.sessionId,
+                                ).notifier,
+                              )
+                              .updateCaption(text);
+                        },
+                        decoration: const InputDecoration(
+                          hintText: '오늘의 한마디를 적어보세요. (선택)',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

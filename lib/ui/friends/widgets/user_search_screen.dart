@@ -139,6 +139,7 @@ class _UserSearchScreenState extends ConsumerState<UserSearchScreen> {
                       );
                     }
                     return SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 24),
                       child: state.searchQuery.isNotEmpty
                           ? SearchedFriendListView(
                               searchedUsers: state.searchResults,

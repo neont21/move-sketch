@@ -220,319 +220,322 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text('계정 정보')),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('로그인 수단', style: textTheme.labelLarge),
-              ListTile(
-                leading: Icon(
-                  Icons.g_mobiledata,
-                  color: isGoogleLinked
-                      ? colorScheme.primary
-                      : colorScheme.tertiaryContainer,
-                ),
-                title: Text('Google', style: textTheme.bodyLarge),
-                subtitle: state.isGoogleLinked && state.googleEmail != null
-                    ? Text(state.googleEmail!, style: textTheme.labelSmall)
-                    : null,
-                trailing: OutlinedButton(
-                  onPressed: state.isProcessing
-                      ? null
-                      : () {
-                          if (isGoogleLinked) {
-                            _handleUnlink(
-                              context,
-                              ref,
-                              providerName: 'Google',
-                              providerId: 'google.com',
-                            );
-                          } else {
-                            _handleLink(
-                              context,
-                              ref,
-                              providerName: 'Google',
-                              action: () => ref
-                                  .read(
-                                    accountSettingsViewModelProvider.notifier,
-                                  )
-                                  .linkGoogle(),
-                            );
-                          }
-                        },
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: Size.zero,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 12,
-                    ),
-                    backgroundColor: isGoogleLinked
-                        ? colorScheme.surfaceContainer
-                        : colorScheme.primary,
-                    side: BorderSide(color: colorScheme.outline),
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding:const EdgeInsets.fromLTRB(20, 0, 20, 16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('로그인 수단', style: textTheme.labelLarge),
+                ListTile(
+                  leading: Icon(
+                    Icons.g_mobiledata,
+                    color: isGoogleLinked
+                        ? colorScheme.primary
+                        : colorScheme.tertiaryContainer,
                   ),
-                  child: Text(
-                    isGoogleLinked ? '연결 해제' : '연결하기',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: isGoogleLinked
-                          ? colorScheme.tertiaryContainer
-                          : colorScheme.onPrimary,
+                  title: Text('Google', style: textTheme.bodyLarge),
+                  subtitle: state.isGoogleLinked && state.googleEmail != null
+                      ? Text(state.googleEmail!, style: textTheme.labelSmall)
+                      : null,
+                  trailing: OutlinedButton(
+                    onPressed: state.isProcessing
+                        ? null
+                        : () {
+                            if (isGoogleLinked) {
+                              _handleUnlink(
+                                context,
+                                ref,
+                                providerName: 'Google',
+                                providerId: 'google.com',
+                              );
+                            } else {
+                              _handleLink(
+                                context,
+                                ref,
+                                providerName: 'Google',
+                                action: () => ref
+                                    .read(
+                                      accountSettingsViewModelProvider.notifier,
+                                    )
+                                    .linkGoogle(),
+                              );
+                            }
+                          },
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                      backgroundColor: isGoogleLinked
+                          ? colorScheme.surfaceContainer
+                          : colorScheme.primary,
+                      side: BorderSide(color: colorScheme.outline),
                     ),
-                  ),
-                ),
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.apple,
-                  color: isAppleLinked
-                      ? colorScheme.primary
-                      : colorScheme.tertiaryContainer,
-                ),
-                title: Text('Apple', style: textTheme.bodyLarge),
-                subtitle: state.isAppleLinked && state.appleEmail != null
-                    ? Text(state.appleEmail!, style: textTheme.labelSmall)
-                    : null,
-                trailing: OutlinedButton(
-                  onPressed: state.isProcessing
-                      ? null
-                      : () {
-                          if (isAppleLinked) {
-                            _handleUnlink(
-                              context,
-                              ref,
-                              providerName: 'Apple',
-                              providerId: 'apple.com',
-                            );
-                          } else {
-                            _handleLink(
-                              context,
-                              ref,
-                              providerName: 'Apple',
-                              action: () => ref
-                                  .read(
-                                    accountSettingsViewModelProvider.notifier,
-                                  )
-                                  .linkApple(),
-                            );
-                          }
-                        },
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: Size.zero,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 12,
-                    ),
-                    backgroundColor: isAppleLinked
-                        ? colorScheme.surfaceContainer
-                        : colorScheme.primary,
-                    side: BorderSide(color: colorScheme.outline),
-                  ),
-                  child: Text(
-                    isAppleLinked ? '연결 해제' : '연결하기',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: isAppleLinked
-                          ? colorScheme.tertiaryContainer
-                          : colorScheme.onPrimary,
+                    child: Text(
+                      isGoogleLinked ? '연결 해제' : '연결하기',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: isGoogleLinked
+                            ? colorScheme.tertiaryContainer
+                            : colorScheme.onPrimary,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.email,
-                  color: hasPassword
-                      ? colorScheme.primary
-                      : colorScheme.tertiaryContainer,
+                ListTile(
+                  leading: Icon(
+                    Icons.apple,
+                    color: isAppleLinked
+                        ? colorScheme.primary
+                        : colorScheme.tertiaryContainer,
+                  ),
+                  title: Text('Apple', style: textTheme.bodyLarge),
+                  subtitle: state.isAppleLinked && state.appleEmail != null
+                      ? Text(state.appleEmail!, style: textTheme.labelSmall)
+                      : null,
+                  trailing: OutlinedButton(
+                    onPressed: state.isProcessing
+                        ? null
+                        : () {
+                            if (isAppleLinked) {
+                              _handleUnlink(
+                                context,
+                                ref,
+                                providerName: 'Apple',
+                                providerId: 'apple.com',
+                              );
+                            } else {
+                              _handleLink(
+                                context,
+                                ref,
+                                providerName: 'Apple',
+                                action: () => ref
+                                    .read(
+                                      accountSettingsViewModelProvider.notifier,
+                                    )
+                                    .linkApple(),
+                              );
+                            }
+                          },
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 12,
+                      ),
+                      backgroundColor: isAppleLinked
+                          ? colorScheme.surfaceContainer
+                          : colorScheme.primary,
+                      side: BorderSide(color: colorScheme.outline),
+                    ),
+                    child: Text(
+                      isAppleLinked ? '연결 해제' : '연결하기',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: isAppleLinked
+                            ? colorScheme.tertiaryContainer
+                            : colorScheme.onPrimary,
+                      ),
+                    ),
+                  ),
                 ),
-                title: Text('email', style: textTheme.bodyLarge),
-                subtitle: hasPassword && state.passwordEmail != null
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            state.passwordEmail!,
-                            style: textTheme.labelSmall,
-                          ),
-                          if (!state.isEmailVerified) ...[
-                            const SizedBox(height: 2),
+                ListTile(
+                  leading: Icon(
+                    Icons.email,
+                    color: hasPassword
+                        ? colorScheme.primary
+                        : colorScheme.tertiaryContainer,
+                  ),
+                  title: Text('email', style: textTheme.bodyLarge),
+                  subtitle: hasPassword && state.passwordEmail != null
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              '이메일 인증이 필요합니다',
-                              style: textTheme.labelSmall?.copyWith(
-                                color: colorScheme.error,
-                                fontWeight: FontWeight.bold,
+                              state.passwordEmail!,
+                              style: textTheme.labelSmall,
+                            ),
+                            if (!state.isEmailVerified) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                '이메일 인증이 필요합니다',
+                                style: textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.error,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ],
+                        )
+                      : null,
+                  trailing: state.isProcessing
+                      ? null
+                      : !hasPassword
+                      ? OutlinedButton(
+                          onPressed: () {
+                            showDialog<void>(
+                              context: context,
+                              builder: (dialogContext) =>
+                                  const RegisterPasswordDialog(),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 12,
+                            ),
+                            backgroundColor: colorScheme.primary,
+                            side: BorderSide(color: colorScheme.outline),
+                          ),
+                          child: Text(
+                            '등록하기',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onPrimary,
+                            ),
+                          ),
+                        )
+                      : !state.isEmailVerified
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextButton(
+                              onPressed: () async {
+                                final result = await ref
+                                    .read(
+                                      accountSettingsViewModelProvider.notifier,
+                                    )
+                                    .resendVerificationEmail();
+
+                                if (!context.mounted) {
+                                  return;
+                                }
+
+                                switch (result) {
+                                  case Ok():
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('인증 메일이 재전송되었습니다.'),
+                                      ),
+                                    );
+                                  case Error(:final error):
+                                    final errorMessage = error is AppException
+                                        ? error.message
+                                        : '인증 메일 전송에 실패했습니다.';
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(errorMessage),
+                                        backgroundColor: colorScheme.error,
+                                      ),
+                                    );
+                                }
+                              },
+                              child: Text(
+                                '재전송',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                            OutlinedButton(
+                              onPressed: () =>
+                                  _handleCancelPendingEmail(context, ref),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: Size.zero,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 12,
+                                ),
+                                backgroundColor: colorScheme.surfaceContainer,
+                                side: BorderSide(color: colorScheme.outline),
+                              ),
+                              child: Text(
+                                '연결 취소',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.error,
+                                ),
                               ),
                             ),
                           ],
-                        ],
-                      )
-                    : null,
-                trailing: state.isProcessing
-                    ? null
-                    : !hasPassword
-                    ? OutlinedButton(
-                        onPressed: () {
-                          showDialog<void>(
-                            context: context,
-                            builder: (dialogContext) =>
-                                const RegisterPasswordDialog(),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 12,
+                        )
+                      : OutlinedButton(
+                          onPressed: () => _handleUnlink(
+                            context,
+                            ref,
+                            providerName: '비밀번호',
+                            providerId: 'password',
                           ),
-                          backgroundColor: colorScheme.primary,
-                          side: BorderSide(color: colorScheme.outline),
-                        ),
-                        child: Text(
-                          '등록하기',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onPrimary,
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 12,
+                            ),
+                            backgroundColor: colorScheme.surfaceContainer,
+                            side: BorderSide(color: colorScheme.outline),
                           ),
-                        ),
-                      )
-                    : !state.isEmailVerified
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextButton(
-                            onPressed: () async {
-                              final result = await ref
-                                  .read(
-                                    accountSettingsViewModelProvider.notifier,
-                                  )
-                                  .resendVerificationEmail();
-
-                              if (!context.mounted) {
-                                return;
-                              }
-
-                              switch (result) {
-                                case Ok():
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('인증 메일이 재전송되었습니다.'),
-                                    ),
-                                  );
-                                case Error(:final error):
-                                  final errorMessage = error is AppException
-                                      ? error.message
-                                      : '인증 메일 전송에 실패했습니다.';
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(errorMessage),
-                                      backgroundColor: colorScheme.error,
-                                    ),
-                                  );
-                              }
-                            },
-                            child: Text(
-                              '재전송',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.primary,
-                              ),
+                          child: Text(
+                            '연결 해제',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.tertiaryContainer,
                             ),
                           ),
-                          OutlinedButton(
-                            onPressed: () =>
-                                _handleCancelPendingEmail(context, ref),
-                            style: OutlinedButton.styleFrom(
-                              minimumSize: Size.zero,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 12,
-                              ),
-                              backgroundColor: colorScheme.surfaceContainer,
-                              side: BorderSide(color: colorScheme.outline),
-                            ),
-                            child: Text(
-                              '연결 취소',
-                              style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.error,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : OutlinedButton(
-                        onPressed: () => _handleUnlink(
-                          context,
-                          ref,
-                          providerName: '비밀번호',
-                          providerId: 'password',
                         ),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 12,
-                          ),
-                          backgroundColor: colorScheme.surfaceContainer,
-                          side: BorderSide(color: colorScheme.outline),
-                        ),
-                        child: Text(
-                          '연결 해제',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.tertiaryContainer,
-                          ),
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 16),
-              if (state.verifiedLinkedProviders.contains('password'))
+                ),
+                const SizedBox(height: 16),
+                if (state.verifiedLinkedProviders.contains('password'))
+                  ListTile(
+                    onTap: () {
+                      context.go(Routes.meSettingsPassword);
+                    },
+                    title: Text('비밀번호 변경', style: textTheme.bodyLarge),
+                    trailing: Icon(
+                      Icons.chevron_right,
+                      color: colorScheme.tertiaryContainer,
+                    ),
+                  ),
                 ListTile(
                   onTap: () {
-                    context.go(Routes.meSettingsPassword);
+                    showDialog(
+                      context: context,
+                      builder: (dialogContext) => Dialog(
+                        child: SystemAlertDialog(
+                          title: '로그아웃 할까요?',
+                          description: '기록은 그대로 남아 있어요.\n다시 로그인하면 이어서 볼 수 있어요.',
+                          confirmText: '로그아웃',
+                          onConfirm: _handleSignOut,
+                        ),
+                      ),
+                    );
                   },
-                  title: Text('비밀번호 변경', style: textTheme.bodyLarge),
+                  title: Text('로그아웃', style: textTheme.bodyLarge),
                   trailing: Icon(
                     Icons.chevron_right,
                     color: colorScheme.tertiaryContainer,
                   ),
                 ),
-              ListTile(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (dialogContext) => Dialog(
-                      child: SystemAlertDialog(
-                        title: '로그아웃 할까요?',
-                        description: '기록은 그대로 남아 있어요.\n다시 로그인하면 이어서 볼 수 있어요.',
-                        confirmText: '로그아웃',
-                        onConfirm: _handleSignOut,
-                      ),
+                ListTile(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => Dialog(child: DeleteAccountDialog()),
+                    );
+                  },
+                  title: Text(
+                    '계정 삭제',
+                    style: textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.error,
                     ),
-                  );
-                },
-                title: Text('로그아웃', style: textTheme.bodyLarge),
-                trailing: Icon(
-                  Icons.chevron_right,
-                  color: colorScheme.tertiaryContainer,
-                ),
-              ),
-              ListTile(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => Dialog(child: DeleteAccountDialog()),
-                  );
-                },
-                title: Text(
-                  '계정 삭제',
-                  style: textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.error,
+                  ),
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    color: colorScheme.tertiaryContainer,
                   ),
                 ),
-                trailing: Icon(
-                  Icons.chevron_right,
-                  color: colorScheme.tertiaryContainer,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

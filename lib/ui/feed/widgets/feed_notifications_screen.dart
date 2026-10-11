@@ -171,7 +171,7 @@ class _FeedNotificationsScreenState
             );
             return SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
                 child: Row(
                   spacing: 20,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,

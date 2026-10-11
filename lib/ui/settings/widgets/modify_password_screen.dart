@@ -99,103 +99,106 @@ class _ModifyPasswordScreenState extends ConsumerState<ModifyPasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text('비밀번호 변경')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              spacing: 20,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LabeledTextFormField(
-                  labelText: '기존 비밀번호',
-                  hintText: '기존 비밀번호',
-                  controller: _currentPasswordController,
-                  textInputAction: TextInputAction.next,
-                  enabled: !_isSubmitting,
-                  showPassword: showCurrentPassword,
-                  toggleVisibility: () {
-                    setState(() {
-                      showCurrentPassword = !showCurrentPassword;
-                    });
-                  },
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return '기존 비밀번호를 입력해 주세요.';
-                    }
-                    return null;
-                  },
-                ),
-                LabeledTextFormField(
-                  labelText: '새 비밀번호',
-                  hintText: '새 비밀번호',
-                  controller: _newPasswordController,
-                  textInputAction: TextInputAction.next,
-                  enabled: !_isSubmitting,
-                  showPassword: _showNewPassword,
-                  toggleVisibility: () {
-                    setState(() {
-                      _showNewPassword = !_showNewPassword;
-                    });
-                  },
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    final String? validationError = Validators.validatePassword(
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                spacing: 20,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LabeledTextFormField(
+                    labelText: '기존 비밀번호',
+                    hintText: '기존 비밀번호',
+                    controller: _currentPasswordController,
+                    textInputAction: TextInputAction.next,
+                    enabled: !_isSubmitting,
+                    showPassword: showCurrentPassword,
+                    toggleVisibility: () {
+                      setState(() {
+                        showCurrentPassword = !showCurrentPassword;
+                      });
+                    },
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return '기존 비밀번호를 입력해 주세요.';
+                      }
+                      return null;
+                    },
+                  ),
+                  LabeledTextFormField(
+                    labelText: '새 비밀번호',
+                    hintText: '새 비밀번호',
+                    controller: _newPasswordController,
+                    textInputAction: TextInputAction.next,
+                    enabled: !_isSubmitting,
+                    showPassword: _showNewPassword,
+                    toggleVisibility: () {
+                      setState(() {
+                        _showNewPassword = !_showNewPassword;
+                      });
+                    },
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) {
+                      final String? validationError = Validators.validatePassword(
+                        value,
+                      );
+                      if (validationError != null) {
+                        return validationError;
+                      }
+                      if (value == _currentPasswordController.text) {
+                        return '새 비밀번호는 기존 비밀번호와 달라야 합니다.';
+                      }
+                      return null;
+                    },
+                  ),
+                  LabeledTextFormField(
+                    labelText: '새 비밀번호 확인',
+                    hintText: '새 비밀번호 확인',
+                    controller: _confirmPasswordController,
+                    textInputAction: TextInputAction.done,
+                    enabled: !_isSubmitting,
+                    onFieldSubmitted: (value) {
+                      if (!_isSubmitting) {
+                        _handleSubmit();
+                      }
+                    },
+                    showPassword: _showCheckPassword,
+                    toggleVisibility: () {
+                      setState(() {
+                        _showCheckPassword = !_showCheckPassword;
+                      });
+                    },
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) => Validators.validateConfirmPassword(
                       value,
-                    );
-                    if (validationError != null) {
-                      return validationError;
-                    }
-                    if (value == _currentPasswordController.text) {
-                      return '새 비밀번호는 기존 비밀번호와 달라야 합니다.';
-                    }
-                    return null;
-                  },
-                ),
-                LabeledTextFormField(
-                  labelText: '새 비밀번호 확인',
-                  hintText: '새 비밀번호 확인',
-                  controller: _confirmPasswordController,
-                  textInputAction: TextInputAction.done,
-                  enabled: !_isSubmitting,
-                  onFieldSubmitted: (value) {
-                    if (!_isSubmitting) {
-                      _handleSubmit();
-                    }
-                  },
-                  showPassword: _showCheckPassword,
-                  toggleVisibility: () {
-                    setState(() {
-                      _showCheckPassword = !_showCheckPassword;
-                    });
-                  },
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => Validators.validateConfirmPassword(
-                    value,
-                    _newPasswordController.text,
+                      _newPasswordController.text,
+                    ),
                   ),
-                ),
-                Text(
-                  '영문과 숫자를 섞어 8자 이상으로 정해 주세요.',
-                  style: textTheme.labelMedium,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: _isSubmitting ? null : _handleSubmit,
-                    child: _isSubmitting
-                        ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('비밀번호 변경'),
+                  Text(
+                    '영문과 숫자를 섞어 8자 이상으로 정해 주세요.',
+                    style: textTheme.labelMedium,
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null : _handleSubmit,
+                      child: _isSubmitting
+                          ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('비밀번호 변경'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

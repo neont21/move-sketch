@@ -35,8 +35,8 @@ class BlockedUserScreen extends ConsumerWidget {
               await ref.read(blockedUsersViewModelProvider.future);
             },
             child: ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               itemCount: state.length,
               itemBuilder: (context, index) {
                 return UserCard(
