@@ -59,10 +59,12 @@ class SessionResumeDialog extends ConsumerWidget {
           DialogActionButtons(
             confirmText: '이어하기',
             onConfirm: () {
+              context.pop();
               context.go(Routes.sessionTracking);
             },
             cancelText: '이대로 저장',
             onCancel: () {
+              context.pop();
               context.go(Routes.sessionResult(session.id));
             },
           ),
