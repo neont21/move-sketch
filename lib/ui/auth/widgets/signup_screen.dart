@@ -105,143 +105,149 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text('계정 만들기')),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              spacing: 20,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LabeledTextFormField(
-                  labelText: '닉네임',
-                  hintText: '친구에게 보일 이름을 10자 이내로 입력해 주세요',
-                  controller: _nicknameController,
-                  textInputAction: TextInputAction.next,
-                  enabled: !isLoading,
-                  maxLength: 10,
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: Validators.validateNickname,
-                ),
-                LabeledTextFormField(
-                  labelText: '아이디',
-                  hintText: '로그인에 사용할 아이디 (변경 불가)',
-                  controller: _usernameController,
-                  textInputAction: TextInputAction.next,
-                  enabled: !isLoading,
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: Validators.validateUsername,
-                ),
-                LabeledTextFormField(
-                  inputType: TextInputType.emailAddress,
-                  labelText: '이메일',
-                  hintText: '계정 인증에 사용할 이메일을 입력해 주세요',
-                  controller: _emailController,
-                  textInputAction: TextInputAction.next,
-                  enabled: !isLoading,
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: Validators.validateEmail,
-                ),
-                LabeledTextFormField(
-                  inputType: TextInputType.visiblePassword,
-                  labelText: '비밀번호',
-                  hintText: '영문과 숫자를 섞어 8자 이상 입력해 주세요',
-                  controller: _passwordController,
-                  textInputAction: TextInputAction.next,
-                  enabled: !isLoading,
-                  showPassword: _showPassword,
-                  toggleVisibility: () {
-                    setState(() {
-                      _showPassword = !_showPassword;
-                    });
-                  },
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: Validators.validatePassword,
-                ),
-                LabeledTextFormField(
-                  inputType: TextInputType.visiblePassword,
-                  labelText: '비밀번호 확인',
-                  hintText: '비밀번호를 다시 입력해 주세요',
-                  controller: _passwordCheckController,
-                  textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (value) {
-                    if (!isLoading) {
-                      _handleSignup();
-                    }
-                  },
-                  enabled: !isLoading,
-                  showPassword: _showCheckPassword,
-                  toggleVisibility: () {
-                    setState(() {
-                      _showCheckPassword = !_showCheckPassword;
-                    });
-                  },
-                  autoValidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => Validators.validateConfirmPassword(
-                    value,
-                    _passwordController.text,
+      body: SafeArea(
+        top: false,
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.all(20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                spacing: 20,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  LabeledTextFormField(
+                    labelText: '닉네임',
+                    hintText: '친구에게 보일 이름을 10자 이내로 입력해 주세요',
+                    controller: _nicknameController,
+                    textInputAction: TextInputAction.next,
+                    enabled: !isLoading,
+                    maxLength: 10,
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: Validators.validateNickname,
                   ),
-                ),
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Checkbox(
-                      value: _agree,
-                      onChanged: (newValue) {
-                        setState(() {
-                          _agree = newValue ?? !_agree;
-                        });
-                      },
+                  LabeledTextFormField(
+                    labelText: '아이디',
+                    hintText: '로그인에 사용할 아이디 (변경 불가)',
+                    controller: _usernameController,
+                    textInputAction: TextInputAction.next,
+                    enabled: !isLoading,
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: Validators.validateUsername,
+                  ),
+                  LabeledTextFormField(
+                    inputType: TextInputType.emailAddress,
+                    labelText: '이메일',
+                    hintText: '계정 인증에 사용할 이메일을 입력해 주세요',
+                    controller: _emailController,
+                    textInputAction: TextInputAction.next,
+                    enabled: !isLoading,
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: Validators.validateEmail,
+                  ),
+                  LabeledTextFormField(
+                    inputType: TextInputType.visiblePassword,
+                    labelText: '비밀번호',
+                    hintText: '영문과 숫자를 섞어 8자 이상 입력해 주세요',
+                    controller: _passwordController,
+                    textInputAction: TextInputAction.next,
+                    enabled: !isLoading,
+                    showPassword: _showPassword,
+                    toggleVisibility: () {
+                      setState(() {
+                        _showPassword = !_showPassword;
+                      });
+                    },
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: Validators.validatePassword,
+                  ),
+                  LabeledTextFormField(
+                    inputType: TextInputType.visiblePassword,
+                    labelText: '비밀번호 확인',
+                    hintText: '비밀번호를 다시 입력해 주세요',
+                    controller: _passwordCheckController,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (value) {
+                      if (!isLoading) {
+                        _handleSignup();
+                      }
+                    },
+                    enabled: !isLoading,
+                    showPassword: _showCheckPassword,
+                    toggleVisibility: () {
+                      setState(() {
+                        _showCheckPassword = !_showCheckPassword;
+                      });
+                    },
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (value) => Validators.validateConfirmPassword(
+                      value,
+                      _passwordController.text,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        context.push(Routes.tos);
-                      },
-                      child: Text(
-                        '이용약관',
-                        style: textTheme.labelMedium?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w700,
+                  ),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Checkbox(
+                        value: _agree,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _agree = newValue ?? !_agree;
+                          });
+                        },
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          context.push(Routes.tos);
+                        },
+                        child: Text(
+                          '이용약관',
+                          style: textTheme.labelMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                    ),
-                    Text('과 ', style: textTheme.labelMedium),
-                    GestureDetector(
-                      onTap: () {
-                        context.push(Routes.privacy);
-                      },
-                      child: Text(
-                        '개인정보 처리 방침',
-                        style: textTheme.labelMedium?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w700,
+                      Text('과 ', style: textTheme.labelMedium),
+                      GestureDetector(
+                        onTap: () {
+                          context.push(Routes.privacy);
+                        },
+                        child: Text(
+                          '개인정보 처리 방침',
+                          style: textTheme.labelMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () => setState(() => _agree = !_agree),
-                      child: Text('에 동의해요 (필수)', style: textTheme.labelMedium),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: (_agree && !isLoading) ? _handleSignup : null,
-                    child: isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text('가입하기'),
+                      GestureDetector(
+                        onTap: () => setState(() => _agree = !_agree),
+                        child: Text(
+                          '에 동의해요 (필수)',
+                          style: textTheme.labelMedium,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton(
+                      onPressed: (_agree && !isLoading) ? _handleSignup : null,
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text('가입하기'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -111,9 +111,9 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
     final result = state.sessionResult;
 
     if (result.isShared) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-        child: SafeArea(
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
           child: ElevatedButton(
             onPressed: () {
               context.go(Routes.historyPost(widget.sessionId));
@@ -128,18 +128,20 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
         ),
       );
     } else if (state.isLatest) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-        child: SafeArea(
-          child: ElevatedButton(
-            onPressed: () {
-              context.go(Routes.historyShare(widget.sessionId));
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+          child: SafeArea(
+            child: ElevatedButton(
+              onPressed: () {
+                context.go(Routes.historyShare(widget.sessionId));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+              ),
+              child: Text('피드에 올리기'),
             ),
-            child: Text('피드에 올리기'),
           ),
         ),
       );

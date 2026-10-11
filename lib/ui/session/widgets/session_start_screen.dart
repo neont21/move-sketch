@@ -72,90 +72,93 @@ class SessionStartScreen extends ConsumerWidget {
           icon: Icon(Icons.chevron_left),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Center(
-          child: Column(
-            spacing: 20,
-            children: [
-              AnimatedToggleSwitch<ActivityType>.size(
-                current: state.activityType,
-                values: ActivityType.values,
-                onChanged: (type) {
-                  ref
-                      .read(sessionStartViewModelProvider.notifier)
-                      .setActivityType(type);
-                },
-                selectedIconScale: 1.0,
-                height: 48,
-                indicatorSize: const Size(120, 40),
-                style: ToggleStyle(
-                  backgroundColor: colorScheme.outline,
-                  borderColor: colorScheme.outline,
-                  indicatorColor: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(80),
-                ),
-                borderWidth: 4,
-                iconBuilder: (value) {
-                  return Center(
-                    child: Text(
-                      value.label,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: (value == state.activityType)
-                            ? colorScheme.onPrimary
-                            : colorScheme.tertiaryFixed,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: state.missions.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return ListTile(
-                        title: Text('오늘의 미션', style: textTheme.headlineSmall),
-                        trailing: Text(
-                          '최대 두 개까지 선택 가능 (${state.selectedMissionIds.length}/2)',
-                          style: textTheme.bodySmall,
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Center(
+            child: Column(
+              spacing: 20,
+              children: [
+                AnimatedToggleSwitch<ActivityType>.size(
+                  current: state.activityType,
+                  values: ActivityType.values,
+                  onChanged: (type) {
+                    ref
+                        .read(sessionStartViewModelProvider.notifier)
+                        .setActivityType(type);
+                  },
+                  selectedIconScale: 1.0,
+                  height: 48,
+                  indicatorSize: const Size(120, 40),
+                  style: ToggleStyle(
+                    backgroundColor: colorScheme.outline,
+                    borderColor: colorScheme.outline,
+                    indicatorColor: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(80),
+                  ),
+                  borderWidth: 4,
+                  iconBuilder: (value) {
+                    return Center(
+                      child: Text(
+                        value.label,
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: (value == state.activityType)
+                              ? colorScheme.onPrimary
+                              : colorScheme.tertiaryFixed,
                         ),
-                      );
-                    }
-                    final mission = state.missions[index - 1];
-                    final bool isSelected = state.selectedMissionIds.contains(
-                      mission.id,
-                    );
-                    return MissionCard(
-                      mission: mission,
-                      description: state.getMissionDescription(mission),
-                      isSelected: isSelected,
-                      onTap: () {
-                        ref
-                            .read(sessionStartViewModelProvider.notifier)
-                            .toggleMission(mission.id);
-                      },
+                      ),
                     );
                   },
                 ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: state.isLoading
-                      ? null
-                      : () => _startSession(context, ref),
-                  child: state.isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text('${state.activityType.label} 시작'),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.missions.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return ListTile(
+                          title: Text('오늘의 미션', style: textTheme.headlineSmall),
+                          trailing: Text(
+                            '최대 두 개까지 선택 가능 (${state.selectedMissionIds.length}/2)',
+                            style: textTheme.bodySmall,
+                          ),
+                        );
+                      }
+                      final mission = state.missions[index - 1];
+                      final bool isSelected = state.selectedMissionIds.contains(
+                        mission.id,
+                      );
+                      return MissionCard(
+                        mission: mission,
+                        description: state.getMissionDescription(mission),
+                        isSelected: isSelected,
+                        onTap: () {
+                          ref
+                              .read(sessionStartViewModelProvider.notifier)
+                              .toggleMission(mission.id);
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: ElevatedButton(
+                    onPressed: state.isLoading
+                        ? null
+                        : () => _startSession(context, ref),
+                    child: state.isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text('${state.activityType.label} 시작'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

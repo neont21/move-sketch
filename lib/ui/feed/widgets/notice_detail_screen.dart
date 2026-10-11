@@ -53,65 +53,67 @@ class NoticeDetailScreen extends ConsumerWidget {
           final ColorScheme colorScheme = Theme.of(context).colorScheme;
           final TextTheme textTheme = Theme.of(context).textTheme;
 
-          return Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (state.isImportant)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
+          return SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (state.isImportant)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '중요',
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onErrorContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(4),
+                  Text(
+                    state.title,
+                    style: textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: Text(
-                      '중요',
-                      style: textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onErrorContainer,
-                        fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    state.createdAt.formattedDateDot,
+                    style: textTheme.labelMedium,
+                  ),
+                  const Divider(height: 32),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Text(
+                        state.content,
+                        style: textTheme.bodyMedium?.copyWith(height: 1.6),
                       ),
                     ),
                   ),
-                Text(
-                  state.title,
-                  style: textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  state.createdAt.formattedDateDot,
-                  style: textTheme.labelMedium,
-                ),
-                const Divider(height: 32),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Text(
-                      state.content,
-                      style: textTheme.bodyMedium?.copyWith(height: 1.6),
-                    ),
-                  ),
-                ),
-                if (state.actionUrl != null && state.actionUrl!.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () => _handleActionUrl(
-                        context,
-                        state.actionUrl!,
+                  if (state.actionUrl != null &&
+                      state.actionUrl!.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () =>
+                            _handleActionUrl(context, state.actionUrl!),
+                        child: Text(state.actionButtonText ?? '자세히 보기'),
                       ),
-                      child: Text(state.actionButtonText ?? '자세히 보기'),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
           );
         },
