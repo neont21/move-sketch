@@ -7,6 +7,7 @@ import '../../../domain/models/fixed/mission_template.dart';
 import '../../../domain/models/session/mission_instance.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../domain/models/session/tracking_session.dart';
+import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
 
@@ -215,8 +216,29 @@ class SessionStartViewModel extends Notifier<SessionStartState> {
     state = state.copyWith(selectedMissionIds: selected);
   }
 
-  Future<Result<TrackingSession>> startSession(String userId) async {
+  Future<Result<TrackingSession>> startSession() async {
     state = state.copyWith(isLoading: true);
+
+    final locationRepository = ref.read(locationRepositoryProvider);
+    final hasPermission = await locationRepository.checkAndRequestPermission();
+
+    if (!hasPermission) {
+      state = state.copyWith(isLoading: false);
+
+      return const Result.error(
+        LocationException('운동 경로를 측정하려면 위치 권한과 GPS 활성화가 필요합니다.'),
+      );
+    }
+
+    final currentUser = await ref.read(authViewModelProvider.future);
+
+    if (currentUser == null) {
+      state = state.copyWith(isLoading: false);
+
+      return const Result.error(
+        AuthException('로그인된 사용자 정보를 찾을 수 없습니다.'),
+      );
+    }
 
     final selectedMissions = state.missions
         .where((template) => state.selectedMissionIds.contains(template.id))
@@ -233,7 +255,7 @@ class SessionStartViewModel extends Notifier<SessionStartState> {
 
     final sessionRepository = ref.read(sessionRepositoryProvider);
     final result = await sessionRepository.startSession(
-      userId: userId,
+      userId: currentUser.uid,
       activityType: state.activityType,
       missions: missions,
     );
