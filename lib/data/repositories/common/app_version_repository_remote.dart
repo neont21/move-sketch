@@ -7,7 +7,7 @@ import 'app_version_repository.dart';
 import 'firebase_exception_mapper.dart';
 
 final class AppVersionRepositoryRemote implements AppVersionRepository {
-  AppVersionService appVersionService;
+  final AppVersionService appVersionService;
 
   AppVersionRepositoryRemote({required this.appVersionService});
 

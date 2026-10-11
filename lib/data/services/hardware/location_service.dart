@@ -31,7 +31,8 @@ class LocationService {
     if (permission == LocationPermission.deniedForever) {
       return false;
     }
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return false;
     }

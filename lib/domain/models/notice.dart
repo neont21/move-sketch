@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../../utils/date_time_utils.dart';
+
 @immutable
 final class Notice {
   final String id;
@@ -25,9 +27,7 @@ final class Notice {
       id: documentId,
       title: map['title'] as String? ?? '공지사항',
       content: map['content'] as String? ?? '',
-      createdAt: (map['createdAt'] != null)
-          ? DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+      createdAt: parseDateTime(map['createdAt']),
       actionUrl: map['actionUrl'] as String?,
       actionButtonText: map['actionButtonText'] as String?,
       isImportant: map['isImportant'] as bool? ?? false,

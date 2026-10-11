@@ -9,7 +9,7 @@ abstract final class UrlLauncherUtils {
   static const String _androidPackageName = 'com.neonsightrap.move_sketch';
 
   static const String iosStoreUrl =
-      'https://apps.apple.com/kr/app//id$_iosAppId';
+      'https://apps.apple.com/kr/app/id$_iosAppId';
 
   static const String androidStoreUrl =
       'market://details?id=$_androidPackageName';
