@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/config/dependencies.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import '../../../config/assets.dart';
-import '../../../domain/models/enums/update_type.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
-import '../../../utils/result.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
+import '../../core/view_models/app_version_viewmodel.dart';
 import '../../core/widgets/update_dialog.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../view_models/home_viewmodel.dart';
@@ -28,6 +25,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   late String _formattedDate;
 
   bool _isResumeDialogShowing = false;
+  bool _isUpdateDialogShowing = false;
 
   void _showSessionResumeDialog(TrackingSession session) {
     if (_isResumeDialogShowing || !mounted) {
@@ -39,7 +37,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => PopScope(
+      builder: (dialogContext) => PopScope(
         canPop: false,
         child: Dialog(child: SessionResumeDialog(session: session)),
       ),
@@ -48,35 +46,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  Future<void> _checkAppVersion() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    final currentBuildNumber = int.tryParse(packageInfo.buildNumber) ?? 1;
-
-    final appVersionRepository = ref.read(appVersionRepositoryProvider);
-    final result = await appVersionRepository.getVersionPolicy();
-
-    if (!mounted) {
+  void _showUpdateDialog(AppVersionState versionState) {
+    if (_isUpdateDialogShowing || !mounted) {
       return;
     }
 
-    switch (result) {
-      case Ok(:final value):
-        final updateType = value.checkUpdateType(currentBuildNumber);
-        if (updateType == UpdateType.none) {
-          return;
-        }
+    _isUpdateDialogShowing = true;
 
-        final isForceUpdate = updateType == UpdateType.force;
-        showDialog(
-          context: context,
-          barrierDismissible: !isForceUpdate,
-          builder: (dialogContext) => Dialog(
-            child: UpdateDialog(policy: value, isForceUpdate: isForceUpdate),
-          ),
-        );
-      case Error():
-        break;
-    }
+    showDialog(
+      context: context,
+      barrierDismissible: !versionState.isForceUpdate,
+      builder: (dialogContext) => Dialog(
+        child: UpdateDialog(
+          policy: versionState.policy!,
+          isForceUpdate: versionState.isForceUpdate,
+        ),
+      ),
+    ).then((_) {
+      _isUpdateDialogShowing = false;
+    });
   }
 
   @override
@@ -86,8 +74,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _formattedDate = DateTime.now().formattedHeaderDate;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAppVersion();
-
       final session = ref.read(homeViewModelProvider).value?.uncompletedSession;
       if (session != null) {
         _showSessionResumeDialog(session);
@@ -99,6 +85,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
+
+    ref.listen<AsyncValue<AppVersionState>>(appVersionViewModelProvider, (prev, next) {
+      final versionState = next.value;
+      if (versionState != null && versionState.shouldUpdate) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showUpdateDialog(versionState);
+        });
+      }
+    });
 
     ref.listen<AsyncValue<HomeState>>(homeViewModelProvider, (prev, next) {
       final session = next.value?.uncompletedSession;
