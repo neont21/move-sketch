@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../utils/date_time_utils.dart';
 
@@ -22,6 +23,26 @@ final class Notice {
     this.isImportant = false,
   });
 
+  factory Notice.create({
+    required String title,
+    required String content,
+    String? actionUrl,
+    String? actionButtonText,
+    bool isImportant = false,
+  }) {
+    return Notice(
+      id: const Uuid().v7(),
+      title: title,
+      content: content,
+      createdAt: DateTime.now(),
+      actionUrl: actionUrl?.trim().isEmpty == true ? null : actionUrl?.trim(),
+      actionButtonText: actionButtonText?.trim().isEmpty == true
+          ? null
+          : actionButtonText?.trim(),
+      isImportant: isImportant,
+    );
+  }
+
   factory Notice.fromMap(Map<String, dynamic> map, String documentId) {
     return Notice(
       id: documentId,
@@ -43,5 +64,23 @@ final class Notice {
       if (actionButtonText != null) 'actionButtonText': actionButtonText,
       'isImportant': isImportant,
     };
+  }
+
+  Notice copyWith({
+    String? title,
+    String? content,
+    String? actionUrl,
+    String? actionButtonText,
+    bool? isImportant,
+  }) {
+    return Notice(
+      id: id,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      createdAt: createdAt,
+      actionUrl: actionUrl ?? this.actionUrl,
+      actionButtonText: actionButtonText ?? this.actionButtonText,
+      isImportant: isImportant ?? this.isImportant,
+    );
   }
 }

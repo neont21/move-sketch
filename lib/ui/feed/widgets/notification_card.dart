@@ -45,6 +45,8 @@ class NotificationCard extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final bool isNotice = notification.type == NotificationType.notice;
+
     return ListTile(
       tileColor: notification.isRead
           ? colorScheme.surfaceContainer
@@ -56,26 +58,50 @@ class NotificationCard extends StatelessWidget {
           context.go(route);
         }
       },
-      leading: UserAvatar(
-        username: notification.sender.username,
-        imageUrl: notification.sender.imageUrl,
-      ),
-      title: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: notification.sender.nickname,
+      leading: isNotice
+          ? Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: colorScheme.secondaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.campaign_rounded,
+                size: 22,
+                color: colorScheme.tertiaryContainer,
+              ),
+            )
+          : UserAvatar(
+              username: notification.sender.username,
+              imageUrl: notification.sender.imageUrl,
+            ),
+      title: isNotice
+          ? Text(
+              notification.noticeTitle ?? notification.type.notification,
               style: textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w700,
+                color: colorScheme.tertiary,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            )
+          : RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: notification.sender.nickname,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  TextSpan(
+                    text: notification.type.notification,
+                    style: textTheme.bodyMedium,
+                  ),
+                ],
               ),
             ),
-            TextSpan(
-              text: notification.type.notification,
-              style: textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
       subtitle: Text(
         notification.createdAt.formattedFeedTime,
         style: textTheme.labelMedium,

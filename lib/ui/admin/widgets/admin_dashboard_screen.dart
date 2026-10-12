@@ -5,6 +5,7 @@ import '../../../config/assets.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../view_models/admin_viewmodel.dart';
+import 'notice_management_tab.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
@@ -143,7 +144,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                   const Expanded(
                     child: TabBarView(
                       children: [
-                        Center(child: Text('공지사항 관리 탭 (TODO)')),
+                        NoticeManagementTab(),
                         Center(child: Text('버전 정책 관리 탭 (TODO)')),
                       ],
                     ),

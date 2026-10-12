@@ -13,6 +13,7 @@ class AppNotification {
   final String? targetSketchId;
   final String? targetCommentId;
   final String? targetNoticeId;
+  final String? noticeTitle;
   final bool isRead;
   final DateTime createdAt;
 
@@ -25,6 +26,7 @@ class AppNotification {
     this.targetSketchId,
     this.targetCommentId,
     this.targetNoticeId,
+    this.noticeTitle,
     this.isRead = false,
   });
 
@@ -67,6 +69,7 @@ class AppNotification {
       'targetSketchId': targetSketchId,
       'targetCommentId': targetCommentId,
       'targetNoticeId': targetNoticeId,
+      'noticeTitle': noticeTitle,
       'isRead': isRead,
       'createdAt': createdAt.toUtc().toIso8601String(),
     };
@@ -81,6 +84,7 @@ class AppNotification {
       targetSketchId: map['targetSketchId'] as String?,
       targetCommentId: map['targetCommentId'] as String?,
       targetNoticeId: map['targetNoticeId'] as String?,
+      noticeTitle: map['noticeTitle'] as String?,
       isRead: map['isRead'] as bool? ?? false,
       createdAt: parseDateTime(map['createdAt']).toLocal(),
     );
@@ -93,6 +97,8 @@ class AppNotification {
     NotificationType? type,
     String? targetSketchId,
     String? targetCommentId,
+    String? targetNoticeId,
+    String? noticeTitle,
     bool? isRead,
     DateTime? createdAt,
   }) {
@@ -103,6 +109,8 @@ class AppNotification {
       type: type ?? this.type,
       targetSketchId: targetSketchId ?? this.targetSketchId,
       targetCommentId: targetCommentId ?? this.targetCommentId,
+      targetNoticeId: targetNoticeId ?? this.targetNoticeId,
+      noticeTitle: noticeTitle ?? this.noticeTitle,
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,
     );

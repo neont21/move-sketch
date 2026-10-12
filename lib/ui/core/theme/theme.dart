@@ -33,7 +33,7 @@ class MoveSketchTheme {
         onPrimary: Colors.white,
         primaryContainer: brand300,
         secondary: navy,
-        secondaryContainer: paperBackground,
+        secondaryContainer: paperTint,
         tertiary: ink,
         tertiaryFixed: inkMuted,
         tertiaryContainer: inkFaint,
