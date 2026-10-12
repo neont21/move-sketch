@@ -9,6 +9,7 @@ final class AppVersionPolicy {
   final int minRequiredBuildNumber;
   final String title;
   final String releaseNotes;
+  final String? storeUrl;
 
   const AppVersionPolicy({
     required this.latestVersion,
@@ -17,6 +18,7 @@ final class AppVersionPolicy {
     required this.minRequiredBuildNumber,
     required this.title,
     required this.releaseNotes,
+    this.storeUrl,
   });
 
   UpdateType checkUpdateType(int currentBuildNumber) {
@@ -38,6 +40,7 @@ final class AppVersionPolicy {
           (map['minRequiredBuildNumber'] as num?)?.toInt() ?? 1,
       title: map['title'] as String? ?? '새로운 버전이 출시되었습니다!',
       releaseNotes: map['releaseNotes'] as String? ?? '',
+      storeUrl: map['storeUrl'] as String?,
     );
   }
 }

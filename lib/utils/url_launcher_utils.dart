@@ -43,7 +43,11 @@ abstract final class UrlLauncherUtils {
     }
   }
 
-  static Future<Result<void>> openStore() async {
+  static Future<Result<void>> openStore({String? customStoreUrl}) async {
+    if (customStoreUrl != null && customStoreUrl.trim().isNotEmpty) {
+      return openExternalUrl(customStoreUrl);
+    }
+
     if (kIsWeb) {
       return const Result.error(
         ExternalAppException('웹 플랫폼에서는 스토어 이동을 지원하지 않습니다.'),

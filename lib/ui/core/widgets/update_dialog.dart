@@ -18,7 +18,9 @@ class UpdateDialog extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final messenger = ScaffoldMessenger.of(context);
 
-    final result = await UrlLauncherUtils.openStore();
+    final result = await UrlLauncherUtils.openStore(
+      customStoreUrl: policy.storeUrl,
+    );
 
     switch (result) {
       case Ok():
