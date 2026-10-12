@@ -100,4 +100,6 @@ abstract final class Routes {
   static const userProfilePath = '/profile/:username';
   static String userProfile(String username) => '/profile/$username';
   static const userProfilePostRelative = ':sketch_id';
+
+  static const String admin = '/admin';
 }

@@ -18,4 +18,31 @@ class NoticeService {
 
     return Notice.fromMap(doc.data()!, doc.id);
   }
+
+  Future<List<Notice>> getAllNotices() async {
+    final snapshot = await _noticesRef
+        .orderBy('createdAt', descending: true)
+        .limit(50)
+        .get();
+
+    return snapshot.docs
+        .map((document) => Notice.fromMap(document.data(), document.id))
+        .toList();
+  }
+
+  Future<void> createNotice(Notice notice) async {
+    if (notice.id.isNotEmpty) {
+      await _noticesRef.doc(notice.id).set(notice.toMap());
+    } else {
+      await _noticesRef.add(notice.toMap());
+    }
+  }
+
+  Future<void> updateNotice(Notice notice) async {
+    await _noticesRef.doc(notice.id).update(notice.toMap());
+  }
+
+  Future<void> deleteNotice(String noticeId) async {
+    await _noticesRef.doc(noticeId).delete();
+  }
 }

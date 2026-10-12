@@ -18,4 +18,16 @@ class AppVersionService {
 
     return AppVersionPolicy.fromMap(doc.data()!);
   }
+
+  Future<void> updateVersionPolicy(AppVersionPolicy policy) async {
+    await _versionDocRef.set({
+      'latestVersion': policy.latestVersion,
+      'latestBuildNumber': policy.latestBuildNumber,
+      'minRequiredVersion': policy.minRequiredVersion,
+      'minRequiredBuildNumber': policy.minRequiredBuildNumber,
+      'title': policy.title,
+      'releaseNotes': policy.releaseNotes,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
 }

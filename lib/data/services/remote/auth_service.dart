@@ -53,6 +53,10 @@ class AuthService {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
+    if (kIsWeb) {
+      return await _auth.signInWithPopup(GoogleAuthProvider());
+    }
+
     try {
       final GoogleSignInAccount account = await GoogleSignIn.instance
           .authenticate();

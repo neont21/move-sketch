@@ -30,4 +30,21 @@ final class AppVersionRepositoryRemote implements AppVersionRepository {
       );
     }
   }
+
+  @override
+  Future<Result<void>> updateVersionPolicy(AppVersionPolicy policy) async {
+    try {
+      await appVersionService.updateVersionPolicy(policy);
+
+      return const Result.ok(null);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '버전 정책 저장 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('버전 정책 저장 중 오류가 발생했습니다.', cause: e),
+      );
+    }
+  }
 }

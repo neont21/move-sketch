@@ -28,4 +28,64 @@ class NoticeRepositoryRemote implements NoticeRepository {
       return Result.error(DatabaseException('공지사항 조회 중 오류가 발생했습니다.', cause: e));
     }
   }
+
+  @override
+  Future<Result<List<Notice>>> getAllNotices() async {
+    try {
+      final notices = await noticeService.getAllNotices();
+
+      return Result.ok(notices);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '공지사항 조회 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(DatabaseException('공지사항 조회 중 오류가 발생했습니다.', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<void>> createNotice(Notice notice) async {
+    try {
+      await noticeService.createNotice(notice);
+
+      return const Result.ok(null);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '공지사항 등록 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(DatabaseException('공지사항 등록 중 오류가 발생했습니다.', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<void>> updateNotice(Notice notice) async {
+    try {
+      await noticeService.updateNotice(notice);
+
+      return const Result.ok(null);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '공지사항 수정 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(DatabaseException('공지사항 수정 중 오류가 발생했습니다.', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<void>> deleteNotice(String noticeId) async {
+    try {
+      await noticeService.deleteNotice(noticeId);
+
+      return const Result.ok(null);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '공지사항 삭제 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(DatabaseException('공지사항 삭제 중 오류가 발생했습니다.', cause: e));
+    }
+  }
 }

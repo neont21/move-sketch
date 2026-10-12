@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../domain/models/social/social_auth_result.dart';
 import '../domain/models/social/social_onboarding_profile.dart';
 import '../domain/models/social/user.dart';
+import '../ui/admin/widgets/admin_gate.dart';
 import '../ui/auth/view_models/auth_viewmodel.dart';
 import '../ui/auth/widgets/login_screen.dart';
 import '../ui/auth/widgets/reset_password_screen.dart';
@@ -90,7 +92,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           location.startsWith(Routes.auth) ||
           location == Routes.privacy ||
           location == Routes.tos ||
-          location == Routes.license;
+          location == Routes.license ||
+          location.startsWith(Routes.admin);
 
       if (user == null) {
         return isPublicRoute ? null : Routes.login;
@@ -114,7 +117,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, navigationShell) =>
             MoveSketchShell(navigationShell: navigationShell),
         branches: [
-          // tap: Home
+          // tab: Home
           StatefulShellBranch(
             navigatorKey: _homeNavigatorKey,
             routes: [
@@ -124,7 +127,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // tap: Feed
+          // tab: Feed
           StatefulShellBranch(
             navigatorKey: _feedNavigatorKey,
             routes: [
@@ -196,7 +199,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // tap: History
+          // tab: History
           StatefulShellBranch(
             navigatorKey: _historyNavigatorKey,
             routes: [
@@ -229,7 +232,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // tap: Me
+          // tab: Me
           StatefulShellBranch(
             navigatorKey: _meNavigatorKey,
             routes: [
@@ -397,6 +400,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      if (kIsWeb)
+        GoRoute(
+          path: Routes.admin,
+          builder: (context, state) {
+            return const AdminGate();
+          },
+        ),
     ],
   );
 });
