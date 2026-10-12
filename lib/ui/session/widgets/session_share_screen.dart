@@ -12,6 +12,7 @@ import '../../feed/view_models/feed_post_viewmodel.dart';
 import '../../feed/view_models/feed_viewmodel.dart';
 import '../../history/view_models/history_details_viewmodel.dart';
 import '../../history/view_models/history_viewmodel.dart';
+import '../../profile/view_models/my_profile_viewmodel.dart';
 import '../view_models/session_share_viewmodel.dart';
 import 'sketch_card.dart';
 
@@ -66,6 +67,7 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
         ref.invalidate(feedViewModelProvider);
         ref.invalidate(historyViewModelProvider);
         ref.invalidate(historyDetailsViewModelProvider(widget.sessionId));
+        ref.invalidate(myProfileViewModelProvider);
 
         final currentMatchedLocation = GoRouterState.of(
           context,

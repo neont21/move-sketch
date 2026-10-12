@@ -11,6 +11,7 @@ import '../../core/widgets/error_retry_view.dart';
 import '../../friends/widgets/user_list_dialog.dart';
 import '../../history/view_models/history_viewmodel.dart';
 import '../../home/view_models/home_viewmodel.dart';
+import '../../profile/view_models/my_profile_viewmodel.dart';
 import '../view_models/feed_post_viewmodel.dart';
 import '../view_models/feed_viewmodel.dart';
 import 'cheer_button.dart';
@@ -178,6 +179,7 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
         ref.invalidate(feedViewModelProvider);
         ref.invalidate(historyViewModelProvider);
         ref.invalidate(homeViewModelProvider);
+        ref.invalidate(myProfileViewModelProvider);
 
         if (mounted) {
           context.pop();

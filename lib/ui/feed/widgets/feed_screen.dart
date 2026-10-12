@@ -7,6 +7,7 @@ import '../../../utils/result.dart';
 import '../../core/widgets/error_retry_view.dart';
 import '../../history/view_models/history_viewmodel.dart';
 import '../../home/view_models/home_viewmodel.dart';
+import '../../profile/view_models/my_profile_viewmodel.dart';
 import '../view_models/feed_notifications_viewmodel.dart';
 import '../view_models/feed_viewmodel.dart';
 import 'feed_post_card.dart';
@@ -80,6 +81,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       case Ok():
         ref.invalidate(historyViewModelProvider);
         ref.invalidate(homeViewModelProvider);
+        ref.invalidate(myProfileViewModelProvider);
       case Error(:final error):
         final errorMessage = error is AppException
             ? error.message

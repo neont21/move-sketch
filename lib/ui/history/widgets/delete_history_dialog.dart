@@ -5,6 +5,7 @@ import '../../../utils/result.dart';
 import '../../core/widgets/dialog_action_buttons.dart';
 import '../../feed/view_models/feed_viewmodel.dart';
 import '../../home/view_models/home_viewmodel.dart';
+import '../../profile/view_models/my_profile_viewmodel.dart';
 import '../view_models/history_viewmodel.dart';
 
 class DeleteHistoryDialog extends ConsumerStatefulWidget {
@@ -79,6 +80,7 @@ class _DeleteHistoryDialogState extends ConsumerState<DeleteHistoryDialog> {
                   ref.invalidate(homeViewModelProvider);
                   if (_cascade) {
                     ref.invalidate(feedViewModelProvider);
+                    ref.invalidate(myProfileViewModelProvider);
                   }
                   messenger.showSnackBar(
                     const SnackBar(
