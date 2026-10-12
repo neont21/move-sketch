@@ -61,36 +61,43 @@ class FeedPostCard extends ConsumerWidget {
                 }
               },
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  spacing: 8,
-                  children: [
-                    GestureDetector(
-                      onTap: isAuthorDeleted
-                          ? null
-                          : () {
-                              if (isMe) {
-                                context.go(Routes.me);
-                              } else {
-                                context.go(
-                                  Routes.feedProfile(sketch.author.username),
-                                );
-                              }
-                            },
-                      child: Text(
-                        sketch.author.nickname,
-                        style: textTheme.bodyLarge,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    spacing: 8,
+                    children: [
+                      GestureDetector(
+                        onTap: isAuthorDeleted
+                            ? null
+                            : () {
+                                if (isMe) {
+                                  context.go(Routes.me);
+                                } else {
+                                  context.go(
+                                    Routes.feedProfile(sketch.author.username),
+                                  );
+                                }
+                              },
+                        child: Text(
+                          sketch.author.nickname,
+                          style: textTheme.bodyLarge,
+                        ),
                       ),
-                    ),
-                    ActivityBadge(activityType: sketch.activityType),
-                  ],
-                ),
-                Text(metaText, style: textTheme.labelMedium),
-              ],
+                      ActivityBadge(activityType: sketch.activityType),
+                    ],
+                  ),
+                  Text(
+                    metaText,
+                    style: textTheme.labelMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-            Spacer(),
             BottomSheetButton(
               author: sketch.author,
               sketchIdIfPost: sketch.id,

@@ -130,27 +130,40 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               )
             : RefreshIndicator(
                 onRefresh: _onRefresh,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    itemCount:
-                        state.sketches.length + (state.isFetchingMore ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == state.sketches.length) {
-                        return const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: CircularProgressIndicator(),
-                          ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    const double maxContentWidth = 520.0;
+                    final double horizontalPadding =
+                        constraints.maxWidth > (maxContentWidth + 40.0)
+                        ? (constraints.maxWidth - maxContentWidth) / 2.0
+                        : 20.0;
+
+                    return ListView.builder(
+                      controller: _scrollController,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                        vertical: 8.0,
+                      ),
+                      itemCount:
+                          state.sketches.length +
+                          (state.isFetchingMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == state.sketches.length) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+                        return FeedPostCard(
+                          sketch: state.sketches[index],
+                          onDelete: () =>
+                              _deleteSketch(state.sketches[index].id),
                         );
-                      }
-                      return FeedPostCard(
-                        sketch: state.sketches[index],
-                        onDelete: () => _deleteSketch(state.sketches[index].id),
-                      );
-                    },
-                  ),
+                      },
+                    );
+                  },
                 ),
               ),
       ),

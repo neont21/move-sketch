@@ -86,7 +86,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    ref.listen<AsyncValue<AppVersionState>>(appVersionViewModelProvider, (prev, next) {
+    ref.listen<AsyncValue<AppVersionState>>(appVersionViewModelProvider, (
+      prev,
+      next,
+    ) {
       final versionState = next.value;
       if (versionState != null && versionState.shouldUpdate) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -163,18 +166,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
               Expanded(
-                child: Transform.rotate(
-                  angle: 0.05,
-                  child: SketchCard(
-                    imageProvider:
-                        latestResult?.resultSketchImageUrl != null &&
-                            latestResult!.resultSketchImageUrl!.isNotEmpty
-                        ? NetworkImage(latestResult.resultSketchImageUrl!)
-                        : const AssetImage(Assets.sampleSketch),
-                    caption: latestResult != null
-                        ? '${latestResult.endedAt.formattedDateDot} ${latestResult.activityType.label}'
-                        : '첫 장을 기다리는 중',
-                    isHome: true,
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Transform.rotate(
+                        angle: 0.05,
+                        child: SketchCard(
+                          imageProvider:
+                              latestResult?.resultSketchImageUrl != null &&
+                                  latestResult!.resultSketchImageUrl!.isNotEmpty
+                              ? NetworkImage(latestResult.resultSketchImageUrl!)
+                              : const AssetImage(Assets.sampleSketch),
+                          caption: latestResult != null
+                              ? '${latestResult.endedAt.formattedDateDot} ${latestResult.activityType.label}'
+                              : '첫 장을 기다리는 중',
+                          isHome: true,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
