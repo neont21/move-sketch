@@ -6,7 +6,7 @@ import 'result.dart';
 
 abstract final class UrlLauncherUtils {
   static const String _iosAppId = '6819965333';
-  static const String _androidPackageName = 'com.neonsightrap.move_sketch';
+  static const String _androidPackageName = 'com.neonsigntrap.move_sketch';
 
   static const String iosStoreUrl =
       'https://apps.apple.com/kr/app/id$_iosAppId';
