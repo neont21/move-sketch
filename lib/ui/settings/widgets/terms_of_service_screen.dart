@@ -110,7 +110,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                 content:
                 '1. 서비스는 회원의 단말기 GPS 센서를 활용하여 위치정보를 수집하며, 이는 운동 세션 기록 및 스케치 그래픽 생성에만 활용됩니다.\n'
                     '2. 백그라운드 수집: 운동 세션 실행 중 화면이 꺼지거나 타 앱으로 전환된 상태에서도 경로 유실을 방지하기 위해 백그라운드 위치를 수집합니다. 세션 종료 또는 일시정지 시 수집은 즉시 정지됩니다.\n'
-                    '3. 위치정보 관리책임자: 정주원 (neont21@gmail.com)\n'
+                    '3. 위치정보 관리책임자: 정주원 (movesketch@neonsigntrap.com)\n'
                     '4. 회원은 단말기 권한 설정을 통해 언제든지 위치 수집 동의를 철회할 수 있습니다.',
               ),
               _buildSection(

@@ -163,7 +163,7 @@ class PrivacyScreen extends StatelessWidget {
                 content:
                     '1. 개인정보 처리와 관련한 문의 및 불만처리는 아래의 보호책임자에게 문의해 주시기 바랍니다.\n'
                     '  • 개인정보 보호책임자: 정주원 (무브스케치 개발 및 운영)\n'
-                    '  • 연락처 이메일: neont21@gmail.com\n\n'
+                    '  • 연락처 이메일: movesketch@neonsigntrap.com\n\n'
                     '2. 기타 개인정보 침해에 대한 상담이나 신고는 아래 기관에 문의하실 수 있습니다.\n'
                     '  • 개인정보분쟁조정위원회: (국번없이) 1833-6972 (kopico.go.kr)\n'
                     '  • 개인정보침해신고센터: (국번없이) 118 (privacy.kisa.or.kr)\n'
