@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../../routing/routes.dart';
+import '../../../utils/exceptions.dart';
+import '../../../utils/result.dart';
+import '../../../utils/url_launcher_utils.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -93,6 +96,36 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text('앱 정보', style: textTheme.labelLarge),
+              ListTile(
+                onTap: () async {
+                  final result = await UrlLauncherUtils.openExternalUrl(
+                    UrlLauncherUtils.noticesWebUrl,
+                    inApp: true,
+                  );
+                  if (!context.mounted) {
+                    return;
+                  }
+                  switch (result) {
+                    case Ok():
+                      break;
+                    case Error(:final error):
+                      final String errorMessage = error is AppException
+                          ? error.message
+                          : '공지사항을 열 수 없습니다.';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(errorMessage),
+                          backgroundColor: colorScheme.error,
+                        ),
+                      );
+                  }
+                },
+                title: Text('공지사항', style: textTheme.bodyMedium),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: colorScheme.tertiaryContainer,
+                ),
+              ),
               ListTile(
                 onTap: () {
                   context.push(Routes.privacy);

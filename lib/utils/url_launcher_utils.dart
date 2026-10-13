@@ -17,7 +17,13 @@ abstract final class UrlLauncherUtils {
   static const String androidWebStoreUrl =
       'https://play.google.com/store/apps/details?id=$_androidPackageName';
 
-  static Future<Result<void>> openExternalUrl(String urlString) async {
+  static const String noticesWebUrl =
+      'https://movesketch.neonsigntrap.com/notices.html';
+
+  static Future<Result<void>> openExternalUrl(
+    String urlString, {
+    bool inApp = false,
+  }) async {
     final uri = Uri.tryParse(urlString);
     if (uri == null) {
       return Result.error(ValidationException('유효하지 않은 URL 형식입니다: $urlString'));
@@ -26,7 +32,9 @@ abstract final class UrlLauncherUtils {
     try {
       final isLaunched = await launchUrl(
         uri,
-        mode: LaunchMode.externalApplication,
+        mode: inApp
+            ? LaunchMode.inAppBrowserView
+            : LaunchMode.externalApplication,
       );
 
       if (!isLaunched) {
