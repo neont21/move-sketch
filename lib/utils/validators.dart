@@ -119,4 +119,25 @@ abstract final class Validators {
     }
     return null;
   }
+
+  static String? validateUrl(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'URL을 입력해 주세요.';
+    }
+    final String trimmedUrl = value.trim();
+    final Uri? parsedUri = Uri.tryParse(trimmedUrl);
+    if (parsedUri == null ||
+        (parsedUri.scheme != 'http' && parsedUri.scheme != 'https') ||
+        !parsedUri.hasAuthority) {
+      return 'http:// 또는 https:// 로 시작하는 올바른 URL을 입력해 주세요.';
+    }
+    return null;
+  }
+
+  static String? validateOptionalUrl(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null;
+    }
+    return validateUrl(value);
+  }
 }

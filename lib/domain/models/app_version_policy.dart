@@ -9,7 +9,8 @@ final class AppVersionPolicy {
   final int minRequiredBuildNumber;
   final String title;
   final String releaseNotes;
-  final String? storeUrl;
+  final String? androidStoreUrl;
+  final String? iosStoreUrl;
 
   const AppVersionPolicy({
     required this.latestVersion,
@@ -18,7 +19,8 @@ final class AppVersionPolicy {
     required this.minRequiredBuildNumber,
     required this.title,
     required this.releaseNotes,
-    this.storeUrl,
+    this.androidStoreUrl,
+    this.iosStoreUrl,
   });
 
   UpdateType checkUpdateType(int currentBuildNumber) {
@@ -40,7 +42,72 @@ final class AppVersionPolicy {
           (map['minRequiredBuildNumber'] as num?)?.toInt() ?? 1,
       title: map['title'] as String? ?? '새로운 버전이 출시되었습니다!',
       releaseNotes: map['releaseNotes'] as String? ?? '',
-      storeUrl: map['storeUrl'] as String?,
+      androidStoreUrl: map['androidStoreUrl'] as String?,
+      iosStoreUrl: map['iosStoreUrl'] as String?,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'latestVersion': latestVersion,
+      'latestBuildNumber': latestBuildNumber,
+      'minRequiredVersion': minRequiredVersion,
+      'minRequiredBuildNumber': minRequiredBuildNumber,
+      'title': title,
+      'releaseNotes': releaseNotes,
+      'androidStoreUrl': androidStoreUrl,
+      'iosStoreUrl': iosStoreUrl,
+    };
+  }
+
+  AppVersionPolicy copyWith({
+    String? latestVersion,
+    int? latestBuildNumber,
+    String? minRequiredVersion,
+    int? minRequiredBuildNumber,
+    String? title,
+    String? releaseNotes,
+    String? androidStoreUrl,
+    String? iosStoreUrl,
+  }) {
+    return AppVersionPolicy(
+      latestVersion: latestVersion ?? this.latestVersion,
+      latestBuildNumber: latestBuildNumber ?? this.latestBuildNumber,
+      minRequiredVersion: minRequiredVersion ?? this.minRequiredVersion,
+      minRequiredBuildNumber:
+          minRequiredBuildNumber ?? this.minRequiredBuildNumber,
+      title: title ?? this.title,
+      releaseNotes: releaseNotes ?? this.releaseNotes,
+      androidStoreUrl: androidStoreUrl ?? this.androidStoreUrl,
+      iosStoreUrl: iosStoreUrl ?? this.iosStoreUrl,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is AppVersionPolicy &&
+        other.latestVersion == latestVersion &&
+        other.latestBuildNumber == latestBuildNumber &&
+        other.minRequiredVersion == minRequiredVersion &&
+        other.minRequiredBuildNumber == minRequiredBuildNumber &&
+        other.title == title &&
+        other.releaseNotes == releaseNotes &&
+        other.androidStoreUrl == androidStoreUrl &&
+        other.iosStoreUrl == iosStoreUrl;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    latestVersion,
+    latestBuildNumber,
+    minRequiredVersion,
+    minRequiredBuildNumber,
+    title,
+    releaseNotes,
+    androidStoreUrl,
+    iosStoreUrl,
+  );
 }

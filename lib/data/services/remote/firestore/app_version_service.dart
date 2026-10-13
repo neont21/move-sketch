@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:move_sketch/domain/models/app_version_policy.dart';
+
+import '../../../../domain/models/app_version_policy.dart';
 
 class AppVersionService {
   final FirebaseFirestore _firestore;
@@ -27,6 +28,8 @@ class AppVersionService {
       'minRequiredBuildNumber': policy.minRequiredBuildNumber,
       'title': policy.title,
       'releaseNotes': policy.releaseNotes,
+      'androidStoreUrl': policy.androidStoreUrl,
+      'iosStoreUrl': policy.iosStoreUrl,
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
   }

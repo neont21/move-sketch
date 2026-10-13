@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../domain/models/app_version_policy.dart';
 import '../../../utils/exceptions.dart';
@@ -18,8 +19,13 @@ class UpdateDialog extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final messenger = ScaffoldMessenger.of(context);
 
+    final bool isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    final String? targetStoreUrl = isIOS
+        ? policy.iosStoreUrl
+        : policy.androidStoreUrl;
+
     final result = await UrlLauncherUtils.openStore(
-      customStoreUrl: policy.storeUrl,
+      customStoreUrl: targetStoreUrl,
     );
 
     switch (result) {
