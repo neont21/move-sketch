@@ -77,7 +77,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     refreshListenable: refreshListenable,
-    initialLocation: Routes.home,
+    initialLocation: kIsWeb ? Routes.admin : Routes.home,
     redirect: (context, state) {
       final authState = ref.read(authViewModelProvider);
 
@@ -87,6 +87,10 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final user = authState.value;
       final location = state.matchedLocation;
+
+      if (kIsWeb && location == '/') {
+        return Routes.admin;
+      }
 
       final isPublicRoute =
           location.startsWith(Routes.auth) ||
@@ -105,7 +109,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           location == Routes.resetPassword;
 
       if (isAuthRoute) {
-        return Routes.home;
+        return kIsWeb ? Routes.admin : Routes.home;
       }
 
       return null;
