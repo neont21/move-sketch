@@ -5,6 +5,7 @@ export type NotificationType =
   | "requestFriend"
   | "acceptFriend"
   | "reminder"
+  | "notice"
   | "unknown";
 
 export interface SenderSummary {
@@ -40,4 +41,14 @@ export interface UserDocument {
   readonly nickname: string;
   readonly fcmToken?: string | null;
   readonly notificationSettings?: NotificationSettings;
+}
+
+export interface NoticeDocument {
+  readonly id?: string;
+  readonly title: string;
+  readonly content: string;
+  readonly createdAt: string;
+  readonly isImportant?: boolean;
+  readonly actionUrl?: string | null;
+  readonly actionButtonText?: string | null;
 }

@@ -6,3 +6,4 @@ export {onNotificationCreated} from "./notifications/send_push_notification";
 export {
   sendDailyReminderNotification,
 } from "./notifications/reminder_scheduler";
+export {onNoticeCreated} from "./notifications/notice_broadcast";
