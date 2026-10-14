@@ -25,6 +25,8 @@ function buildNotificationBody(
     return `${senderNickname} 님이 내 댓글에 답글을 달았어요.`;
   case "cheer":
     return `${senderNickname} 님이 내 스케치에 응원을 보냈어요.`;
+  case "sketch":
+    return `${senderNickname} 님이 새로운 스케치를 게시했어요.`;
   case "requestFriend":
     return `${senderNickname} 님이 친구 요청을 보냈어요.`;
   case "acceptFriend":
@@ -62,6 +64,8 @@ function isNotificationAllowed(
   case "reply":
   case "cheer":
     return settings.responseNotification ?? true;
+  case "sketch":
+    return settings.sketchNotification ?? true;
   default:
     return true;
   }

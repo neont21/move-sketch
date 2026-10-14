@@ -5,6 +5,7 @@ enum NotificationType {
   ),
   reply(notification: '님이 내 댓글에 답글을 달았어요.', base: '/feed/notifications/post/'),
   cheer(notification: '님이 내 스케치에 응원을 보냈어요.', base: '/feed/notifications/post/'),
+  sketch(notification: '님이 새로운 스케치를 게시했어요.', base: '/feed/notifications/post/'),
   requestFriend(
     notification: '님이 친구 요청을 보냈어요.',
     base: '/feed/notifications/profile/',
@@ -13,13 +14,10 @@ enum NotificationType {
     notification: '님이 친구 요청을 수락했어요.',
     base: '/feed/notifications/profile/',
   ),
-  reminder(
-    notification: '오늘의 운동을 시작해 볼까요?',
-    base: '/session-start'
-  ),
+  reminder(notification: '오늘의 운동을 시작해 볼까요?', base: '/session-start'),
   notice(
     notification: '새로운 공지사항이 등록되었어요.',
-    base: '/feed/notifications/notices/'
+    base: '/feed/notifications/notices/',
   ),
   unknown(notification: '님의 알 수 없는 알림.', base: '/');
 

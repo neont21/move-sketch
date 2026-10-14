@@ -7,3 +7,4 @@ export {
   sendDailyReminderNotification,
 } from "./notifications/reminder_scheduler";
 export {onNoticeCreated} from "./notifications/notice_broadcast";
+export {onSketchPostCreated} from "./notifications/sketch_broadcast";

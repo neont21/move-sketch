@@ -148,7 +148,8 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
     return switch (notificationType) {
       NotificationType.comment ||
       NotificationType.reply ||
-      NotificationType.cheer =>
+      NotificationType.cheer ||
+      NotificationType.sketch =>
         (targetSketchId != null && targetSketchId.isNotEmpty)
             ? Routes.feedNotificationPost(targetSketchId)
             : Routes.feedNotifications,
@@ -158,9 +159,9 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
             : Routes.feedNotifications,
       NotificationType.reminder => Routes.sessionStart,
       NotificationType.notice =>
-      (targetNoticeId != null && targetNoticeId.isNotEmpty)
-          ? Routes.feedNotificationNotice(targetNoticeId)
-          : Routes.feedNotifications,
+        (targetNoticeId != null && targetNoticeId.isNotEmpty)
+            ? Routes.feedNotificationNotice(targetNoticeId)
+            : Routes.feedNotifications,
       NotificationType.unknown => Routes.feedNotifications,
     };
   }
@@ -189,11 +190,15 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
   }
 
   void _navigateToRoute(String destinationRoute) {
-    FirebaseCrashlytics.instance.log('푸시 알림 딥링크 네비게이션 시도: route=$destinationRoute');
+    FirebaseCrashlytics.instance.log(
+      '푸시 알림 딥링크 네비게이션 시도: route=$destinationRoute',
+    );
 
     final context = rootNavigatorKey.currentContext;
     if (context == null) {
-      FirebaseCrashlytics.instance.log('네비게이션 실패: rootNavigatorKey.currentContext가 null임');
+      FirebaseCrashlytics.instance.log(
+        '네비게이션 실패: rootNavigatorKey.currentContext가 null임',
+      );
       return;
     }
 

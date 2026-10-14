@@ -21,6 +21,7 @@ class NotificationCard extends StatelessWidget {
       case NotificationType.comment:
       case NotificationType.reply:
       case NotificationType.cheer:
+      case NotificationType.sketch:
         if (notification.targetSketchId != null) {
           return Routes.feedNotificationPost(notification.targetSketchId!);
         }
