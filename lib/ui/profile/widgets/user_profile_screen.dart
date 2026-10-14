@@ -16,6 +16,7 @@ class UserProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final profileState = ref.watch(userProfileViewModelProvider(username));
 
@@ -25,10 +26,34 @@ class UserProfileScreen extends ConsumerWidget {
           profileState.maybeWhen(
             data: (state) {
               final targetUser = state.user.toSummary();
-              return UserSheetButton(
-                targetUser: targetUser,
-                isFriend: state.isFriend,
-                isBlocked: state.isBlocked,
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (state.isFriend)
+                    IconButton(
+                      onPressed: () {
+                        ref
+                            .read(
+                              userProfileViewModelProvider(username).notifier,
+                            )
+                            .toggleFavoriteFriend();
+                      },
+                      icon: Icon(
+                        state.isFavorite
+                            ? Icons.notifications_active_rounded
+                            : Icons.notifications_none_rounded,
+                        color: state.isFavorite
+                            ? colorScheme.primary
+                            : colorScheme.tertiaryContainer,
+                      ),
+                    ),
+                  UserSheetButton(
+                    targetUser: targetUser,
+                    isFriend: state.isFriend,
+                    isBlocked: state.isBlocked,
+                  ),
+                  const SizedBox(width: 12),
+                ],
               );
             },
             orElse: () => const SizedBox.shrink(),
@@ -57,7 +82,10 @@ class UserProfileScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(targetUser.nickname, style: textTheme.bodyLarge),
+                            Text(
+                              targetUser.nickname,
+                              style: textTheme.bodyLarge,
+                            ),
                             Text(
                               '@${targetUser.username}',
                               style: textTheme.labelMedium,
@@ -84,7 +112,9 @@ class UserProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 16),
                   state.isFriend
                       ? const SizedBox.shrink()
-                      : MutualFriendsSection(mutualFriends: state.mutualFriends),
+                      : MutualFriendsSection(
+                          mutualFriends: state.mutualFriends,
+                        ),
                   const Divider(),
                   Expanded(
                     child: state.isFriend

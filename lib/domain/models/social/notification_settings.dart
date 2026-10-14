@@ -5,6 +5,7 @@ class NotificationSettings {
   final bool pushEnabled;
   final bool friendNotification;
   final bool responseNotification;
+  final bool sketchNotification;
   final bool reminderNotification;
   final Set<int> reminderDays;
   final int reminderHour;
@@ -13,6 +14,7 @@ class NotificationSettings {
     this.pushEnabled = true,
     this.friendNotification = true,
     this.responseNotification = true,
+    this.sketchNotification = true,
     this.reminderNotification = false,
     this.reminderDays = const {1, 2, 3, 4, 5},
     this.reminderHour = 19,
@@ -23,6 +25,7 @@ class NotificationSettings {
       'pushEnabled': pushEnabled,
       'friendNotification': friendNotification,
       'responseNotification': responseNotification,
+      'sketchNotification': sketchNotification,
       'reminderNotification': reminderNotification,
       'reminderDays': reminderDays.toList()..sort(),
       'reminderHour': reminderHour,
@@ -34,6 +37,7 @@ class NotificationSettings {
       pushEnabled: map['pushEnabled'] as bool? ?? true,
       friendNotification: map['friendNotification'] as bool? ?? true,
       responseNotification: map['responseNotification'] as bool? ?? true,
+      sketchNotification: map['sketchNotification'] as bool? ?? true,
       reminderNotification: map['reminderNotification'] as bool? ?? false,
       reminderDays:
           (map['reminderDays'] as List<dynamic>?)
@@ -48,6 +52,7 @@ class NotificationSettings {
     bool? pushEnabled,
     bool? friendNotification,
     bool? responseNotification,
+    bool? sketchNotification,
     bool? reminderNotification,
     Set<int>? reminderDays,
     int? reminderHour,
@@ -56,6 +61,7 @@ class NotificationSettings {
       pushEnabled: pushEnabled ?? this.pushEnabled,
       friendNotification: friendNotification ?? this.friendNotification,
       responseNotification: responseNotification ?? this.responseNotification,
+      sketchNotification: sketchNotification ?? this.sketchNotification,
       reminderNotification: reminderNotification ?? this.reminderNotification,
       reminderDays: reminderDays ?? this.reminderDays,
       reminderHour: reminderHour ?? this.reminderHour,
@@ -70,6 +76,7 @@ class NotificationSettings {
               pushEnabled == other.pushEnabled &&
               friendNotification == other.friendNotification &&
               responseNotification == other.responseNotification &&
+              sketchNotification == other.sketchNotification &&
               reminderNotification == other.reminderNotification &&
               reminderHour == other.reminderHour &&
               setEquals(reminderDays, other.reminderDays);
@@ -78,6 +85,7 @@ class NotificationSettings {
     pushEnabled,
     friendNotification,
     responseNotification,
+    sketchNotification,
     reminderNotification,
     Object.hashAllUnordered(reminderDays),
     reminderHour,

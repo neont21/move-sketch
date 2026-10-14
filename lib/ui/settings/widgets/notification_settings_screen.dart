@@ -78,7 +78,7 @@ class _NotificationSettingsScreenState
     return [
       ListTile(
         title: Text('친구', style: textTheme.bodyLarge),
-        subtitle: Text('친구 요청과 수락을 알려 줘요', style: textTheme.labelSmall),
+        subtitle: Text('친구 요청과 수락을 알려줘요.', style: textTheme.labelSmall),
         trailing: SimpleBinaryToggle(
           toggle: settings.friendNotification,
           onChanged: (value) {
@@ -91,8 +91,22 @@ class _NotificationSettingsScreenState
         ),
       ),
       ListTile(
+        title: Text('새 스케치', style: textTheme.bodyLarge),
+        subtitle: Text('관심 친구가 새 운동을 게시하면 알려줘요.', style: textTheme.labelSmall),
+        trailing: SimpleBinaryToggle(
+          toggle: settings.sketchNotification,
+          onChanged: (value) {
+            _updateSettings(
+              settings.copyWith(
+                sketchNotification: !settings.sketchNotification,
+              ),
+            );
+          },
+        ),
+      ),
+      ListTile(
         title: Text('응원과 댓글', style: textTheme.bodyLarge),
-        subtitle: Text('내 기록에 친구가 반응하면 알려줘요', style: textTheme.labelSmall),
+        subtitle: Text('내 기록에 친구가 반응하면 알려줘요.', style: textTheme.labelSmall),
         trailing: SimpleBinaryToggle(
           toggle: settings.responseNotification,
           onChanged: (value) {

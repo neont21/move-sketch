@@ -80,4 +80,10 @@ abstract interface class FriendshipRepository {
 
   /// 내가 차단한 사용자와 나를 차단한 사용자의 UID를 조회한다. (사용자 검색)
   Future<Result<List<String>>> getBlockedUserIds(String currentUserId);
+
+  /// 특정 친구에 대한 관심 친구 설정을 토글하고 변경된 관심 친구 여부를 반환한다. (사용자 프로필)
+  Future<Result<bool>> toggleFavoriteFriend({
+    required String currentUserId,
+    required String targetUserId,
+  });
 }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../domain/models/social/block_status.dart';
 import '../../../../domain/models/enums/friendship_status.dart';
 import '../../../../domain/models/social/friendship.dart';
+import '../../../../utils/exceptions.dart';
 
 class FriendshipService {
   final FirebaseFirestore _firestore;
@@ -173,5 +174,29 @@ class FriendshipService {
         .whereType<String>();
 
     return {...blockedByMe, ...blockingMe}.toList();
+  }
+
+  Future<bool> toggleFavoriteFriend({
+    required String currentUserId,
+    required String targetUserId,
+  }) async {
+    final friendshipId = generateFriendshipId(currentUserId, targetUserId);
+    final friendshipRef = _friendshipsRef.doc(friendshipId);
+
+    final snapshot = await friendshipRef.get();
+    if (!snapshot.exists || snapshot.data() == null) {
+      throw const NotFoundException('친구 관계 문서를 찾을 수 없습니다.');
+    }
+
+    final friendship = Friendship.fromMap(snapshot.data()!);
+    final isCurrentlyFavorite = friendship.isFavoriteOf(currentUserId);
+    final nextFavoriteState = !isCurrentlyFavorite;
+    await friendshipRef.update({
+      'favorites': nextFavoriteState
+          ? FieldValue.arrayUnion([currentUserId])
+          : FieldValue.arrayRemove([currentUserId]),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    return nextFavoriteState;
   }
 }

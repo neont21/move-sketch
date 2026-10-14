@@ -31,6 +31,7 @@ class UserProfileState {
   });
 
   bool get isFriend => friendship?.status == FriendshipStatus.accepted;
+  bool get isFavorite => friendship?.isFavoriteOf(currentUserId) ?? false;
 
   bool get isSentRequest =>
       friendship?.status == FriendshipStatus.pending &&
@@ -136,6 +137,39 @@ class UserProfileViewModel extends AsyncNotifier<UserProfileState> {
       sketches: sketches,
       isBlocked: isBlocked,
     );
+  }
+
+  Future<void> toggleFavoriteFriend() async {
+    final current = state.value;
+    if (current == null || !current.isFriend) {
+      return;
+    }
+
+    final friendship = current.friendship!;
+
+    final friendshipRepository = ref.read(friendshipRepositoryProvider);
+    final result = await friendshipRepository.toggleFavoriteFriend(
+      currentUserId: current.currentUserId,
+      targetUserId: current.user.uid,
+    );
+
+    switch (result) {
+      case Ok(:final value):
+        final favorites = friendship.favorites;
+        final updatedFavorites = value
+            ? [...favorites, current.currentUserId]
+            : favorites.where((uid) => uid != current.currentUserId).toList();
+
+        final updatedFriendship = friendship.copyWith(
+          favorites: updatedFavorites,
+        );
+
+        state = AsyncData(
+          current.copyWith(friendship: () => updatedFriendship),
+        );
+      case Error():
+        break;
+    }
   }
 }
 

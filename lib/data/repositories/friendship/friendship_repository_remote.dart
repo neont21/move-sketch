@@ -464,4 +464,29 @@ final class FriendshipRepositoryRemote implements FriendshipRepository {
       );
     }
   }
+
+  @override
+  Future<Result<bool>> toggleFavoriteFriend({
+    required String currentUserId,
+    required String targetUserId,
+  }) async {
+    try {
+      final updatedState = await friendshipService.toggleFavoriteFriend(
+        currentUserId: currentUserId,
+        targetUserId: targetUserId,
+      );
+
+      return Result.ok(updatedState);
+    } on AppException catch (e) {
+      return Result.error(e);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '관심 친구 알림 설정 변경 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('관심 친구 알림 설정 변경 중 오류가 발생했습니다.', cause: e),
+      );
+    }
+  }
 }

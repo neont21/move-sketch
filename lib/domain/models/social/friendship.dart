@@ -9,6 +9,7 @@ class Friendship {
   final String requesterId;
   final String receiverId;
   final List<String> members;
+  final List<String> favorites;
   final FriendshipStatus status;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -21,6 +22,7 @@ class Friendship {
     required this.createdAt,
     required this.updatedAt,
     required this.members,
+    this.favorites = const [],
   });
 
   factory Friendship.create({
@@ -36,6 +38,7 @@ class Friendship {
       receiverId: receiverId,
       status: status,
       members: List.unmodifiable([requesterId, receiverId]),
+      favorites: const [],
       createdAt: now,
       updatedAt: now,
     );
@@ -43,6 +46,8 @@ class Friendship {
 
   bool get isAccepted => status == FriendshipStatus.accepted;
   bool get isPending => status == FriendshipStatus.pending;
+
+  bool isFavoriteOf(String myUid) => favorites.contains(myUid);
 
   bool isReceivedBy(String myUid) {
     return receiverId == myUid && status == FriendshipStatus.pending;
@@ -72,6 +77,7 @@ class Friendship {
       'requesterId': requesterId,
       'receiverId': receiverId,
       'members': members,
+      'favorites': favorites,
       'status': status.name,
       'createdAt': createdAt.toUtc().toIso8601String(),
       'updatedAt': updatedAt.toUtc().toIso8601String(),
@@ -91,6 +97,11 @@ class Friendship {
               ?.map((e) => e as String)
               .toList() ??
           [requester, receiver],
+      favorites:
+          (map['favorites'] as List<dynamic>?)
+              ?.map((element) => element as String)
+              .toList() ??
+          const [],
       status: FriendshipStatus.fromString(map['status'] as String?),
       createdAt: parseDateTime(map['createdAt']).toLocal(),
       updatedAt: parseDateTime(map['updatedAt']).toLocal(),
@@ -105,6 +116,7 @@ class Friendship {
     FriendshipStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<String>? favorites,
   }) {
     return Friendship(
       id: id ?? this.id,
@@ -114,6 +126,7 @@ class Friendship {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      favorites: favorites ?? this.favorites,
     );
   }
 
