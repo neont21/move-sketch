@@ -3,25 +3,39 @@ import 'package:drift_flutter/drift_flutter.dart';
 import '../../../../domain/models/enums/activity_type.dart';
 import '../../../../domain/models/enums/session_status.dart';
 import '../../../../domain/models/enums/mission_axis.dart';
+import '../../../../domain/models/enums/sync_status.dart';
+import 'tables/offline_session_queue_table.dart';
 import 'tables/tracking_sessions_table.dart';
 import 'tables/location_points_table.dart';
 import 'tables/mission_instances_table.dart';
 import 'daos/session_dao.dart';
+import 'daos/offline_session_queue_dao.dart';
 
 part 'app_database.g.dart';
 
 @DriftDatabase(
-  tables: [TrackingSessionsTable, LocationPointsTable, MissionInstancesTable],
-  daos: [SessionDao],
+  tables: [
+    TrackingSessionsTable,
+    LocationPointsTable,
+    MissionInstancesTable,
+    OfflineSessionQueueTable,
+  ],
+  daos: [SessionDao, OfflineSessionQueueDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
   @override
   MigrationStrategy get migration => MigrationStrategy(
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON;');
+    },
+    onUpgrade: (migrator, from, to) async {
+      if (from < 2) {
+        await migrator.createTable(offlineSessionQueueTable);
+      }
     },
   );
   static QueryExecutor _openConnection() {

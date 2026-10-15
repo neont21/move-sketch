@@ -19,39 +19,43 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
   }) {
     return transaction(() async {
       await (delete(trackingSessionsTable)..where(
-            (t) =>
-                t.status.equalsValue(SessionStatus.active) |
-                t.status.equalsValue(SessionStatus.pausedAuto) |
-                t.status.equalsValue(SessionStatus.pausedManual),
+            (table) =>
+                table.status.equalsValue(SessionStatus.active) |
+                table.status.equalsValue(SessionStatus.pausedAuto) |
+                table.status.equalsValue(SessionStatus.pausedManual),
           ))
           .go();
 
       await into(trackingSessionsTable).insert(session);
+
       for (final mission in missions) {
         await into(missionInstancesTable).insert(mission);
       }
     });
   }
 
-  Future<TrackingSessionsTableData?> getActiveSession() =>
-      (select(trackingSessionsTable)
-            ..where(
-              (t) =>
-                  t.status.equalsValue(SessionStatus.active) |
-                  t.status.equalsValue(SessionStatus.pausedAuto) |
-                  t.status.equalsValue(SessionStatus.pausedManual),
-            )
-            ..orderBy([(t) => OrderingTerm.desc(t.startedAt)])
-            ..limit(1))
-          .getSingleOrNull();
+  Future<TrackingSessionsTableData?> getActiveSession() {
+    return (select(trackingSessionsTable)
+          ..where(
+            (table) =>
+                table.status.equalsValue(SessionStatus.active) |
+                table.status.equalsValue(SessionStatus.pausedAuto) |
+                table.status.equalsValue(SessionStatus.pausedManual),
+          )
+          ..orderBy([(table) => OrderingTerm.desc(table.startedAt)])
+          ..limit(1))
+        .getSingleOrNull();
+  }
 
-  Future<TrackingSessionsTableData?> getSessionById(String sessionId) =>
-      (select(
-        trackingSessionsTable,
-      )..where((session) => session.id.equals(sessionId))).getSingleOrNull();
+  Future<TrackingSessionsTableData?> getSessionById(String sessionId) {
+    return (select(
+      trackingSessionsTable,
+    )..where((session) => session.id.equals(sessionId))).getSingleOrNull();
+  }
 
-  Future<void> insertPoint(LocationPointsTableCompanion point) =>
-      into(locationPointsTable).insert(point);
+  Future<void> insertPoint(LocationPointsTableCompanion point) {
+    return into(locationPointsTable).insert(point);
+  }
 
   Future<void> updateSessionProgress({
     required String sessionId,
@@ -63,7 +67,7 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
   }) {
     return (update(
       trackingSessionsTable,
-    )..where((t) => t.id.equals(sessionId))).write(
+    )..where((table) => table.id.equals(sessionId))).write(
       TrackingSessionsTableCompanion(
         elapsedDurationSeconds: Value(elapsedSeconds),
         distanceInMeters: Value(distance),
@@ -74,31 +78,37 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
     );
   }
 
-  Future<void> updateMissionProgress(MissionInstancesTableCompanion mission) =>
-      (update(
-        missionInstancesTable,
-      )..where((t) => t.id.equals(mission.id.value))).write(mission);
+  Future<void> updateMissionProgress(MissionInstancesTableCompanion mission) {
+    return (update(
+      missionInstancesTable,
+    )..where((table) => table.id.equals(mission.id.value))).write(mission);
+  }
 
   Future<void> updateSessionStatus({
     required String sessionId,
     required SessionStatus status,
   }) {
-    return (update(trackingSessionsTable)..where((t) => t.id.equals(sessionId)))
+    return (update(trackingSessionsTable)
+          ..where((table) => table.id.equals(sessionId)))
         .write(TrackingSessionsTableCompanion(status: Value(status)));
   }
 
-  Future<List<LocationPointsTableData>> getPoints(String sessionId) =>
-      (select(locationPointsTable)
-            ..where((t) => t.sessionId.equals(sessionId))
-            ..orderBy([(t) => OrderingTerm.asc(t.sequenceId)]))
-          .get();
+  Future<List<LocationPointsTableData>> getPoints(String sessionId) {
+    return (select(locationPointsTable)
+          ..where((table) => table.sessionId.equals(sessionId))
+          ..orderBy([(table) => OrderingTerm.asc(table.sequenceId)]))
+        .get();
+  }
 
-  Future<List<MissionInstancesTableData>> getMissions(String sessionId) =>
-      (select(
-        missionInstancesTable,
-      )..where((t) => t.sessionId.equals(sessionId))).get();
+  Future<List<MissionInstancesTableData>> getMissions(String sessionId) {
+    return (select(
+      missionInstancesTable,
+    )..where((table) => table.sessionId.equals(sessionId))).get();
+  }
 
-  Future<void> deleteSession(String sessionId) => (delete(
-    trackingSessionsTable,
-  )..where((t) => t.id.equals(sessionId))).go();
+  Future<void> deleteSession(String sessionId) {
+    return (delete(
+      trackingSessionsTable,
+    )..where((table) => table.id.equals(sessionId))).go();
+  }
 }

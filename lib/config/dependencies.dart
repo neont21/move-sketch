@@ -11,6 +11,8 @@ import '../data/repositories/geocoding/geocoding_repository.dart';
 import '../data/repositories/geocoding/geocoding_repository_remote.dart';
 import '../data/repositories/location/location_repository.dart';
 import '../data/repositories/location/location_repository_local.dart';
+import '../data/repositories/network/network_connectivity_repository.dart';
+import '../data/repositories/network/network_connectivity_repository_local.dart';
 import '../data/repositories/notification/notice_repository.dart';
 import '../data/repositories/notification/notice_repository_remote.dart';
 import '../data/repositories/notification/notification_repository.dart';
@@ -19,6 +21,8 @@ import '../data/repositories/notification/push_notification_repository.dart';
 import '../data/repositories/notification/push_notification_repository_remote.dart';
 import '../data/repositories/report/report_repository.dart';
 import '../data/repositories/report/report_repository_remote.dart';
+import '../data/repositories/session/offline_session_repository.dart';
+import '../data/repositories/session/offline_session_repository_local.dart';
 import '../data/repositories/session/session_repository.dart';
 import '../data/repositories/session/session_repository_local.dart';
 import '../data/repositories/session_result/session_result_repository.dart';
@@ -31,7 +35,9 @@ import '../data/repositories/weather/weather_repository.dart';
 import '../data/repositories/weather/weather_repository_remote.dart';
 
 import '../data/services/hardware/location_service.dart';
+import '../data/services/hardware/network_connectivity_service.dart';
 import '../data/services/local/database/app_database.dart';
+import '../data/services/local/offline_session_service.dart';
 import '../data/services/local/session_service.dart';
 import '../data/services/remote/auth_service.dart';
 import '../data/services/remote/firebase_messaging_service.dart';
@@ -49,6 +55,7 @@ import '../data/services/remote/weather_service.dart';
 
 import '../domain/use_cases/session/complete_session_use_case.dart';
 import '../domain/use_cases/session/compose_sketch_use_case.dart';
+import '../domain/use_cases/session/sync_pending_sessions_use_case.dart';
 import '../domain/use_cases/social/accept_friend_request_use_case.dart';
 import '../domain/use_cases/social/add_comment_use_case.dart';
 import '../domain/use_cases/social/block_user_use_case.dart';
@@ -87,6 +94,19 @@ final sessionServiceProvider = Provider<SessionService>((ref) {
   final db = ref.watch(appDatabaseProvider);
 
   return SessionService(db.sessionDao);
+});
+
+/// OfflineSessionService Provider: 로컬 운동 세션 업로드 대기열 관리
+final offlineSessionServiceProvider = Provider<OfflineSessionService>((ref) {
+  final db = ref.watch(appDatabaseProvider);
+
+  return OfflineSessionService(db.offlineSessionQueueDao);
+});
+
+/// NetworkConnectivityService Provider: 디바이스 네트워크 연결 여부 확인
+final networkConnectivityServiceProvider =
+Provider<NetworkConnectivityService>((ref) {
+  return NetworkConnectivityService();
 });
 
 /// AuthService Provider: Firebase Authentication 기반 계정 관리
@@ -187,6 +207,26 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
   return SessionRepositoryLocal(
     sessionService: ref.watch(sessionServiceProvider),
+  );
+});
+
+/// OfflineSessionRepository Provider: 운동 세션 결과 대기열 저장소
+/// 네트워크 이슈가 있을 경우 로컬에 업로드 대기열 구성
+final offlineSessionRepositoryProvider = Provider<OfflineSessionRepository>((
+  ref,
+) {
+  return OfflineSessionRepositoryLocal(
+    offlineSessionService: ref.watch(offlineSessionServiceProvider),
+  );
+});
+
+/// NetworkConnectivityRepository Provider: 네트워크 상태 및 전환 이벤트 저장소
+/// 네트워크 연결 상태 확인
+final networkConnectivityRepositoryProvider =
+Provider<NetworkConnectivityRepository>((ref) {
+  return NetworkConnectivityRepositoryLocal(
+    networkConnectivityService:
+    ref.watch(networkConnectivityServiceProvider),
   );
 });
 
@@ -300,6 +340,19 @@ final completeSessionUseCaseProvider = Provider<CompleteSessionUseCase>((ref) {
   return CompleteSessionUseCase(
     sessionRepository: ref.watch(sessionRepositoryProvider),
     sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
+    offlineSessionRepository: ref.watch(offlineSessionRepositoryProvider),
+  );
+});
+
+/// SyncPendingSessionsUseCase Provider: 오프라인 미전송 세션 백그라운드 동기화
+final syncPendingSessionsUseCaseProvider =
+Provider<SyncPendingSessionsUseCase>((ref) {
+  return SyncPendingSessionsUseCase(
+    offlineSessionRepository: ref.watch(offlineSessionRepositoryProvider),
+    sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
+    sessionRepository: ref.watch(sessionRepositoryProvider),
+    networkConnectivityRepository:
+    ref.watch(networkConnectivityRepositoryProvider),
   );
 });
 

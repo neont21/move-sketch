@@ -1686,6 +1686,612 @@ class MissionInstancesTableCompanion
   }
 }
 
+class $OfflineSessionQueueTableTable extends OfflineSessionQueueTable
+    with
+        TableInfo<
+          $OfflineSessionQueueTableTable,
+          OfflineSessionQueueTableData
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OfflineSessionQueueTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sessionResultJsonMeta = const VerificationMeta(
+    'sessionResultJson',
+  );
+  @override
+  late final GeneratedColumn<String> sessionResultJson =
+      GeneratedColumn<String>(
+        'session_result_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _sketchImagePathMeta = const VerificationMeta(
+    'sketchImagePath',
+  );
+  @override
+  late final GeneratedColumn<String> sketchImagePath = GeneratedColumn<String>(
+    'sketch_image_path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncStatus, String> syncStatus =
+      GeneratedColumn<String>(
+        'sync_status',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<SyncStatus>(
+        $OfflineSessionQueueTableTable.$convertersyncStatus,
+      );
+  static const VerificationMeta _retryCountMeta = const VerificationMeta(
+    'retryCount',
+  );
+  @override
+  late final GeneratedColumn<int> retryCount = GeneratedColumn<int>(
+    'retry_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lastAttemptedAtMeta = const VerificationMeta(
+    'lastAttemptedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastAttemptedAt =
+      GeneratedColumn<DateTime>(
+        'last_attempted_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _errorMessageMeta = const VerificationMeta(
+    'errorMessage',
+  );
+  @override
+  late final GeneratedColumn<String> errorMessage = GeneratedColumn<String>(
+    'error_message',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    sessionResultJson,
+    sketchImagePath,
+    createdAt,
+    syncStatus,
+    retryCount,
+    lastAttemptedAt,
+    errorMessage,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'offline_session_queue_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OfflineSessionQueueTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('session_result_json')) {
+      context.handle(
+        _sessionResultJsonMeta,
+        sessionResultJson.isAcceptableOrUnknown(
+          data['session_result_json']!,
+          _sessionResultJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionResultJsonMeta);
+    }
+    if (data.containsKey('sketch_image_path')) {
+      context.handle(
+        _sketchImagePathMeta,
+        sketchImagePath.isAcceptableOrUnknown(
+          data['sketch_image_path']!,
+          _sketchImagePathMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sketchImagePathMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('retry_count')) {
+      context.handle(
+        _retryCountMeta,
+        retryCount.isAcceptableOrUnknown(data['retry_count']!, _retryCountMeta),
+      );
+    }
+    if (data.containsKey('last_attempted_at')) {
+      context.handle(
+        _lastAttemptedAtMeta,
+        lastAttemptedAt.isAcceptableOrUnknown(
+          data['last_attempted_at']!,
+          _lastAttemptedAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('error_message')) {
+      context.handle(
+        _errorMessageMeta,
+        errorMessage.isAcceptableOrUnknown(
+          data['error_message']!,
+          _errorMessageMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OfflineSessionQueueTableData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OfflineSessionQueueTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
+      sessionResultJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_result_json'],
+      )!,
+      sketchImagePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sketch_image_path'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      syncStatus: $OfflineSessionQueueTableTable.$convertersyncStatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}sync_status'],
+        )!,
+      ),
+      retryCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}retry_count'],
+      )!,
+      lastAttemptedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_attempted_at'],
+      ),
+      errorMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}error_message'],
+      ),
+    );
+  }
+
+  @override
+  $OfflineSessionQueueTableTable createAlias(String alias) {
+    return $OfflineSessionQueueTableTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncStatus, String, String> $convertersyncStatus =
+      const EnumNameConverter<SyncStatus>(SyncStatus.values);
+}
+
+class OfflineSessionQueueTableData extends DataClass
+    implements Insertable<OfflineSessionQueueTableData> {
+  final String id;
+  final String userId;
+  final String sessionResultJson;
+  final String sketchImagePath;
+  final DateTime createdAt;
+  final SyncStatus syncStatus;
+  final int retryCount;
+  final DateTime? lastAttemptedAt;
+  final String? errorMessage;
+  const OfflineSessionQueueTableData({
+    required this.id,
+    required this.userId,
+    required this.sessionResultJson,
+    required this.sketchImagePath,
+    required this.createdAt,
+    required this.syncStatus,
+    required this.retryCount,
+    this.lastAttemptedAt,
+    this.errorMessage,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['session_result_json'] = Variable<String>(sessionResultJson);
+    map['sketch_image_path'] = Variable<String>(sketchImagePath);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    {
+      map['sync_status'] = Variable<String>(
+        $OfflineSessionQueueTableTable.$convertersyncStatus.toSql(syncStatus),
+      );
+    }
+    map['retry_count'] = Variable<int>(retryCount);
+    if (!nullToAbsent || lastAttemptedAt != null) {
+      map['last_attempted_at'] = Variable<DateTime>(lastAttemptedAt);
+    }
+    if (!nullToAbsent || errorMessage != null) {
+      map['error_message'] = Variable<String>(errorMessage);
+    }
+    return map;
+  }
+
+  OfflineSessionQueueTableCompanion toCompanion(bool nullToAbsent) {
+    return OfflineSessionQueueTableCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      sessionResultJson: Value(sessionResultJson),
+      sketchImagePath: Value(sketchImagePath),
+      createdAt: Value(createdAt),
+      syncStatus: Value(syncStatus),
+      retryCount: Value(retryCount),
+      lastAttemptedAt: lastAttemptedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastAttemptedAt),
+      errorMessage: errorMessage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(errorMessage),
+    );
+  }
+
+  factory OfflineSessionQueueTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OfflineSessionQueueTableData(
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      sessionResultJson: serializer.fromJson<String>(json['sessionResultJson']),
+      sketchImagePath: serializer.fromJson<String>(json['sketchImagePath']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      syncStatus: $OfflineSessionQueueTableTable.$convertersyncStatus.fromJson(
+        serializer.fromJson<String>(json['syncStatus']),
+      ),
+      retryCount: serializer.fromJson<int>(json['retryCount']),
+      lastAttemptedAt: serializer.fromJson<DateTime?>(json['lastAttemptedAt']),
+      errorMessage: serializer.fromJson<String?>(json['errorMessage']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
+      'sessionResultJson': serializer.toJson<String>(sessionResultJson),
+      'sketchImagePath': serializer.toJson<String>(sketchImagePath),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'syncStatus': serializer.toJson<String>(
+        $OfflineSessionQueueTableTable.$convertersyncStatus.toJson(syncStatus),
+      ),
+      'retryCount': serializer.toJson<int>(retryCount),
+      'lastAttemptedAt': serializer.toJson<DateTime?>(lastAttemptedAt),
+      'errorMessage': serializer.toJson<String?>(errorMessage),
+    };
+  }
+
+  OfflineSessionQueueTableData copyWith({
+    String? id,
+    String? userId,
+    String? sessionResultJson,
+    String? sketchImagePath,
+    DateTime? createdAt,
+    SyncStatus? syncStatus,
+    int? retryCount,
+    Value<DateTime?> lastAttemptedAt = const Value.absent(),
+    Value<String?> errorMessage = const Value.absent(),
+  }) => OfflineSessionQueueTableData(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    sessionResultJson: sessionResultJson ?? this.sessionResultJson,
+    sketchImagePath: sketchImagePath ?? this.sketchImagePath,
+    createdAt: createdAt ?? this.createdAt,
+    syncStatus: syncStatus ?? this.syncStatus,
+    retryCount: retryCount ?? this.retryCount,
+    lastAttemptedAt: lastAttemptedAt.present
+        ? lastAttemptedAt.value
+        : this.lastAttemptedAt,
+    errorMessage: errorMessage.present ? errorMessage.value : this.errorMessage,
+  );
+  OfflineSessionQueueTableData copyWithCompanion(
+    OfflineSessionQueueTableCompanion data,
+  ) {
+    return OfflineSessionQueueTableData(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      sessionResultJson: data.sessionResultJson.present
+          ? data.sessionResultJson.value
+          : this.sessionResultJson,
+      sketchImagePath: data.sketchImagePath.present
+          ? data.sketchImagePath.value
+          : this.sketchImagePath,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      syncStatus: data.syncStatus.present
+          ? data.syncStatus.value
+          : this.syncStatus,
+      retryCount: data.retryCount.present
+          ? data.retryCount.value
+          : this.retryCount,
+      lastAttemptedAt: data.lastAttemptedAt.present
+          ? data.lastAttemptedAt.value
+          : this.lastAttemptedAt,
+      errorMessage: data.errorMessage.present
+          ? data.errorMessage.value
+          : this.errorMessage,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineSessionQueueTableData(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('sessionResultJson: $sessionResultJson, ')
+          ..write('sketchImagePath: $sketchImagePath, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('retryCount: $retryCount, ')
+          ..write('lastAttemptedAt: $lastAttemptedAt, ')
+          ..write('errorMessage: $errorMessage')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    userId,
+    sessionResultJson,
+    sketchImagePath,
+    createdAt,
+    syncStatus,
+    retryCount,
+    lastAttemptedAt,
+    errorMessage,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OfflineSessionQueueTableData &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.sessionResultJson == this.sessionResultJson &&
+          other.sketchImagePath == this.sketchImagePath &&
+          other.createdAt == this.createdAt &&
+          other.syncStatus == this.syncStatus &&
+          other.retryCount == this.retryCount &&
+          other.lastAttemptedAt == this.lastAttemptedAt &&
+          other.errorMessage == this.errorMessage);
+}
+
+class OfflineSessionQueueTableCompanion
+    extends UpdateCompanion<OfflineSessionQueueTableData> {
+  final Value<String> id;
+  final Value<String> userId;
+  final Value<String> sessionResultJson;
+  final Value<String> sketchImagePath;
+  final Value<DateTime> createdAt;
+  final Value<SyncStatus> syncStatus;
+  final Value<int> retryCount;
+  final Value<DateTime?> lastAttemptedAt;
+  final Value<String?> errorMessage;
+  final Value<int> rowid;
+  const OfflineSessionQueueTableCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.sessionResultJson = const Value.absent(),
+    this.sketchImagePath = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.syncStatus = const Value.absent(),
+    this.retryCount = const Value.absent(),
+    this.lastAttemptedAt = const Value.absent(),
+    this.errorMessage = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OfflineSessionQueueTableCompanion.insert({
+    required String id,
+    required String userId,
+    required String sessionResultJson,
+    required String sketchImagePath,
+    required DateTime createdAt,
+    required SyncStatus syncStatus,
+    this.retryCount = const Value.absent(),
+    this.lastAttemptedAt = const Value.absent(),
+    this.errorMessage = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       userId = Value(userId),
+       sessionResultJson = Value(sessionResultJson),
+       sketchImagePath = Value(sketchImagePath),
+       createdAt = Value(createdAt),
+       syncStatus = Value(syncStatus);
+  static Insertable<OfflineSessionQueueTableData> custom({
+    Expression<String>? id,
+    Expression<String>? userId,
+    Expression<String>? sessionResultJson,
+    Expression<String>? sketchImagePath,
+    Expression<DateTime>? createdAt,
+    Expression<String>? syncStatus,
+    Expression<int>? retryCount,
+    Expression<DateTime>? lastAttemptedAt,
+    Expression<String>? errorMessage,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (sessionResultJson != null) 'session_result_json': sessionResultJson,
+      if (sketchImagePath != null) 'sketch_image_path': sketchImagePath,
+      if (createdAt != null) 'created_at': createdAt,
+      if (syncStatus != null) 'sync_status': syncStatus,
+      if (retryCount != null) 'retry_count': retryCount,
+      if (lastAttemptedAt != null) 'last_attempted_at': lastAttemptedAt,
+      if (errorMessage != null) 'error_message': errorMessage,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OfflineSessionQueueTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? userId,
+    Value<String>? sessionResultJson,
+    Value<String>? sketchImagePath,
+    Value<DateTime>? createdAt,
+    Value<SyncStatus>? syncStatus,
+    Value<int>? retryCount,
+    Value<DateTime?>? lastAttemptedAt,
+    Value<String?>? errorMessage,
+    Value<int>? rowid,
+  }) {
+    return OfflineSessionQueueTableCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      sessionResultJson: sessionResultJson ?? this.sessionResultJson,
+      sketchImagePath: sketchImagePath ?? this.sketchImagePath,
+      createdAt: createdAt ?? this.createdAt,
+      syncStatus: syncStatus ?? this.syncStatus,
+      retryCount: retryCount ?? this.retryCount,
+      lastAttemptedAt: lastAttemptedAt ?? this.lastAttemptedAt,
+      errorMessage: errorMessage ?? this.errorMessage,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (sessionResultJson.present) {
+      map['session_result_json'] = Variable<String>(sessionResultJson.value);
+    }
+    if (sketchImagePath.present) {
+      map['sketch_image_path'] = Variable<String>(sketchImagePath.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (syncStatus.present) {
+      map['sync_status'] = Variable<String>(
+        $OfflineSessionQueueTableTable.$convertersyncStatus.toSql(
+          syncStatus.value,
+        ),
+      );
+    }
+    if (retryCount.present) {
+      map['retry_count'] = Variable<int>(retryCount.value);
+    }
+    if (lastAttemptedAt.present) {
+      map['last_attempted_at'] = Variable<DateTime>(lastAttemptedAt.value);
+    }
+    if (errorMessage.present) {
+      map['error_message'] = Variable<String>(errorMessage.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OfflineSessionQueueTableCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('sessionResultJson: $sessionResultJson, ')
+          ..write('sketchImagePath: $sketchImagePath, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('syncStatus: $syncStatus, ')
+          ..write('retryCount: $retryCount, ')
+          ..write('lastAttemptedAt: $lastAttemptedAt, ')
+          ..write('errorMessage: $errorMessage, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1695,7 +2301,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $LocationPointsTableTable(this);
   late final $MissionInstancesTableTable missionInstancesTable =
       $MissionInstancesTableTable(this);
+  late final $OfflineSessionQueueTableTable offlineSessionQueueTable =
+      $OfflineSessionQueueTableTable(this);
   late final SessionDao sessionDao = SessionDao(this as AppDatabase);
+  late final OfflineSessionQueueDao offlineSessionQueueDao =
+      OfflineSessionQueueDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1704,6 +2314,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     trackingSessionsTable,
     locationPointsTable,
     missionInstancesTable,
+    offlineSessionQueueTable,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3073,6 +3684,327 @@ typedef $$MissionInstancesTableTableProcessedTableManager =
       MissionInstancesTableData,
       PrefetchHooks Function({bool sessionId})
     >;
+typedef $$OfflineSessionQueueTableTableCreateCompanionBuilder =
+    OfflineSessionQueueTableCompanion Function({
+      required String id,
+      required String userId,
+      required String sessionResultJson,
+      required String sketchImagePath,
+      required DateTime createdAt,
+      required SyncStatus syncStatus,
+      Value<int> retryCount,
+      Value<DateTime?> lastAttemptedAt,
+      Value<String?> errorMessage,
+      Value<int> rowid,
+    });
+typedef $$OfflineSessionQueueTableTableUpdateCompanionBuilder =
+    OfflineSessionQueueTableCompanion Function({
+      Value<String> id,
+      Value<String> userId,
+      Value<String> sessionResultJson,
+      Value<String> sketchImagePath,
+      Value<DateTime> createdAt,
+      Value<SyncStatus> syncStatus,
+      Value<int> retryCount,
+      Value<DateTime?> lastAttemptedAt,
+      Value<String?> errorMessage,
+      Value<int> rowid,
+    });
+
+class $$OfflineSessionQueueTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OfflineSessionQueueTableTable> {
+  $$OfflineSessionQueueTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sessionResultJson => $composableBuilder(
+    column: $table.sessionResultJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sketchImagePath => $composableBuilder(
+    column: $table.sketchImagePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SyncStatus, SyncStatus, String>
+  get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get retryCount => $composableBuilder(
+    column: $table.retryCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastAttemptedAt => $composableBuilder(
+    column: $table.lastAttemptedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get errorMessage => $composableBuilder(
+    column: $table.errorMessage,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OfflineSessionQueueTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OfflineSessionQueueTableTable> {
+  $$OfflineSessionQueueTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sessionResultJson => $composableBuilder(
+    column: $table.sessionResultJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sketchImagePath => $composableBuilder(
+    column: $table.sketchImagePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncStatus => $composableBuilder(
+    column: $table.syncStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get retryCount => $composableBuilder(
+    column: $table.retryCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastAttemptedAt => $composableBuilder(
+    column: $table.lastAttemptedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get errorMessage => $composableBuilder(
+    column: $table.errorMessage,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OfflineSessionQueueTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OfflineSessionQueueTableTable> {
+  $$OfflineSessionQueueTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get sessionResultJson => $composableBuilder(
+    column: $table.sessionResultJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sketchImagePath => $composableBuilder(
+    column: $table.sketchImagePath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SyncStatus, String> get syncStatus =>
+      $composableBuilder(
+        column: $table.syncStatus,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<int> get retryCount => $composableBuilder(
+    column: $table.retryCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastAttemptedAt => $composableBuilder(
+    column: $table.lastAttemptedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get errorMessage => $composableBuilder(
+    column: $table.errorMessage,
+    builder: (column) => column,
+  );
+}
+
+class $$OfflineSessionQueueTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OfflineSessionQueueTableTable,
+          OfflineSessionQueueTableData,
+          $$OfflineSessionQueueTableTableFilterComposer,
+          $$OfflineSessionQueueTableTableOrderingComposer,
+          $$OfflineSessionQueueTableTableAnnotationComposer,
+          $$OfflineSessionQueueTableTableCreateCompanionBuilder,
+          $$OfflineSessionQueueTableTableUpdateCompanionBuilder,
+          (
+            OfflineSessionQueueTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $OfflineSessionQueueTableTable,
+              OfflineSessionQueueTableData
+            >,
+          ),
+          OfflineSessionQueueTableData,
+          PrefetchHooks Function()
+        > {
+  $$OfflineSessionQueueTableTableTableManager(
+    _$AppDatabase db,
+    $OfflineSessionQueueTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OfflineSessionQueueTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$OfflineSessionQueueTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$OfflineSessionQueueTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<String> sessionResultJson = const Value.absent(),
+                Value<String> sketchImagePath = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<SyncStatus> syncStatus = const Value.absent(),
+                Value<int> retryCount = const Value.absent(),
+                Value<DateTime?> lastAttemptedAt = const Value.absent(),
+                Value<String?> errorMessage = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OfflineSessionQueueTableCompanion(
+                id: id,
+                userId: userId,
+                sessionResultJson: sessionResultJson,
+                sketchImagePath: sketchImagePath,
+                createdAt: createdAt,
+                syncStatus: syncStatus,
+                retryCount: retryCount,
+                lastAttemptedAt: lastAttemptedAt,
+                errorMessage: errorMessage,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String userId,
+                required String sessionResultJson,
+                required String sketchImagePath,
+                required DateTime createdAt,
+                required SyncStatus syncStatus,
+                Value<int> retryCount = const Value.absent(),
+                Value<DateTime?> lastAttemptedAt = const Value.absent(),
+                Value<String?> errorMessage = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OfflineSessionQueueTableCompanion.insert(
+                id: id,
+                userId: userId,
+                sessionResultJson: sessionResultJson,
+                sketchImagePath: sketchImagePath,
+                createdAt: createdAt,
+                syncStatus: syncStatus,
+                retryCount: retryCount,
+                lastAttemptedAt: lastAttemptedAt,
+                errorMessage: errorMessage,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $OfflineSessionQueueTableTable,
+                    OfflineSessionQueueTableData
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OfflineSessionQueueTableTable,
+                    OfflineSessionQueueTableData
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OfflineSessionQueueTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OfflineSessionQueueTableTable,
+      OfflineSessionQueueTableData,
+      $$OfflineSessionQueueTableTableFilterComposer,
+      $$OfflineSessionQueueTableTableOrderingComposer,
+      $$OfflineSessionQueueTableTableAnnotationComposer,
+      $$OfflineSessionQueueTableTableCreateCompanionBuilder,
+      $$OfflineSessionQueueTableTableUpdateCompanionBuilder,
+      (
+        OfflineSessionQueueTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $OfflineSessionQueueTableTable,
+          OfflineSessionQueueTableData
+        >,
+      ),
+      OfflineSessionQueueTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3083,4 +4015,9 @@ class $AppDatabaseManager {
       $$LocationPointsTableTableTableManager(_db, _db.locationPointsTable);
   $$MissionInstancesTableTableTableManager get missionInstancesTable =>
       $$MissionInstancesTableTableTableManager(_db, _db.missionInstancesTable);
+  $$OfflineSessionQueueTableTableTableManager get offlineSessionQueueTable =>
+      $$OfflineSessionQueueTableTableTableManager(
+        _db,
+        _db.offlineSessionQueueTable,
+      );
 }

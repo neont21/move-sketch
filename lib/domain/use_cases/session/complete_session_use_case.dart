@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import '../../../data/repositories/session/offline_session_repository.dart';
 import '../../../data/repositories/session/session_repository.dart';
 import '../../../data/repositories/session_result/session_result_repository.dart';
 import '../../../utils/exceptions.dart';
@@ -10,10 +11,12 @@ import '../../models/session/session_result.dart';
 final class CompleteSessionUseCase {
   final SessionRepository sessionRepository;
   final SessionResultRepository sessionResultRepository;
+  final OfflineSessionRepository offlineSessionRepository;
 
   CompleteSessionUseCase({
     required this.sessionRepository,
     required this.sessionResultRepository,
+    required this.offlineSessionRepository,
   });
 
   Future<Result<SessionResult>> execute({
@@ -42,6 +45,12 @@ final class CompleteSessionUseCase {
         return Result.error(error);
     }
 
+    await offlineSessionRepository.enqueuePendingSession(
+      sessionResult: sessionResult,
+      sketchBytes: sketchBytes,
+      syncStatus: SyncStatus.syncing,
+    );
+
     Result<SessionResult> remoteResult;
     try {
       remoteResult = await sessionResultRepository
@@ -56,9 +65,18 @@ final class CompleteSessionUseCase {
 
     switch (remoteResult) {
       case Ok():
+        await offlineSessionRepository.deletePendingSession(sessionId);
         await sessionRepository.discardSession(sessionId);
         return remoteResult;
-      case Error():
+      case Error(:final error):
+        await offlineSessionRepository.updateSyncStatus(
+          sessionId: sessionId,
+          status: SyncStatus.syncFailed,
+          lastAttemptedAt: DateTime.now(),
+          errorMessage: error.toString(),
+          incrementRetry: true,
+        );
+
         return Result.ok(
           sessionResult.copyWith(syncStatus: SyncStatus.syncFailed),
         );
