@@ -108,7 +108,7 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
 
     final composeSketchUseCase = ref.read(composeSketchUseCaseProvider);
 
-    final sketchComposition =  composeSketchUseCase.execute(
+    final sketchComposition = composeSketchUseCase.execute(
       missions: session.missions,
       character: user.selectedCharacter,
     );
@@ -159,7 +159,6 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
       sketchComposition: sketchComposition,
     );
   }
-
 
   Future<Result<SessionResult>> completeAndSaveSession({
     required Uint8List sketchBytes,
@@ -232,8 +231,14 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
     );
 
     final sketchBytes = current.sketchBytes ?? Uint8List(0);
+
+    final offlineSessionRepository = ref.read(
+      offlineSessionRepositoryProvider,
+    );
+
     try {
       final sessionResultRepository = ref.read(sessionResultRepositoryProvider);
+
       final saveResult = await sessionResultRepository
           .saveResult(result: current.sessionResult!, sketchBytes: sketchBytes)
           .timeout(const Duration(seconds: 15));
@@ -251,6 +256,10 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
           final sessionRepository = ref.read(sessionRepositoryProvider);
           await sessionRepository.discardSession(current.session.id);
 
+          await offlineSessionRepository.deletePendingSession(
+            current.session.id,
+          );
+
           return Result.ok(syncedResult);
         case Error():
           state = AsyncData(
@@ -261,6 +270,14 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
               isSubmitting: false,
             ),
           );
+
+          await offlineSessionRepository.updateSyncStatus(
+            sessionId: current.session.id,
+            status: SyncStatus.syncFailed,
+            lastAttemptedAt: DateTime.now(),
+            incrementRetry: true,
+          );
+
           return saveResult;
       }
     } catch (_) {
@@ -272,6 +289,14 @@ class SessionResultViewModel extends AsyncNotifier<SessionResultState> {
           isSubmitting: false,
         ),
       );
+
+      await offlineSessionRepository.updateSyncStatus(
+        sessionId: current.session.id,
+        status: SyncStatus.syncFailed,
+        lastAttemptedAt: DateTime.now(),
+        incrementRetry: true,
+      );
+
       return const Result.error(NetworkException('서버 연결 시간 초과'));
     }
   }

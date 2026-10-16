@@ -7,6 +7,7 @@ import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
 import '../../auth/view_models/auth_viewmodel.dart';
 import '../../core/view_models/app_version_viewmodel.dart';
+import '../../core/view_models/session_sync_viewmodel.dart';
 import '../../core/widgets/update_dialog.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../view_models/home_viewmodel.dart';
@@ -78,6 +79,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (session != null) {
         _showSessionResumeDialog(session);
       }
+
+      ref.read(sessionSyncViewModelProvider.notifier).sync();
     });
   }
 
@@ -108,8 +111,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     });
 
+    ref.listen<SessionSyncState>(sessionSyncViewModelProvider, (
+      previous,
+      next,
+    ) {
+      final syncedCount = next.lastSyncedCount;
+      if (previous?.isSyncing == true &&
+          !next.isSyncing &&
+          syncedCount != null &&
+          syncedCount > 0) {
+        ref.invalidate(homeViewModelProvider);
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
+          SnackBar(content: Text('$syncedCount개의 오프라인 세션이 안전하게 동기화되었습니다.')),
+        );
+      }
+    });
+
     final currentUser = ref.watch(currentUserProvider);
     final homeState = ref.watch(homeViewModelProvider).value;
+    final syncState = ref.watch(sessionSyncViewModelProvider);
     final latestResult = homeState?.latestResult;
     final weatherInfo = homeState?.weatherInfo;
 
@@ -165,6 +187,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
+              if (syncState.pendingCount > 0)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.cloud_off_outlined,
+                        size: 18,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '전송 대기 중인 세션이 ${syncState.pendingCount}개 있습니다.',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                      if (syncState.isSyncing)
+                        SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colorScheme.primary,
+                          ),
+                        )
+                      else
+                        TextButton(
+                          onPressed: () {
+                            ref
+                                .read(sessionSyncViewModelProvider.notifier)
+                                .sync();
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text('동기화'),
+                        ),
+                    ],
+                  ),
+                ),
               Expanded(
                 child: Center(
                   child: FittedBox(
