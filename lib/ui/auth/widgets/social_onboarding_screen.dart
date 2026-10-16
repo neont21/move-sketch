@@ -10,10 +10,11 @@ import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../../utils/validators.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
+import '../../core/widgets/responsive_container.dart';
 import '../view_models/auth_viewmodel.dart';
 
 class SocialOnboardingScreen extends ConsumerStatefulWidget {
-  final SocialAuthNeedsOnboarding  initialData;
+  final SocialAuthNeedsOnboarding initialData;
 
   const SocialOnboardingScreen({super.key, required this.initialData});
 
@@ -39,7 +40,7 @@ class _SocialOnboardingScreenState
 
     _usernameController = TextEditingController();
     _nicknameController = TextEditingController(
-      text: widget.initialData.defaultNickname ?? ''
+      text: widget.initialData.defaultNickname ?? '',
     );
   }
 
@@ -90,7 +91,8 @@ class _SocialOnboardingScreenState
               },
             ),
             if (_selectedImageFile != null ||
-                (!_isPhotoRemoved && widget.initialData.defaultPhotoUrl != null))
+                (!_isPhotoRemoved &&
+                    widget.initialData.defaultPhotoUrl != null))
               ListTile(
                 leading: const Icon(Icons.delete_outline),
                 title: const Text('기본 이미지로 변경'),
@@ -205,75 +207,79 @@ class _SocialOnboardingScreenState
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const SizedBox(height: 12),
-                  Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      _buildAvatarPreview(),
-                      GestureDetector(
-                        onTap: _showImageOptions,
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: colorScheme.primary,
-                          child: Icon(
-                            Icons.camera_alt,
-                            size: 16,
-                            color: colorScheme.onPrimary,
+            child: ResponsiveContainer.form(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        _buildAvatarPreview(),
+                        GestureDetector(
+                          onTap: _showImageOptions,
+                          child: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: colorScheme.primary,
+                            child: Icon(
+                              Icons.camera_alt,
+                              size: 16,
+                              color: colorScheme.onPrimary,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text('프로필 사진은 나중에도 변경할 수 있어요', style: textTheme.labelSmall),
-                  const SizedBox(height: 24),
-                  LabeledTextFormField(
-                    controller: _usernameController,
-                    labelText: '아이디',
-                    hintText: '영문 소문자, 숫자, 밑줄 3~20자',
-                    inputType: TextInputType.text,
-                    validator: (value) {
-                      if (_usernameServerValidationError != null) {
-                        return _usernameServerValidationError;
-                      }
-                      return Validators.validateUsername(value);
-                    },
-                    onChanged: (_) {
-                      if (_usernameServerValidationError != null) {
-                        setState(() {
-                          _usernameServerValidationError = null;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  LabeledTextFormField(
-                    controller: _nicknameController,
-                    labelText: '닉네임',
-                    hintText: '10글자 이내로 작성',
-                    inputType: TextInputType.text,
-                    validator: Validators.validateNickname,
-                  ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: _isCheckingUsername ? null : _handleSubmit,
-                      child: _isCheckingUsername
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('다음'),
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text('프로필 사진은 나중에도 변경할 수 있어요', style: textTheme.labelSmall),
+                    const SizedBox(height: 24),
+                    LabeledTextFormField(
+                      controller: _usernameController,
+                      labelText: '아이디',
+                      hintText: '영문 소문자, 숫자, 밑줄 3~20자',
+                      inputType: TextInputType.text,
+                      validator: (value) {
+                        if (_usernameServerValidationError != null) {
+                          return _usernameServerValidationError;
+                        }
+                        return Validators.validateUsername(value);
+                      },
+                      onChanged: (_) {
+                        if (_usernameServerValidationError != null) {
+                          setState(() {
+                            _usernameServerValidationError = null;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    LabeledTextFormField(
+                      controller: _nicknameController,
+                      labelText: '닉네임',
+                      hintText: '10글자 이내로 작성',
+                      inputType: TextInputType.text,
+                      validator: Validators.validateNickname,
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _isCheckingUsername ? null : _handleSubmit,
+                        child: _isCheckingUsername
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('다음'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

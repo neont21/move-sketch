@@ -135,87 +135,84 @@ class _NoticeFormDialogState extends ConsumerState<NoticeFormDialog> {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 560),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            spacing: 16,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _isEditMode ? '공지사항 수정' : '새 공지사항 등록',
-                style: textTheme.headlineSmall,
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          spacing: 16,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _isEditMode ? '공지사항 수정' : '새 공지사항 등록',
+              style: textTheme.headlineSmall,
+            ),
+            TextFormField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: '제목 *',
+                hintText: '공지사항 제목을 입력하세요',
               ),
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: '제목 *',
-                  hintText: '공지사항 제목을 입력하세요',
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return '제목은 필수 입력 항목입니다.';
-                  }
-                  return null;
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return '제목은 필수 입력 항목입니다.';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _contentController,
+              minLines: 4,
+              maxLines: 8,
+              decoration: const InputDecoration(
+                labelText: '내용 *',
+                hintText: '공지사항 본문 내용을 입력하세요',
+                alignLabelWithHint: true,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return '내용은 필수 입력 항목입니다.';
+                }
+                return null;
+              },
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('중요 공지사항으로 등록', style: textTheme.bodyLarge),
+              trailing: SimpleBinaryToggle(
+                toggle: _isImportant,
+                onChanged: (isChecked) {
+                  setState(() {
+                    _isImportant = isChecked;
+                  });
                 },
               ),
-              TextFormField(
-                controller: _contentController,
-                minLines: 4,
-                maxLines: 8,
-                decoration: const InputDecoration(
-                  labelText: '내용 *',
-                  hintText: '공지사항 본문 내용을 입력하세요',
-                  alignLabelWithHint: true,
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return '내용은 필수 입력 항목입니다.';
-                  }
-                  return null;
-                },
+            ),
+            TextFormField(
+              controller: _actionButtonTextController,
+              decoration: const InputDecoration(
+                labelText: '외부 링크 버튼 문구 (선택)',
+                hintText: '예: 업데이트 하러가기',
               ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('중요 공지사항으로 등록', style: textTheme.bodyLarge),
-                trailing: SimpleBinaryToggle(
-                  toggle: _isImportant,
-                  onChanged: (isChecked) {
-                    setState(() {
-                      _isImportant = isChecked;
-                    });
-                  },
-                ),
+            ),
+            TextFormField(
+              controller: _actionUrlController,
+              decoration: const InputDecoration(
+                labelText: '외부 링크 URL (선택)',
+                hintText: 'https://...',
               ),
-              TextFormField(
-                controller: _actionButtonTextController,
-                decoration: const InputDecoration(
-                  labelText: '외부 링크 버튼 문구 (선택)',
-                  hintText: '예: 업데이트 하러가기',
-                ),
-              ),
-              TextFormField(
-                controller: _actionUrlController,
-                decoration: const InputDecoration(
-                  labelText: '외부 링크 URL (선택)',
-                  hintText: 'https://...',
-                ),
-              ),
-              const SizedBox(height: 4),
-              DialogActionButtons(
-                cancelText: '취소',
-                confirmText: _isSubmitting
-                    ? '저장 중...'
-                    : (_isEditMode ? '수정하기' : '등록하기'),
-                onCancel: () => context.pop(),
-                onConfirm: _handleSubmit,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+            DialogActionButtons(
+              cancelText: '취소',
+              confirmText: _isSubmitting
+                  ? '저장 중...'
+                  : (_isEditMode ? '수정하기' : '등록하기'),
+              onCancel: () => context.pop(),
+              onConfirm: _handleSubmit,
+            ),
+          ],
         ),
       ),
     );

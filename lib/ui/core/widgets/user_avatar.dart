@@ -59,7 +59,10 @@ class UserAvatar extends StatelessWidget {
     }
 
     if (onTap != null && !_isDeletedUser) {
-      avatar = GestureDetector(onTap: onTap, child: avatar);
+      avatar = MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(onTap: onTap, child: avatar),
+      );
     }
 
     return avatar;

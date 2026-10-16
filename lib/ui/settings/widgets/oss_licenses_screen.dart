@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/widgets/responsive_container.dart';
+
 class OSSLicensesScreen extends StatefulWidget {
   const OSSLicensesScreen({super.key});
 
@@ -95,11 +97,11 @@ class _OSSLicensesScreenState extends State<OSSLicensesScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(title: Text('오픈소스 라이선스')),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: _isLoading
+    return ResponsiveContainer.text(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Scaffold(
+        appBar: AppBar(title: Text('오픈소스 라이선스')),
+        body: _isLoading
             ? Center(child: CircularProgressIndicator())
             : ListView.builder(
                 itemCount: _ossLicenses.length,

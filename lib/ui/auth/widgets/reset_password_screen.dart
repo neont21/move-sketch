@@ -6,6 +6,7 @@ import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
+import '../../core/widgets/responsive_container.dart';
 import '../view_models/auth_viewmodel.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
@@ -103,59 +104,61 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                spacing: 20,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('가입할 때 쓴 이메일로 재설정 링크를 보내 드려요.'),
-                  LabeledTextFormField(
-                    inputType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (value) {
-                      if (!_isLoading) {
-                        _handleResetPassword();
-                      }
-                    },
-                    labelText: '이메일',
-                    hintText: 'user@example.com',
-                    controller: _emailController,
-                    enabled: !_isLoading,
-                    autoValidateMode: AutovalidateMode.onUserInteraction,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return '이메일을 입력해 주세요.';
-                      }
-                      final emailRegex = RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      );
-                      if (!emailRegex.hasMatch(value.trim())) {
-                        return '올바른 이메일 형식을 입력해 주세요.';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleResetPassword,
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('재설정 링크 받기'),
+            child: ResponsiveContainer.form(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  spacing: 20,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('가입할 때 쓴 이메일로 재설정 링크를 보내 드려요.'),
+                    LabeledTextFormField(
+                      inputType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (value) {
+                        if (!_isLoading) {
+                          _handleResetPassword();
+                        }
+                      },
+                      labelText: '이메일',
+                      hintText: 'user@example.com',
+                      controller: _emailController,
+                      enabled: !_isLoading,
+                      autoValidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return '이메일을 입력해 주세요.';
+                        }
+                        final emailRegex = RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        );
+                        if (!emailRegex.hasMatch(value.trim())) {
+                          return '올바른 이메일 형식을 입력해 주세요.';
+                        }
+                        return null;
+                      },
                     ),
-                  ),
-                  Text(
-                    '소셜 로그인으로 가입하셨다면 비밀번호가 없으니 소셜 로그인 버튼을 이용해 주세요.',
-                    style: textTheme.labelMedium,
-                  ),
-                ],
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _handleResetPassword,
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('재설정 링크 받기'),
+                      ),
+                    ),
+                    Text(
+                      '소셜 로그인으로 가입하셨다면 비밀번호가 없으니 소셜 로그인 버튼을 이용해 주세요.',
+                      style: textTheme.labelMedium,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

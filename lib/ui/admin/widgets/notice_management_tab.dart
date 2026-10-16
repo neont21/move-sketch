@@ -59,7 +59,10 @@ class NoticeManagementTab extends ConsumerWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => Dialog(child: NoticeFormDialog(initialNotice: notice)),
+      builder: (_) => Dialog(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: NoticeFormDialog(initialNotice: notice),
+      ),
     );
   }
 

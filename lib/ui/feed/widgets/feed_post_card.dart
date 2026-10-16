@@ -69,21 +69,28 @@ class FeedPostCard extends ConsumerWidget {
                   Row(
                     spacing: 8,
                     children: [
-                      GestureDetector(
-                        onTap: isAuthorDeleted
-                            ? null
-                            : () {
-                                if (isMe) {
-                                  context.go(Routes.me);
-                                } else {
-                                  context.go(
-                                    Routes.feedProfile(sketch.author.username),
-                                  );
-                                }
-                              },
-                        child: Text(
-                          sketch.author.nickname,
-                          style: textTheme.bodyLarge,
+                      MouseRegion(
+                        cursor: isAuthorDeleted
+                            ? MouseCursor.defer
+                            : SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: isAuthorDeleted
+                              ? null
+                              : () {
+                                  if (isMe) {
+                                    context.go(Routes.me);
+                                  } else {
+                                    context.go(
+                                      Routes.feedProfile(
+                                        sketch.author.username,
+                                      ),
+                                    );
+                                  }
+                                },
+                          child: Text(
+                            sketch.author.nickname,
+                            style: textTheme.bodyLarge,
+                          ),
                         ),
                       ),
                       ActivityBadge(activityType: sketch.activityType),
@@ -105,15 +112,20 @@ class FeedPostCard extends ConsumerWidget {
             ),
           ],
         ),
-        GestureDetector(
-          onTap: () {
-            context.go(Routes.feedPost(sketch.id));
-          },
-          child: Transform.rotate(
-            angle: _calculateRotationAngle(sketch.id),
-            child: SketchCard(
-              imageProvider: NetworkImage(sketch.sketchUrl),
-              caption: sketch.caption,
+        MouseRegion(
+          cursor: isDetail ? MouseCursor.defer : SystemMouseCursors.click,
+          hitTestBehavior: HitTestBehavior.deferToChild,
+          child: GestureDetector(
+            onTap: () {
+              context.go(Routes.feedPost(sketch.id));
+            },
+            behavior: HitTestBehavior.deferToChild,
+            child: Transform.rotate(
+              angle: _calculateRotationAngle(sketch.id),
+              child: SketchCard(
+                imageProvider: NetworkImage(sketch.sketchUrl),
+                caption: sketch.caption,
+              ),
             ),
           ),
         ),

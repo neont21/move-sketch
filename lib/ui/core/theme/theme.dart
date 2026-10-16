@@ -206,6 +206,7 @@ class MoveSketchTheme {
       ),
       dialogTheme: DialogThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        constraints: const BoxConstraints(maxWidth: 480),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         shape: RoundedRectangleBorder(

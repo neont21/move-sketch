@@ -8,6 +8,7 @@ import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/error_retry_view.dart';
+import '../../core/widgets/responsive_container.dart';
 import '../../feed/view_models/feed_post_viewmodel.dart';
 import '../../feed/view_models/feed_viewmodel.dart';
 import '../../history/view_models/history_details_viewmodel.dart';
@@ -134,57 +135,56 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
       sessionShareViewModelProvider(widget.sessionId),
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text((shareState.value?.isEdit ?? false) ? '수정하기' : '피드에 올리기'),
-        actions: [
-          shareState.maybeWhen(
-            data: (state) => state.isPublishing
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Center(
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+    return ResponsiveContainer.mediaForm(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text((shareState.value?.isEdit ?? false) ? '수정하기' : '피드에 올리기'),
+          actions: [
+            shareState.maybeWhen(
+              data: (state) => state.isPublishing
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
                       ),
+                    )
+                  : IconButton(
+                      onPressed: _handleSave,
+                      icon: const Icon(Icons.check),
                     ),
-                  )
-                : IconButton(
-                    onPressed: _handleSave,
-                    icon: const Icon(Icons.check),
-                  ),
-            orElse: () => const SizedBox.shrink(),
-          ),
-        ],
-      ),
-      body: shareState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => ErrorRetryView.fromError(
-          error: error,
-          defaultMessage: '데이터를 불러오는 중 오류가 발생했습니다.',
-          onRetry: () =>
-              ref.invalidate(sessionShareViewModelProvider(widget.sessionId)),
+              orElse: () => const SizedBox.shrink(),
+            ),
+          ],
         ),
-        data: (state) {
-          final imageProvider = _resolveSketchImage(
-            result: state.sessionResult,
-            existingUrl: state.existingPost?.sketchUrl,
-            character: state.character,
-          );
-          final rawTag = state.locationTags.length > state.locationIndex
-              ? state.locationTags[state.locationIndex]
-              : '알 수 없는 위치';
-          final locationDisplayText = rawTag == '알 수 없는 위치'
-              ? rawTag
-              : '$rawTag 인근';
-
-          return SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Center(
+        body: shareState.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => ErrorRetryView.fromError(
+            error: error,
+            defaultMessage: '데이터를 불러오는 중 오류가 발생했습니다.',
+            onRetry: () =>
+                ref.invalidate(sessionShareViewModelProvider(widget.sessionId)),
+          ),
+          data: (state) {
+            final imageProvider = _resolveSketchImage(
+              result: state.sessionResult,
+              existingUrl: state.existingPost?.sketchUrl,
+              character: state.character,
+            );
+            final rawTag = state.locationTags.length > state.locationIndex
+                ? state.locationTags[state.locationIndex]
+                : '알 수 없는 위치';
+            final locationDisplayText = rawTag == '알 수 없는 위치'
+                ? rawTag
+                : '$rawTag 인근';
+      
+            return SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     spacing: 20,
                     children: [
@@ -319,10 +319,9 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
                     ],
                   ),
                 ),
-              ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

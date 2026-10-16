@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/widgets/error_retry_view.dart';
+import '../../core/widgets/responsive_container.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../../friends/widgets/mutual_friends_section.dart';
 import '../view_models/user_profile_viewmodel.dart';
@@ -71,7 +72,7 @@ class UserProfileScreen extends ConsumerWidget {
           final targetUser = state.user;
           return SafeArea(
             top: false,
-            child: Padding(
+            child: ResponsiveContainer(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

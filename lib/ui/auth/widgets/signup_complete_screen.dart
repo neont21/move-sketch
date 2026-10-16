@@ -6,6 +6,7 @@ import '../../../config/dependencies.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../core/widgets/responsive_container.dart';
 import '../view_models/auth_viewmodel.dart';
 
 class SignupCompleteScreen extends ConsumerStatefulWidget {
@@ -90,7 +91,7 @@ class _SignupCompleteScreenState extends ConsumerState<SignupCompleteScreen> {
       },
       child: Scaffold(
         body: SafeArea(
-          child: Padding(
+          child: ResponsiveContainer.form(
             padding: const EdgeInsets.all(20),
             child: Column(
               spacing: 20,

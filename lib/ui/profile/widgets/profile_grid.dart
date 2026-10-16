@@ -21,11 +21,14 @@ class ProfileGrid extends StatelessWidget {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
       ),
-      itemBuilder: (context, index) => GestureDetector(
-        onTap: () => onTap(index),
-        child: SketchCard(
-          imageProvider: NetworkImage(sketches[index].sketchUrl),
-          isGrid: true,
+      itemBuilder: (context, index) => MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => onTap(index),
+          child: SketchCard(
+            imageProvider: NetworkImage(sketches[index].sketchUrl),
+            isGrid: true,
+          ),
         ),
       ),
     );

@@ -79,21 +79,24 @@ class UserCommentTile extends ConsumerWidget {
                 Row(
                   spacing: 12,
                   children: [
-                    GestureDetector(
-                      onTap: isAuthorDeleted
-                          ? null
-                          : () {
-                              if (isMe) {
-                                context.go(Routes.me);
-                              } else {
-                                context.go(
-                                  Routes.feedProfile(comment.author.username),
-                                );
-                              }
-                            },
-                      child: Text(
-                        comment.author.nickname,
-                        style: textTheme.bodyLarge,
+                    MouseRegion(
+                      cursor: isAuthorDeleted ? MouseCursor.defer : SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: isAuthorDeleted
+                            ? null
+                            : () {
+                                if (isMe) {
+                                  context.go(Routes.me);
+                                } else {
+                                  context.go(
+                                    Routes.feedProfile(comment.author.username),
+                                  );
+                                }
+                              },
+                        child: Text(
+                          comment.author.nickname,
+                          style: textTheme.bodyLarge,
+                        ),
                       ),
                     ),
                     const Spacer(),
@@ -122,15 +125,18 @@ class UserCommentTile extends ConsumerWidget {
                       style: textTheme.labelMedium,
                     ),
                     if (!comment.isReply && !isAuthorDeleted && onReply != null)
-                      GestureDetector(
-                        onTap: () {
-                          onReply!(comment);
-                        },
-                        child: Text(
-                          '답글',
-                          style: textTheme.labelMedium?.copyWith(
-                            color: colorScheme.secondary,
-                            fontWeight: FontWeight.w700,
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            onReply!(comment);
+                          },
+                          child: Text(
+                            '답글',
+                            style: textTheme.labelMedium?.copyWith(
+                              color: colorScheme.secondary,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),
