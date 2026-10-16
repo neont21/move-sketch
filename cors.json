@@ -1,0 +1,14 @@
+[
+  {
+    "origin": [
+      "https://movesketch.neonsigntrap.com",
+      "https://move-sketch.web.app",
+      "https://move-sketch.firebaseapp.com",
+      "http://localhost:50000",
+      "http://localhost:3000"
+    ],
+    "method": ["GET", "HEAD"],
+    "responseHeader": ["Content-Type", "Access-Control-Allow-Origin"],
+    "maxAgeSeconds": 3600
+  }
+]
