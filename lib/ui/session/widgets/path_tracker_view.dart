@@ -57,6 +57,16 @@ class _PathTrackerViewState extends State<PathTrackerView> {
 
   static const LatLng _defaultCenterSeoul = LatLng(37.5665, 126.9780);
 
+  List<LatLng> get _validGpsPoints => widget.gpsPoints
+      .where(
+        (point) =>
+    point.latitude >= -90.0 &&
+        point.latitude <= 90.0 &&
+        point.longitude >= -180.0 &&
+        point.longitude <= 180.0,
+  )
+      .toList();
+
   double _calculateBearing(LatLng start, LatLng end) {
     const degToRad = math.pi / 180.0;
     final lat1 = start.latitude * degToRad;
@@ -126,14 +136,14 @@ class _PathTrackerViewState extends State<PathTrackerView> {
   }
 
   LatLng get _resolvedCenter {
-    if (widget.gpsPoints.isEmpty) {
+    final validPoints = _validGpsPoints;
+    if (validPoints.isEmpty) {
       return widget.initialCenter ?? _defaultCenterSeoul;
     }
-    if (widget.isTracking) {
-      return widget.gpsPoints.last;
+    if (widget.isTracking || validPoints.length == 1) {
+      return validPoints.last;
     }
-
-    final bounds = LatLngBounds.fromPoints(widget.gpsPoints);
+    final bounds = LatLngBounds.fromPoints(validPoints);
     return bounds.center;
   }
 
@@ -141,8 +151,10 @@ class _PathTrackerViewState extends State<PathTrackerView> {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final validPoints = _validGpsPoints;
+
     final markers = <Marker>[];
-    final startPoint = widget.gpsPoints.firstOrNull ?? widget.initialCenter;
+    final startPoint = validPoints.firstOrNull ?? widget.initialCenter;
     if (startPoint != null) {
       markers.add(
         Marker(
@@ -153,7 +165,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
         ),
       );
     }
-    if (widget.gpsPoints.length > 1) {
+    if (validPoints.length > 1) {
       Widget markerIcon;
 
       if (!widget.isTracking) {
@@ -175,7 +187,7 @@ class _PathTrackerViewState extends State<PathTrackerView> {
         );
       }
 
-      markers.add(Marker(point: widget.gpsPoints.last, child: markerIcon));
+      markers.add(Marker(point: validPoints.last, child: markerIcon));
     }
 
     return FractionallySizedBox(
@@ -193,9 +205,9 @@ class _PathTrackerViewState extends State<PathTrackerView> {
             mapController: _mapController,
             options: MapOptions(
               initialCameraFit:
-                  !widget.isTracking && widget.gpsPoints.length >= 2
+                  !widget.isTracking && validPoints.length >= 2
                   ? CameraFit.bounds(
-                      bounds: LatLngBounds.fromPoints(widget.gpsPoints),
+                      bounds: LatLngBounds.fromPoints(validPoints),
                       padding: const EdgeInsets.all(28.0),
                       maxZoom: 16.0,
                     )
@@ -222,11 +234,11 @@ class _PathTrackerViewState extends State<PathTrackerView> {
                   return Opacity(opacity: 0.48, child: tileWidget);
                 },
               ),
-              if (widget.gpsPoints.isNotEmpty)
+              if (validPoints.isNotEmpty)
                 PolylineLayer(
                   polylines: [
                     Polyline(
-                      points: widget.gpsPoints,
+                      points: validPoints,
                       color: colorScheme.primary,
                       strokeWidth: 2,
                     ),

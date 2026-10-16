@@ -65,32 +65,61 @@ abstract final class PolylineUtils {
   static List<LatLng> decodePolyline(String encoded) {
     final List<LatLng> points = [];
     int index = 0;
-    final int len = encoded.length;
+    final int length = encoded.length;
     int lat = 0;
     int lng = 0;
 
-    while (index < len) {
-      int b;
+    while (index < length) {
+      int code;
       int shift = 0;
       int result = 0;
+
       do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
+        if (index >= length) {
+          break;
+        }
+
+        code = encoded.codeUnitAt(index++) - 63;
+        result |= (code & 0x1f) << shift;
         shift += 5;
-      } while (b >= 0x20);
-      final int dLat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      } while (code >= 0x20);
+
+      final valueLat = result >> 1;
+      final int dLat = (result & 1) != 0
+          ? (~BigInt.from(valueLat)).toInt()
+          : valueLat;
       lat += dLat;
+
       shift = 0;
       result = 0;
+
       do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
+        if (index >= length) {
+          break;
+        }
+
+        code = encoded.codeUnitAt(index++) - 63;
+        result |= (code & 0x1f) << shift;
         shift += 5;
-      } while (b >= 0x20);
-      final int dLng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      } while (code >= 0x20);
+
+      final valueLng = result >> 1;
+      final int dLng = (result & 1) != 0
+          ? (~BigInt.from(valueLng)).toInt()
+          : valueLng;
       lng += dLng;
-      points.add(LatLng(lat / 1e5, lng / 1e5));
+
+      final double latitude = lat / 1e5;
+      final double longitude = lng / 1e5;
+
+      if (latitude >= -90.0 &&
+          latitude <= 90.0 &&
+          longitude >= -180.0 &&
+          longitude <= 180.0) {
+        points.add(LatLng(latitude, longitude));
+      }
     }
+
     return points;
   }
 
@@ -128,6 +157,7 @@ abstract final class PolylineUtils {
     if (maxDist > epsilon) {
       final left = _rdp(points.sublist(0, maxIndex + 1), epsilon);
       final right = _rdp(points.sublist(maxIndex), epsilon);
+
       return [...left.sublist(0, left.length - 1), ...right];
     } else {
       return [first, last];
@@ -175,6 +205,8 @@ abstract final class PolylineUtils {
   }
 }
 
-List<LatLng> _simplifyRdpTask(({List<LatLng> gpsPoints, double epsilon}) params) {
+List<LatLng> _simplifyRdpTask(
+  ({List<LatLng> gpsPoints, double epsilon}) params,
+) {
   return PolylineUtils._rdp(params.gpsPoints, params.epsilon);
 }
