@@ -281,8 +281,8 @@ class _FeedPostScreenState extends ConsumerState<FeedPostScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          RichText(
-                            text: TextSpan(
+                          Text.rich(
+                            TextSpan(
                               children: [
                                 TextSpan(
                                   text: _replyTarget?.author.nickname,

@@ -316,8 +316,8 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        RichText(
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             children: [
                               TextSpan(
                                 text: '소요 시간\n',
@@ -330,8 +330,8 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
                             ],
                           ),
                         ),
-                        RichText(
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             children: [
                               TextSpan(
                                 text: '이동 거리\n',
@@ -345,8 +345,8 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
                             ],
                           ),
                         ),
-                        RichText(
-                          text: TextSpan(
+                        Text.rich(
+                          TextSpan(
                             children: [
                               TextSpan(
                                 text: '소모 칼로리\n',

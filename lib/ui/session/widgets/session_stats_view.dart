@@ -30,8 +30,8 @@ class SessionStatsView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(mission.axis.label, style: textTheme.bodySmall),
-                    RichText(
-                      text: TextSpan(
+                    Text.rich(
+                      TextSpan(
                         children: [
                           TextSpan(
                             text: mission.formattedValue,

@@ -46,12 +46,20 @@ class SessionCard extends StatelessWidget {
                 Dialog(child: DeleteHistoryDialog(sessionId: result.id, isShared: result.isShared)),
           );
         },
-        leading: Image(
-          image:
-              result.resultSketchImageUrl != null &&
-                  result.resultSketchImageUrl!.isNotEmpty
-              ? NetworkImage(result.resultSketchImageUrl!)
-              : const AssetImage(Assets.sampleSketch),
+        leading:ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: result.resultSketchImageUrl != null &&
+              result.resultSketchImageUrl!.isNotEmpty
+              ? Image.network(
+            result.resultSketchImageUrl!,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+            const Image(image: AssetImage(Assets.sampleSketch)),
+          )
+              : const Image(
+            image: AssetImage(Assets.sampleSketch),
+            fit: BoxFit.cover,
+          ),
         ),
         title: Row(
           spacing: 8,
@@ -81,8 +89,8 @@ class SessionCard extends StatelessWidget {
             ],
           ],
         ),
-        subtitle: RichText(
-          text: TextSpan(
+        subtitle: Text.rich(
+          TextSpan(
             children: _buildMetadata(),
             style: textTheme.labelSmall,
           ),

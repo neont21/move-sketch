@@ -87,8 +87,8 @@ class NotificationCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             )
-          : RichText(
-              text: TextSpan(
+          : Text.rich(
+              TextSpan(
                 children: [
                   TextSpan(
                     text: notification.sender.nickname,

@@ -38,8 +38,8 @@ class UserCard extends StatelessWidget {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
     if (subtitle != null) {
-      return RichText(
-        text: TextSpan(
+      return Text.rich(
+        TextSpan(
           children: [
             TextSpan(text: user.nickname, style: textTheme.bodyMedium),
             const TextSpan(text: ' '),
