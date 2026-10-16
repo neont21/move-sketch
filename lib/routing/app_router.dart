@@ -74,10 +74,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   final refreshListenable = RouterRefreshListenable(ref);
   ref.onDispose(refreshListenable.dispose);
 
+  final String defaultLocation = kIsWeb ? Routes.feed : Routes.home;
+
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     refreshListenable: refreshListenable,
-    initialLocation: kIsWeb ? Routes.admin : Routes.home,
+    initialLocation: defaultLocation,
     redirect: (context, state) {
       final authState = ref.read(authViewModelProvider);
 
@@ -87,10 +89,6 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final user = authState.value;
       final location = state.matchedLocation;
-
-      if (kIsWeb && location == '/') {
-        return Routes.admin;
-      }
 
       final isPublicRoute =
           location.startsWith(Routes.auth) ||
@@ -109,28 +107,40 @@ final routerProvider = Provider<GoRouter>((ref) {
           location == Routes.resetPassword;
 
       if (isAuthRoute) {
-        return kIsWeb ? Routes.admin : Routes.home;
+        return defaultLocation;
+      }
+
+      if (kIsWeb) {
+        final isSessionRestricted =
+            location == Routes.home ||
+            location == Routes.sessionStart ||
+            location == Routes.sessionTracking ||
+            location.startsWith('/session-result');
+        if (isSessionRestricted) {
+          return Routes.feed;
+        }
       }
 
       return null;
     },
     routes: [
-      GoRoute(path: '/', redirect: (context, state) => Routes.home),
+      GoRoute(path: '/', redirect: (context, state) => defaultLocation),
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state, navigationShell) =>
             MoveSketchShell(navigationShell: navigationShell),
         branches: [
           // tab: Home
-          StatefulShellBranch(
-            navigatorKey: _homeNavigatorKey,
-            routes: [
-              GoRoute(
-                path: Routes.home,
-                builder: (context, state) => HomeScreen(),
-              ),
-            ],
-          ),
+          if (!kIsWeb)
+            StatefulShellBranch(
+              navigatorKey: _homeNavigatorKey,
+              routes: [
+                GoRoute(
+                  path: Routes.home,
+                  builder: (context, state) => HomeScreen(),
+                ),
+              ],
+            ),
           // tab: Feed
           StatefulShellBranch(
             navigatorKey: _feedNavigatorKey,
