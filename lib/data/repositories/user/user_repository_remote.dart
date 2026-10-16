@@ -40,7 +40,9 @@ final class UserRepositoryRemote implements UserRepository {
           providerInfo.providerId == 'apple.com',
     );
 
-    if (!hasSocialProvider && !user.emailVerified) {
+    if (user.providerData.isNotEmpty &&
+        !hasSocialProvider &&
+        !user.emailVerified) {
       return const Result.error(AuthException('이메일 인증이 완료되지 않은 사용자입니다.'));
     }
 

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -18,7 +19,9 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  if (!kIsWeb) {
+  if (kIsWeb) {
+    await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+  } else {
     await GoogleSignIn.instance.initialize();
 
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -94,6 +97,9 @@ class MoveSketchApp extends ConsumerWidget {
     return MaterialApp.router(
       scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: ref.watch(routerProvider),
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        scrollbars: false,
+      ),
       title: '무브스케치',
       theme: MoveSketchTheme.lightTheme,
       debugShowCheckedModeBanner: false,

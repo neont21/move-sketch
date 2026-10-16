@@ -24,40 +24,42 @@ final class AuthRepositoryRemote implements AuthRepository {
     required this.storageService,
   });
 
-  @override
-  String? get currentUid {
-    final user = authService.currentUser;
+  bool _isValidSessionUser(auth.User? user) {
     if (user == null) {
-      return null;
+      return false;
     }
 
     final hasSocialProvider = user.providerData.any(
       (info) =>
           info.providerId == 'google.com' || info.providerId == 'apple.com',
     );
-    if (!hasSocialProvider && !user.emailVerified) {
+
+    if (user.providerData.isNotEmpty &&
+        !hasSocialProvider &&
+        !user.emailVerified) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  String? get currentUid {
+    final user = authService.currentUser;
+    if (!_isValidSessionUser(user)) {
       return null;
     }
 
-    return user.uid;
+    return user?.uid;
   }
 
   @override
   Stream<String?> get authStateChanges =>
       authService.authStateChanges.map((user) {
-        if (user == null) {
-          return null;
-        }
-        final hasSocialProvider = user.providerData.any(
-          (info) =>
-              info.providerId == 'google.com' || info.providerId == 'apple.com',
-        );
-
-        if (!hasSocialProvider && !user.emailVerified) {
+        if (!_isValidSessionUser(user)) {
           return null;
         }
 
-        return user.uid;
+        return user?.uid;
       }).distinct();
 
   @override
@@ -636,7 +638,8 @@ final class AuthRepositoryRemote implements AuthRepository {
 
       return const Result.ok(null);
     } on FirebaseAuthException catch (error) {
-      if (error.code == 'wrong-password' || error.code == 'invalid-credential') {
+      if (error.code == 'wrong-password' ||
+          error.code == 'invalid-credential') {
         return const Result.error(AuthException('비밀번호가 올바르지 않습니다.'));
       }
       return Result.error(

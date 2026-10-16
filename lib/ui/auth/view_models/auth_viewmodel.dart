@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/dependencies.dart';
 import '../../../data/repositories/auth/auth_repository.dart';
@@ -19,6 +20,19 @@ class AuthViewModel extends AsyncNotifier<User?> {
   StreamSubscription<String?>? _authSubscription;
 
   List<String> get linkedProviders => _authRepository.linkedProviders;
+
+  void _setupNativeUserServices(String userId) {
+    if (!kIsWeb) {
+      ref.read(pushNotificationViewModelProvider.notifier).initialize(userId);
+      FirebaseCrashlytics.instance.setUserIdentifier(userId);
+    }
+  }
+
+  void _clearNativeUserIdentifier() {
+    if (!kIsWeb) {
+      FirebaseCrashlytics.instance.setUserIdentifier('');
+    }
+  }
 
   void _listenAuthState() {
     _authSubscription?.cancel();
@@ -46,8 +60,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
         };
 
         if (state.value != null) {
-          ref.read(pushNotificationViewModelProvider.notifier).initialize(uid);
-          FirebaseCrashlytics.instance.setUserIdentifier(uid);
+          _setupNativeUserServices(uid);
         }
       }
     });
@@ -61,7 +74,17 @@ class AuthViewModel extends AsyncNotifier<User?> {
       _authSubscription?.cancel();
     });
 
-    final uid = _authRepository.currentUid;
+    String? uid = _authRepository.currentUid;
+    if (uid == null && kIsWeb) {
+      try {
+        uid = await _authRepository.authStateChanges.first;
+      } catch (_) {
+        uid = null;
+      }
+    }
+
+    _listenAuthState();
+
     if (uid == null) {
       return null;
     }
@@ -73,8 +96,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     };
 
     if (user != null) {
-      ref.read(pushNotificationViewModelProvider.notifier).initialize(user.uid);
-      FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
+      _setupNativeUserServices(user.uid);
     }
 
     return user;
@@ -117,11 +139,8 @@ class AuthViewModel extends AsyncNotifier<User?> {
     switch (result) {
       case Ok(:final value):
         state = AsyncData(value);
-        ref
-            .read(pushNotificationViewModelProvider.notifier)
-            .initialize(value.uid);
+        _setupNativeUserServices(value.uid);
 
-        FirebaseCrashlytics.instance.setUserIdentifier(value.uid);
         return result;
       case Error():
         state = AsyncData(null);
@@ -157,11 +176,8 @@ class AuthViewModel extends AsyncNotifier<User?> {
     switch (result) {
       case Ok(:final value):
         state = AsyncData(value);
-        ref
-            .read(pushNotificationViewModelProvider.notifier)
-            .initialize(value.uid);
+        _setupNativeUserServices(value.uid);
 
-        FirebaseCrashlytics.instance.setUserIdentifier(value.uid);
         return result;
       case Error(:final error):
         state = AsyncError(error, StackTrace.current);
@@ -195,11 +211,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
         switch (value) {
           case SocialAuthSuccess(:final user):
             state = AsyncData(user);
-            ref
-                .read(pushNotificationViewModelProvider.notifier)
-                .initialize(user.uid);
-
-            FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
+            _setupNativeUserServices(user.uid);
           case SocialAuthNeedsOnboarding():
             state = const AsyncData(null);
           case SocialAuthCanceled():
@@ -230,11 +242,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
         switch (value) {
           case SocialAuthSuccess(:final user):
             state = AsyncData(user);
-            ref
-                .read(pushNotificationViewModelProvider.notifier)
-                .initialize(user.uid);
-
-            FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
+            _setupNativeUserServices(user.uid);
           case SocialAuthNeedsOnboarding():
             state = const AsyncData(null);
           case SocialAuthCanceled():
@@ -275,11 +283,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     switch (result) {
       case Ok(:final value):
         state = AsyncData(value);
-        ref
-            .read(pushNotificationViewModelProvider.notifier)
-            .initialize(value.uid);
-
-        FirebaseCrashlytics.instance.setUserIdentifier(value.uid);
+        _setupNativeUserServices(value.uid);
         return result;
       case Error(:final error):
         state = AsyncError(error, StackTrace.current);
@@ -309,7 +313,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
     switch (result) {
       case Ok():
-        FirebaseCrashlytics.instance.setUserIdentifier('');
+        _clearNativeUserIdentifier();
         state = const AsyncData(null);
         return result;
       case Error(:final error):
@@ -360,7 +364,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
     switch (result) {
       case Ok():
-        FirebaseCrashlytics.instance.setUserIdentifier('');
+        _clearNativeUserIdentifier();
         state = const AsyncData(null);
       case Error(:final error):
         state = AsyncError(error, StackTrace.current);
@@ -395,7 +399,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
     switch (result) {
       case Ok(value: true):
-        FirebaseCrashlytics.instance.setUserIdentifier('');
+        _clearNativeUserIdentifier();
         state = const AsyncData(null);
       case Ok(value: false):
         state = AsyncData(ref.read(currentUserProvider));
@@ -431,7 +435,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
     switch (result) {
       case Ok(value: true):
-        FirebaseCrashlytics.instance.setUserIdentifier('');
+        _clearNativeUserIdentifier();
         state = const AsyncData(null);
       case Ok(value: false):
         state = AsyncData(ref.read(currentUserProvider));
