@@ -9,6 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 import 'routing/app_router.dart';
 import 'ui/core/theme/theme.dart';
+import 'ui/core/view_models/push_notification_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +39,58 @@ class MoveSketchApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<String?>(
+      pushNotificationViewModelProvider.select(
+        (state) => state.inAppNotificationBody,
+      ),
+      (previous, next) {
+        if (next != null) {
+          final destinationRoute = ref
+              .read(pushNotificationViewModelProvider)
+              .destinationRoute;
+          final messenger = scaffoldMessengerKey.currentState;
+          if (messenger != null) {
+            messenger.hideCurrentSnackBar();
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text(next),
+                action: destinationRoute != null
+                    ? SnackBarAction(
+                        label: '보기',
+                        onPressed: () {
+                          ref.read(routerProvider).push(destinationRoute);
+                        },
+                      )
+                    : null,
+              ),
+            );
+            ref
+                .read(pushNotificationViewModelProvider.notifier)
+                .clearNotification();
+          }
+        }
+      },
+    );
+
+    ref.listen<String?>(
+      pushNotificationViewModelProvider.select(
+            (state) => state.destinationRoute,
+      ),
+          (previous, next) {
+        if (next != null) {
+          final inAppBody = ref
+              .read(pushNotificationViewModelProvider)
+              .inAppNotificationBody;
+          if (inAppBody == null) {
+            ref.read(routerProvider).push(next);
+            ref
+                .read(pushNotificationViewModelProvider.notifier)
+                .clearNotification();
+          }
+        }
+      },
+    );
+
     return MaterialApp.router(
       scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: ref.watch(routerProvider),

@@ -31,7 +31,7 @@ final class UserRepositoryRemote implements UserRepository {
   Future<Result<User?>> getCurrentUserProfile() async {
     final user = authService.currentUser;
     if (user == null) {
-      return const Result.error(AuthException('로그인된 사용자가 없습니다.'));
+      return const Result.ok(null);
     }
 
     final hasSocialProvider = user.providerData.any(

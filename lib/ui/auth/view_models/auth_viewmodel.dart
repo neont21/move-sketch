@@ -42,7 +42,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
         state = switch (profileResult) {
           Ok(:final value) => AsyncData(value),
-          Error() => const AsyncData(null),
+          Error(:final error) => AsyncError(error, StackTrace.current),
         };
 
         if (state.value != null) {
@@ -69,7 +69,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     final profileResult = await _userRepository.getCurrentUserProfile();
     final user = switch (profileResult) {
       Ok(:final value) => value,
-      Error() => null,
+      Error(:final error) => throw error,
     };
 
     if (user != null) {

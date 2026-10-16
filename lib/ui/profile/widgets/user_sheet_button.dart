@@ -58,7 +58,7 @@ class UserSheetButton extends ConsumerWidget {
         title: Text('신고하기', style: TextStyle(color: colorScheme.error)),
         onTap: () {
           context.pop();
-          final currentUser = ref.read(authViewModelProvider).value;
+          final currentUser = ref.read(currentUserProvider);
           if (currentUser != null) {
             showDialog(
               context: context,

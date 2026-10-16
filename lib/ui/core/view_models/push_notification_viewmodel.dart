@@ -3,12 +3,10 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../config/dependencies.dart';
 import '../../../data/repositories/notification/push_notification_repository.dart';
 import '../../../data/repositories/session/session_repository.dart';
 import '../../../domain/models/enums/notification_type.dart';
-import '../../../routing/app_router.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/result.dart';
 
@@ -16,19 +14,31 @@ import '../../../utils/result.dart';
 class PushNotificationState {
   final AuthorizationStatus authorizationStatus;
   final bool isInitialized;
+  final String? inAppNotificationBody;
+  final String? destinationRoute;
 
   const PushNotificationState({
     this.authorizationStatus = AuthorizationStatus.notDetermined,
     this.isInitialized = false,
+    this.inAppNotificationBody,
+    this.destinationRoute,
   });
 
   PushNotificationState copyWith({
     AuthorizationStatus? authorizationStatus,
     bool? isInitialized,
+    ValueGetter<String?>? inAppNotificationBody,
+    ValueGetter<String?>? destinationRoute,
   }) {
     return PushNotificationState(
       authorizationStatus: authorizationStatus ?? this.authorizationStatus,
       isInitialized: isInitialized ?? this.isInitialized,
+      inAppNotificationBody: inAppNotificationBody != null
+          ? inAppNotificationBody()
+          : this.inAppNotificationBody,
+      destinationRoute: destinationRoute != null
+          ? destinationRoute()
+          : this.destinationRoute,
     );
   }
 }
@@ -114,15 +124,26 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
 
     final String destinationRoute = _determineDestinationRoute(message);
 
-    _showInAppNotificationSnackBar(
-      body: body,
-      destinationRoute: destinationRoute,
+    state = state.copyWith(
+      inAppNotificationBody: () => body,
+      destinationRoute: () => destinationRoute,
     );
   }
 
   void _handleNotificationNavigation(RemoteMessage message) {
     final String destinationRoute = _determineDestinationRoute(message);
-    _navigateToRoute(destinationRoute);
+    state = state.copyWith(
+      destinationRoute: () => destinationRoute,
+    );
+  }
+
+  void clearNotification() {
+    if (state.inAppNotificationBody != null || state.destinationRoute != null) {
+      state = state.copyWith(
+        inAppNotificationBody: () => null,
+        destinationRoute: () => null,
+      );
+    }
   }
 
   Future<bool> _isSessionOngoing() async {
@@ -164,45 +185,6 @@ final class PushNotificationViewModel extends Notifier<PushNotificationState> {
             : Routes.feedNotifications,
       NotificationType.unknown => Routes.feedNotifications,
     };
-  }
-
-  void _showInAppNotificationSnackBar({
-    required String body,
-    required String destinationRoute,
-  }) {
-    final messenger = scaffoldMessengerKey.currentState;
-    if (messenger == null) {
-      return;
-    }
-
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(body),
-        action: SnackBarAction(
-          label: '보기',
-          onPressed: () {
-            _navigateToRoute(destinationRoute);
-          },
-        ),
-      ),
-    );
-  }
-
-  void _navigateToRoute(String destinationRoute) {
-    FirebaseCrashlytics.instance.log(
-      '푸시 알림 딥링크 네비게이션 시도: route=$destinationRoute',
-    );
-
-    final context = rootNavigatorKey.currentContext;
-    if (context == null) {
-      FirebaseCrashlytics.instance.log(
-        '네비게이션 실패: rootNavigatorKey.currentContext가 null임',
-      );
-      return;
-    }
-
-    context.push(destinationRoute);
   }
 
   Future<void> clearPushToken(String userId) async {
