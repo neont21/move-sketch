@@ -38,6 +38,10 @@ final class FirebaseMessagingService {
     return firebaseMessaging.getToken();
   }
 
+  Future<String?> getAPNSToken() {
+    return firebaseMessaging.getAPNSToken();
+  }
+
   Stream<String> get onTokenRefresh => firebaseMessaging.onTokenRefresh;
 
   Stream<RemoteMessage> get onMessage => FirebaseMessaging.onMessage;
