@@ -31,12 +31,10 @@ import '../ui/session/widgets/session_tracking_screen.dart';
 import '../ui/settings/widgets/change_character_screen.dart';
 import '../ui/settings/widgets/modify_password_screen.dart';
 import '../ui/settings/widgets/oss_licenses_screen.dart';
-import '../ui/settings/widgets/privacy_screen.dart';
 import '../ui/settings/widgets/account_settings_screen.dart';
 import '../ui/settings/widgets/blocked_user_screen.dart';
 import '../ui/settings/widgets/notification_settings_screen.dart';
 import '../ui/settings/widgets/settings_screen.dart';
-import '../ui/settings/widgets/terms_of_service_screen.dart';
 import '../ui/shell/widgets/move_sketch_shell.dart';
 import 'routes.dart';
 
@@ -92,8 +90,6 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       final isPublicRoute =
           location.startsWith(Routes.auth) ||
-          location == Routes.privacy ||
-          location == Routes.tos ||
           location == Routes.license ||
           location.startsWith(Routes.admin);
 
@@ -340,14 +336,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.license,
         builder: (context, state) => OSSLicensesScreen(),
-      ),
-      GoRoute(
-        path: Routes.privacy,
-        builder: (context, state) => PrivacyScreen(),
-      ),
-      GoRoute(
-        path: Routes.tos,
-        builder: (context, state) => TermsOfServiceScreen(),
       ),
       GoRoute(
         path: Routes.userProfilePath,

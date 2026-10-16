@@ -10,15 +10,17 @@ abstract final class UrlLauncherUtils {
 
   static const String iosStoreUrl =
       'https://apps.apple.com/kr/app/id$_iosAppId';
-
   static const String androidStoreUrl =
       'market://details?id=$_androidPackageName';
-
   static const String androidWebStoreUrl =
       'https://play.google.com/store/apps/details?id=$_androidPackageName';
 
   static const String noticesWebUrl =
       'https://movesketch.neonsigntrap.com/notices.html';
+  static const String privacyWebUrl =
+      'https://movesketch.neonsigntrap.com/privacy.html';
+  static const String termsWebUrl =
+      'https://movesketch.neonsigntrap.com/terms.html';
 
   static Future<Result<void>> openExternalUrl(
     String urlString, {

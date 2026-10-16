@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
+import '../../../utils/url_launcher_utils.dart';
 import '../../../utils/validators.dart';
 import '../../core/widgets/labeled_text_form_field.dart';
 import '../../core/widgets/responsive_container.dart';
@@ -201,8 +202,28 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           },
                         ),
                         GestureDetector(
-                          onTap: () {
-                            context.push(Routes.tos);
+                          onTap: () async {
+                            final result = await UrlLauncherUtils.openExternalUrl(
+                              UrlLauncherUtils.termsWebUrl,
+                              inApp: true,
+                            );
+                            if (!context.mounted) {
+                              return;
+                            }
+                            switch (result) {
+                              case Ok():
+                                break;
+                              case Error(:final error):
+                                final String errorMessage = error is AppException
+                                    ? error.message
+                                    : '이용약관을 열 수 없습니다.';
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(errorMessage),
+                                    backgroundColor: colorScheme.error,
+                                  ),
+                                );
+                            }
                           },
                           child: Text(
                             '이용약관',
@@ -214,8 +235,28 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ),
                         Text('과 ', style: textTheme.labelMedium),
                         GestureDetector(
-                          onTap: () {
-                            context.push(Routes.privacy);
+                          onTap:() async {
+                            final result = await UrlLauncherUtils.openExternalUrl(
+                              UrlLauncherUtils.privacyWebUrl,
+                              inApp: true,
+                            );
+                            if (!context.mounted) {
+                              return;
+                            }
+                            switch (result) {
+                              case Ok():
+                                break;
+                              case Error(:final error):
+                                final String errorMessage = error is AppException
+                                    ? error.message
+                                    : '개인정보처리방침을 열 수 없습니다.';
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(errorMessage),
+                                    backgroundColor: colorScheme.error,
+                                  ),
+                                );
+                            }
                           },
                           child: Text(
                             '개인정보 처리 방침',

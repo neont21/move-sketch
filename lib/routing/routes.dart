@@ -94,8 +94,6 @@ abstract final class Routes {
   static String sessionEdit(String sketchId) => '/edit/$sketchId';
 
   static const license = '/license';
-  static const privacy = '/privacy';
-  static const tos = '/tos';
 
   static const userProfilePath = '/profile/:username';
   static String userProfile(String username) => '/profile/$username';
