@@ -272,16 +272,17 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
           _lastMovedAt != null &&
           DateTime.now().difference(_lastMovedAt!) >= _autoPauseThreshold;
 
-      final updatedStatus = shouldAutoPause ? SessionStatus.pausedAuto : current.status;
+      final updatedStatus = shouldAutoPause
+          ? SessionStatus.pausedAuto
+          : current.status;
 
       if (shouldAutoPause) {
         FirebaseCrashlytics.instance.log(
           '운동 세션 자동 일시정지 감지 (sessionId=${current.session.id})',
         );
-        ref.read(sessionRepositoryProvider).pauseSession(
-          current.session.id,
-          isAuto: true,
-        );
+        ref
+            .read(sessionRepositoryProvider)
+            .pauseSession(current.session.id, isAuto: true);
       }
 
       final newCalories = switch (current.session.activityType) {
@@ -370,9 +371,12 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       }
     }
 
-    final bool shouldAutoResume = current.status.isPausedAuto && movingSecondsDelta > 0;
+    final bool shouldAutoResume =
+        current.status.isPausedAuto && movingSecondsDelta > 0;
 
-    final updatedStatus = shouldAutoResume ? SessionStatus.active : current.status;
+    final updatedStatus = shouldAutoResume
+        ? SessionStatus.active
+        : current.status;
 
     if (shouldAutoResume) {
       FirebaseCrashlytics.instance.log(
@@ -510,18 +514,31 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       throw const SessionException('세션이 시작되지 않았습니다.');
     }
 
+    final TrackingSession currentSession;
+    if (session.status.isPaused) {
+      final resumeResult = await sessionRepository.resumeSession(session.id);
+      switch (resumeResult) {
+        case Ok():
+          currentSession = session.copyWith(status: SessionStatus.active);
+        case Error(:final error):
+          throw error;
+      }
+    } else {
+      currentSession = session;
+    }
+
     _startTimer();
     _startLocationTracking();
 
     FirebaseCrashlytics.instance.log(
-      '운동 세션 트래킹 시작: sessionId=${session.id}, activityType=${session.activityType.name}',
+      '운동 세션 트래킹 시작: sessionId=${currentSession.id}, activityType=${currentSession.activityType.name}',
     );
     final initialLoc = await ref
         .read(locationRepositoryProvider)
         .getLastKnownLocation();
 
     return SessionTrackingState.fromSession(
-      session,
+      currentSession,
       initialLocation: initialLoc,
     );
   }
@@ -536,7 +553,23 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       '운동 세션 일시정지 (sessionId=${current.session.id})',
     );
     final sessionRepository = ref.read(sessionRepositoryProvider);
-    await sessionRepository.pauseSession(current.session.id, isAuto: false);
+    final pauseResult = await sessionRepository.pauseSession(
+      current.session.id,
+      isAuto: false,
+    );
+
+    switch (pauseResult) {
+      case Ok():
+        break;
+      case Error(:final error):
+        FirebaseCrashlytics.instance.recordError(
+          error,
+          StackTrace.current,
+          reason: '운동 세션 수동 일시정지 처리 실패',
+          fatal: false,
+        );
+        return;
+    }
 
     final elapsedDelta = _consumeElapsedDelta(current);
     final newElapsedDuration = current.elapsedDuration + elapsedDelta;
@@ -561,7 +594,22 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       '운동 세션 재개 (sessionId=${current.session.id})',
     );
     final sessionRepository = ref.read(sessionRepositoryProvider);
-    await sessionRepository.resumeSession(current.session.id);
+    final resumeResult = await sessionRepository.resumeSession(
+      current.session.id,
+    );
+
+    switch (resumeResult) {
+      case Ok():
+        break;
+      case Error(:final error):
+        FirebaseCrashlytics.instance.recordError(
+          error,
+          StackTrace.current,
+          reason: '운동 세션 재개 처리 실패',
+          fatal: false,
+        );
+        return;
+    }
 
     _lastTickTime = DateTime.now();
     _lastMovedAt = DateTime.now();

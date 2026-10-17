@@ -68,19 +68,20 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
     }
 
     final (weatherResult, koreanAddress) = await (
-    weatherRepository.getCurrentWeather(
-      latitude: latitude,
-      longitude: longitude,
-    ),
-    geocodingRepository.reverseGeocode(
-      latitude: latitude,
-      longitude: longitude,
-    ),
+      weatherRepository.getCurrentWeather(
+        latitude: latitude,
+        longitude: longitude,
+      ),
+      geocodingRepository.reverseGeocode(
+        latitude: latitude,
+        longitude: longitude,
+      ),
     ).wait;
 
     switch (weatherResult) {
       case Ok(:final value):
-        final finalCityName = (koreanAddress != '알 수 없는 위치' && koreanAddress.isNotEmpty)
+        final finalCityName =
+            (koreanAddress != '알 수 없는 위치' && koreanAddress.isNotEmpty)
             ? koreanAddress
             : value.cityName;
         return value.copyWith(cityName: finalCityName);
@@ -124,11 +125,11 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
   Future<void> _loadRemoteData(String userId) async {
     unawaited(() async {
       final (latestResult, weeklyIndicator) = await (
-      _fetchLatestResult(userId),
-      _fetchWeeklyIndicator(userId),
+        _fetchLatestResult(userId),
+        _fetchWeeklyIndicator(userId),
       ).wait;
       state = state.whenData(
-            (current) => current.copyWith(
+        (current) => current.copyWith(
           latestResult: () => latestResult,
           weeklyIndicator: weeklyIndicator,
         ),
@@ -138,9 +139,7 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
     unawaited(() async {
       final weatherInfo = await _fetchWeather();
       state = state.whenData(
-          (current) => current.copyWith(
-            weatherInfo: () => weatherInfo,
-          ),
+        (current) => current.copyWith(weatherInfo: () => weatherInfo),
       );
     }());
   }
@@ -172,6 +171,12 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
       case Error():
         break;
     }
+  }
+
+  void clearUncompletedSession() {
+    state = state.whenData(
+      (current) => current.copyWith(uncompletedSession: () => null),
+    );
   }
 }
 
