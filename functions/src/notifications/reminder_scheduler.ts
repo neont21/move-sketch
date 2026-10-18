@@ -79,57 +79,63 @@ export const sendDailyReminderNotification = onSchedule(
       return;
     }
 
+    const todayStartIso = todayStartKst.toISOString();
     const messagesToSend: admin.messaging.Message[] = [];
+
     for (const user of eligibleUsers) {
-      const sessionsSnapshot = await db
-        .collection("session_results")
-        .where("userId", "==", user.uid)
-        .where(
-          "endedAt",
-          ">=",
-          admin.firestore.Timestamp.fromDate(todayStartKst)
-        )
-        .where("deletedAt", "==", null)
-        .limit(1)
-        .get();
+      try {
+        const sessionsSnapshot = await db
+          .collection("session_results")
+          .where("userId", "==", user.uid)
+          .where("endedAt", ">=", todayStartIso)
+          .limit(5)
+          .get();
 
-      if (!sessionsSnapshot.empty) {
-        logger.info(
-          `사용자 ${user.uid} (${user.nickname})님은 오늘 이미 운동을 완료하여 리마인더 발송을 생략합니다.`
+        const hasCompletedSessionToday = sessionsSnapshot.docs.some(
+          (doc) => !doc.data().deletedAt
         );
-        continue;
-      }
 
-      const fcmToken = user.fcmToken;
-      if (!fcmToken) {
-        continue;
-      }
+        if (hasCompletedSessionToday) {
+          logger.info(
+            `사용자 ${user.uid} (${user.nickname})님은 오늘 이미 운동을 완료하여 ` +
+            "리마인더 발송을 생략합니다."
+          );
+          continue;
+        }
 
-      messagesToSend.push({
-        token: fcmToken,
-        notification: {
-          title: "무브스케치",
-          body: `${user.nickname}님, 오늘 정해둔 운동 시간이에요! 가볍게 몸을 움직여볼까요?`,
-        },
-        data: {
-          type: "reminder",
-        },
-        android: {
-          priority: "high",
+        const fcmToken = user.fcmToken;
+        if (!fcmToken) {
+          continue;
+        }
+
+        messagesToSend.push({
+          token: fcmToken,
           notification: {
-            channelId: "high_importance_channel",
-            sound: "default",
+            title: "무브스케치",
+            body: `${user.nickname}님, 오늘 정해둔 운동 시간이에요! 가볍게 몸을 움직여볼까요?`,
           },
-        },
-        apns: {
-          payload: {
-            aps: {
+          data: {
+            type: "reminder",
+          },
+          android: {
+            priority: "high",
+            notification: {
+              channelId: "high_importance_channel",
               sound: "default",
-              badge: 1,
             },
           },
-        },
-      });
+          apns: {
+            payload: {
+              aps: {
+                sound: "default",
+                badge: 1,
+              },
+            },
+          },
+        });
+      } catch (e) {
+        logger.error(`사용자 ${user.uid} 리마인더 대상 검사 중 오류 발생:`, e);
+      }
     }
     if (messagesToSend.length === 0) {
       logger.info(
