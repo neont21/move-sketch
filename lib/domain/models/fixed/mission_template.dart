@@ -57,9 +57,9 @@ class MissionTemplate {
       unit: 'km',
       partsSlot: SketchSlot.background,
       tiers: const [
-        MissionTier(tier: 1, threshold: 2.0, description: '2km 이상 달리기'),
-        MissionTier(tier: 2, threshold: 4.0, description: '4km 이상 달리기'),
-        MissionTier(tier: 3, threshold: 7.0, description: '7km 이상 달리기'),
+        MissionTier(tier: 1, threshold: 1.5, description: '8분 페이스 기준 약 12분'),
+        MissionTier(tier: 2, threshold: 3.0, description: '8분 페이스 기준 약 24분'),
+        MissionTier(tier: 3, threshold: 5.0, description: '8분 페이스 기준 약 40분'),
       ],
     ),
     MissionTemplate(
@@ -70,9 +70,9 @@ class MissionTemplate {
       unit: '/km',
       partsSlot: SketchSlot.expression,
       tiers: const [
-        MissionTier(tier: 1, threshold: 480.0, description: '기분 좋은 가벼운 조깅'),
-        MissionTier(tier: 2, threshold: 420.0, description: '활력 넘치는 리듬 페이스'),
-        MissionTier(tier: 3, threshold: 360.0, description: '엄청난 속도'),
+        MissionTier(tier: 1, threshold: 520.0, description: '기분 좋은 가벼운 조깅'),
+        MissionTier(tier: 2, threshold: 470.0, description: '활력 넘치는 리듬 페이스'),
+        MissionTier(tier: 3, threshold: 420.0, description: '시원한 질주 페이스'),
       ],
     ),
     MissionTemplate(
@@ -123,9 +123,9 @@ class MissionTemplate {
       unit: 'km',
       partsSlot: SketchSlot.background,
       tiers: const [
-        MissionTier(tier: 1, threshold: 5.0, description: '5km 이상 라이딩'),
-        MissionTier(tier: 2, threshold: 10.0, description: '10km 이상 라이딩'),
-        MissionTier(tier: 3, threshold: 20.0, description: '20km 이상 라이딩'),
+        MissionTier(tier: 1, threshold: 3.0, description: '평속 12km/h 기준 약 15분'),
+        MissionTier(tier: 2, threshold: 7.0, description: '평속 12km/h 기준 약 35분'),
+        MissionTier(tier: 3, threshold: 12.0, description: '평속 12km/h 기준 약 60분'),
       ],
     ),
     MissionTemplate(
@@ -136,9 +136,9 @@ class MissionTemplate {
       unit: 'km/h',
       partsSlot: SketchSlot.expression,
       tiers: const [
-        MissionTier(tier: 1, threshold: 15.0, description: '평균 15km/h 순항'),
-        MissionTier(tier: 2, threshold: 20.0, description: '평균 20km/h 쾌속'),
-        MissionTier(tier: 3, threshold: 26.0, description: '평균 26km/h 질주'),
+        MissionTier(tier: 1, threshold: 11.0, description: '평균 11km/h 순항'),
+        MissionTier(tier: 2, threshold: 15.0, description: '평균 15km/h 쾌속'),
+        MissionTier(tier: 3, threshold: 19.0, description: '평균 19km/h 질주'),
       ],
     ),
     MissionTemplate(

@@ -8,8 +8,10 @@ import '../../../domain/models/enums/activity_type.dart';
 import '../../../domain/models/enums/mission_axis.dart';
 import '../../../domain/models/enums/session_status.dart';
 import '../../../domain/models/fixed/mission_template.dart';
+import '../../../domain/models/session/interval_tracking_state.dart';
 import '../../../domain/models/session/location_point.dart';
 import '../../../domain/models/session/mission_instance.dart';
+import '../../../domain/models/session/sprint_tracking_state.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -200,6 +202,9 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
   DateTime? _lastTickTime;
   DateTime? _lastMovedAt;
 
+  IntervalTrackingState _intervalState = const IntervalTrackingState();
+  SprintTrackingState _sprintState = const SprintTrackingState();
+
   Duration _consumeElapsedDelta(SessionTrackingState current) {
     if (current.isPausedManual) {
       _lastTickTime = null;
@@ -243,8 +248,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         MissionAxis.pace => averagePaceInSeconds!.toDouble(),
         MissionAxis.speed => averageSpeedKmh ?? 0.0,
         MissionAxis.routeExploration => mission.currentValue,
-        MissionAxis.interval => mission.currentValue,
-        MissionAxis.sprint => mission.currentValue,
+        MissionAxis.interval => _intervalState.count.toDouble(),
+        MissionAxis.sprint => _sprintState.count.toDouble(),
         MissionAxis.unknown => 0.0,
       };
 
@@ -417,6 +422,11 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         } else {
           curPace = avgPace;
         }
+        _intervalState = _intervalState.evaluate(
+          currentPaceInSeconds: curPace,
+          averagePaceInSeconds: avgPace,
+          timestamp: point.timestamp,
+        );
       case ActivityType.riding:
         if (activeSeconds > 0) {
           avgSpeed = newDistanceInKm / (activeSeconds / 3600.0);
@@ -426,6 +436,11 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         } else {
           curSpeed = avgSpeed;
         }
+        _sprintState = _sprintState.evaluate(
+          currentSpeedKmh: curSpeed,
+          averageSpeedKmh: avgSpeed,
+          timestamp: point.timestamp,
+        );
     }
 
     final updatedPoints = [...current.pathPoints, point];
@@ -526,6 +541,25 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     } else {
       currentSession = session;
     }
+
+    final initialIntervalCount =
+        currentSession.missions
+            .where((mission) => mission.axis == MissionAxis.interval)
+            .firstOrNull
+            ?.currentValue
+            .toInt() ??
+        0;
+
+    final initialSprintCount =
+        currentSession.missions
+            .where((mission) => mission.axis == MissionAxis.sprint)
+            .firstOrNull
+            ?.currentValue
+            .toInt() ??
+        0;
+
+    _intervalState = IntervalTrackingState(count: initialIntervalCount);
+    _sprintState = SprintTrackingState(count: initialSprintCount);
 
     _startTimer();
     _startLocationTracking();
