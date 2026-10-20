@@ -99,7 +99,7 @@ lib/
 │       ├── view_models/   # Riverpod 상태 관리 (AsyncNotifier / Notifier)
 │       └── widgets/       # 화면 및 종속적 UI 컴포넌트
 ├── utils/                 # 순수 유틸리티 (포맷터, 날씨 헬퍼, 계산식 등)
-└── main.dart              # 앱 진입점 및 전역 인프라/상태(ProviderScope) 초기화
+└── main.dart              # 앱 진입점 및 전역 인프라/상태(ProviderScope) 초기ㄹ화
 ```
 
 ### 4.2 주요 기술 스택
