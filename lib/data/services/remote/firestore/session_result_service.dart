@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../domain/models/enums/activity_type.dart';
 import '../../../../domain/models/session/session_result.dart';
+import '../../../../utils/date_time_utils.dart';
 
 class SessionResultService {
   final FirebaseFirestore _firestore;
@@ -59,17 +60,12 @@ class SessionResultService {
   }) async {
     final querySnapshot = await _resultsRef
         .where('userId', isEqualTo: userId)
-        .where(
-          'endedAt',
-          isGreaterThanOrEqualTo: since.toUtc().toIso8601String(),
-        )
+        .where('endedAt', isGreaterThanOrEqualTo: Timestamp.fromDate(since))
         .orderBy('endedAt', descending: true)
         .get();
     return querySnapshot.docs
         .where((doc) => doc.data()['deletedAt'] == null)
-        .map(
-          (doc) => DateTime.parse(doc.data()['startedAt'] as String).toLocal(),
-        )
+        .map((doc) => parseDateTime(doc.data()['startedAt']).toLocal())
         .toList();
   }
 
@@ -87,9 +83,9 @@ class SessionResultService {
         .where('userId', isEqualTo: userId)
         .where(
           'endedAt',
-          isGreaterThanOrEqualTo: startOfMonth.toIso8601String(),
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth),
         )
-        .where('endedAt', isLessThan: startOfNextMonth.toIso8601String())
+        .where('endedAt', isLessThan: Timestamp.fromDate(startOfNextMonth))
         .orderBy('endedAt', descending: true)
         .get();
 

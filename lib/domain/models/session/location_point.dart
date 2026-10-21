@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../data/services/local/database/app_database.dart';
@@ -35,7 +36,7 @@ class LocationPoint {
       'speed': speed,
       'heading': heading,
       'accuracy': accuracy,
-      'timestamp': timestamp.toUtc().toIso8601String(),
+      'timestamp': Timestamp.fromDate(timestamp),
     };
   }
 

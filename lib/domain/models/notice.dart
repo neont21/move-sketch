@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-
 import '../../utils/date_time_utils.dart';
 
 @immutable
@@ -59,7 +59,7 @@ final class Notice {
     return {
       'title': title,
       'content': content,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
       if (actionUrl != null) 'actionUrl': actionUrl,
       if (actionButtonText != null) 'actionButtonText': actionButtonText,
       'isImportant': isImportant,

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../../utils/date_time_utils.dart';
 import '../enums/activity_type.dart';
@@ -74,8 +75,8 @@ class SessionResult {
       'id': id,
       'userId': userId,
       'activityType': activityType.name,
-      'startedAt': startedAt.toUtc().toIso8601String(),
-      'endedAt': endedAt.toUtc().toIso8601String(),
+      'startedAt': Timestamp.fromDate(startedAt),
+      'endedAt': Timestamp.fromDate(endedAt),
       'elapsedSeconds': elapsedDuration.inSeconds,
       'distanceInMeters': distanceInMeters,
       'caloriesBurned': caloriesBurned,
@@ -92,9 +93,9 @@ class SessionResult {
       'isShared': isShared,
       'locationTags': locationTags,
       'syncStatus': syncStatus.name,
-      'createdAt': createdAt.toUtc().toIso8601String(),
-      'updatedAt': updatedAt?.toUtc().toIso8601String(),
-      'deletedAt': deletedAt?.toUtc().toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
+      'deletedAt': deletedAt != null ? Timestamp.fromDate(deletedAt!) : null,
     };
   }
 

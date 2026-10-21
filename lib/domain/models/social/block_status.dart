@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../utils/date_time_utils.dart';
 import 'user.dart';
 
@@ -36,7 +37,7 @@ class BlockStatus {
       'id': id,
       'blockerUid': blockerUid,
       'blockedUser': blockedUser.toMap(),
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 

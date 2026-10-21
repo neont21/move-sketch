@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../../utils/date_time_utils.dart';
 
@@ -87,7 +88,7 @@ class WeatherInfo {
       'temperature': temperature,
       'iconCode': iconCode,
       'cityName': cityName,
-      'observedAt': observedAt.toUtc().toIso8601String(),
+      'observedAt': Timestamp.fromDate(observedAt),
     };
   }
 

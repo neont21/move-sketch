@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../../utils/date_time_utils.dart';
 import '../enums/activity_type.dart';
@@ -71,9 +72,9 @@ class SketchPost {
       'activityType': activityType.name,
       'cheeredUserIds': cheeredUserIds.toList(),
       'commentCount': commentCount,
-      'createdAt': createdAt.toUtc().toIso8601String(),
-      'updatedAt': updatedAt?.toUtc().toIso8601String(),
-      'deletedAt': deletedAt?.toUtc().toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
+      'deletedAt': deletedAt != null ? Timestamp.fromDate(deletedAt!) : null,
     };
   }
 

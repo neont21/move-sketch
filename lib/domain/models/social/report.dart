@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import '../enums/report_type.dart';
@@ -23,7 +24,7 @@ class Report {
     this.sketchId,
     this.commentId,
     this.description,
-});
+  });
 
   factory Report.create({
     required UserSummary targetUser,
@@ -40,7 +41,9 @@ class Report {
       reportType: reportType,
       sketchId: sketchId,
       commentId: commentId,
-      description: description?.trim().isEmpty == true ? null : description?.trim(),
+      description: description?.trim().isEmpty == true
+          ? null
+          : description?.trim(),
       createdAt: DateTime.now(),
     );
   }
@@ -54,7 +57,7 @@ class Report {
       'commentId': commentId,
       'reportType': reportType.label,
       'description': description,
-      'createdAt': createdAt.toUtc().toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
     };
   }
 }
