@@ -63,16 +63,15 @@ class SessionTrackingState {
       return Duration.zero;
     }
 
-    int totalMovingSeconds = 0;
+    int totalMovingMillis = 0;
     for (var i = 1; i < points.length; i++) {
       final previousPoint = points[i - 1];
       final currentPoint = points[i];
 
-      final timeDiffSec = currentPoint.timestamp
+      final timeDiffMillis = currentPoint.timestamp
           .difference(previousPoint.timestamp)
-          .inSeconds;
-
-      if (timeDiffSec <= 0 || timeDiffSec > 60) {
+          .inMilliseconds;
+      if (timeDiffMillis <= 0 || timeDiffMillis > 60000) {
         continue;
       }
 
@@ -83,13 +82,14 @@ class SessionTrackingState {
         currentPoint.longitude,
       );
 
-      final speedMps = segmentDistance / timeDiffSec;
+      final timeDiffSeconds = timeDiffMillis / 1000.0;
+      final speedMps = segmentDistance / timeDiffSeconds;
       if (segmentDistance >= 1.5 && speedMps >= 0.5) {
-        totalMovingSeconds += timeDiffSec;
+        totalMovingMillis += timeDiffMillis;
       }
     }
 
-    return Duration(seconds: totalMovingSeconds);
+    return Duration(milliseconds: totalMovingMillis);
   }
 
   static double calculateElevationGainFromPoints(List<LocationPoint> points) {
@@ -204,6 +204,38 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
   IntervalTrackingState _intervalState = const IntervalTrackingState();
   SprintTrackingState _sprintState = const SprintTrackingState();
+  double? _smoothedSpeedMps;
+
+  double? _calculateRollingSpeedMps(
+    List<LocationPoint> points, {
+    Duration window = const Duration(seconds: 30),
+  }) {
+    if (points.isEmpty) {
+      return null;
+    }
+
+    final latestTimestamp = points.last.timestamp;
+    final validSpeeds = <double>[];
+
+    for (int i = points.length - 1; i >= 0; i--) {
+      final locationPoint = points[i];
+      if (latestTimestamp.difference(locationPoint.timestamp) > window) {
+        break;
+      }
+      if (locationPoint.speed != null && locationPoint.speed! > 0.4) {
+        validSpeeds.add(locationPoint.speed!);
+      }
+    }
+
+    if (validSpeeds.length < 3) {
+      return null;
+    }
+
+    final totalSpeedSum = validSpeeds.reduce(
+      (accumulator, speedElement) => accumulator + speedElement,
+    );
+    return totalSpeedSum / validSpeeds.length;
+  }
 
   Duration _consumeElapsedDelta(SessionTrackingState current) {
     if (current.isPausedManual) {
@@ -333,7 +365,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     final lastPoint = current.pathPoints.lastOrNull;
     double deltaDistance = 0.0;
     double deltaElevationGain = 0.0;
-    int movingSecondsDelta = 0;
+    Duration movingDurationDelta = Duration.zero;
 
     if (lastPoint != null) {
       deltaDistance = Geolocator.distanceBetween(
@@ -343,42 +375,38 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         point.longitude,
       );
 
-      if (deltaDistance < 1.5) {
-        return;
-      }
-
-      final timeDiffSec = point.timestamp
+      final timeDiffMillis = point.timestamp
           .difference(lastPoint.timestamp)
-          .inSeconds;
+          .inMilliseconds;
 
-      if (timeDiffSec > 0 && (deltaDistance / timeDiffSec) > 35.0) {
+      final timeDiffSeconds = timeDiffMillis / 1000.0;
+
+      if (timeDiffSeconds < 0.5 || (deltaDistance / timeDiffSeconds) > 35.0) {
         return;
       }
 
-      if (timeDiffSec > 0) {
-        final speedMps = deltaDistance / timeDiffSec;
+      final speedMps = deltaDistance / timeDiffSeconds;
 
-        if (deltaDistance >= 1.5 && speedMps >= 0.5) {
-          movingSecondsDelta = timeDiffSec;
-          _lastMovedAt = DateTime.now();
+      final isStationaryBySensor = point.speed != null && point.speed! < 0.3;
 
-          if (lastPoint.altitude != null && point.altitude != null) {
-            final altitudeDifference = point.altitude! - lastPoint.altitude!;
+      if (!isStationaryBySensor && deltaDistance >= 1.0 && speedMps >= 0.4) {
+        movingDurationDelta = Duration(milliseconds: timeDiffMillis);
+        _lastMovedAt = DateTime.now();
 
-            if (altitudeDifference >= 1.0 &&
-                (altitudeDifference / deltaDistance) <= 0.35) {
-              deltaElevationGain = altitudeDifference;
-            }
+        if (lastPoint.altitude != null && point.altitude != null) {
+          final altitudeDifference = point.altitude! - lastPoint.altitude!;
+          if (altitudeDifference >= 1.0 &&
+              (altitudeDifference / deltaDistance) <= 0.35) {
+            deltaElevationGain = altitudeDifference;
           }
-        } else {
-          deltaDistance = 0.0;
         }
+      } else {
+        deltaDistance = 0.0;
       }
     }
 
     final bool shouldAutoResume =
-        current.status.isPausedAuto && movingSecondsDelta > 0;
-
+        current.status.isPausedAuto && movingDurationDelta > Duration.zero;
     final updatedStatus = shouldAutoResume
         ? SessionStatus.active
         : current.status;
@@ -396,9 +424,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
     final elapsedDelta = _consumeElapsedDelta(current);
     final newElapsedDuration = current.elapsedDuration + elapsedDelta;
-    final newMovingDuration =
-        current.movingDuration + Duration(seconds: movingSecondsDelta);
-    final activeSeconds = newMovingDuration.inSeconds;
+    final newMovingDuration = current.movingDuration + movingDurationDelta;
+    final activeSeconds = newMovingDuration.inMilliseconds / 1000.0;
 
     final newCalories = switch (current.session.activityType) {
       ActivityType.jogging =>
@@ -407,51 +434,83 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         ((newDistanceInKm * 30) + (newElevationGain * 0.05)).round(),
     };
 
-    int? avgPace;
-    int? curPace;
-    double? avgSpeed;
-    double? curSpeed;
+    int? averagePaceInSeconds;
+    int? currentPaceInSeconds;
+    double? averageSpeedKmh;
+    double? currentSpeedKmh;
+
+    final updatedPoints = [...current.pathPoints, point];
 
     switch (current.session.activityType) {
       case ActivityType.jogging:
-        if (newDistance > 30 && activeSeconds > 0) {
-          avgPace = (activeSeconds / newDistanceInKm).round();
+        if (newDistanceInKm > 0.03 && activeSeconds > 0) {
+          averagePaceInSeconds = (activeSeconds / newDistanceInKm).round();
         }
-        if (point.speed != null && point.speed! > 0.5) {
-          curPace = (1000.0 / point.speed!).round();
+
+        if (point.speed != null && point.speed! > 0.4) {
+          _smoothedSpeedMps = (_smoothedSpeedMps == null)
+              ? point.speed!
+              : (_smoothedSpeedMps! * 0.7 + point.speed! * 0.3);
+
+          currentPaceInSeconds = (1000.0 / _smoothedSpeedMps!).round();
         } else {
-          curPace = avgPace;
+          _smoothedSpeedMps = null;
+          currentPaceInSeconds = averagePaceInSeconds;
         }
+
+        final rollingSpeedMps = _calculateRollingSpeedMps(
+          updatedPoints,
+          window: const Duration(seconds: 30),
+        );
+
+        final rollingBaselinePace =
+            rollingSpeedMps != null && rollingSpeedMps > 0.4
+            ? (1000.0 / rollingSpeedMps).round()
+            : averagePaceInSeconds;
+
         _intervalState = _intervalState.evaluate(
-          currentPaceInSeconds: curPace,
-          averagePaceInSeconds: avgPace,
+          currentPaceInSeconds: currentPaceInSeconds,
+          rollingBaselinePaceInSeconds: rollingBaselinePace,
           timestamp: point.timestamp,
         );
       case ActivityType.riding:
         if (activeSeconds > 0) {
-          avgSpeed = newDistanceInKm / (activeSeconds / 3600.0);
+          averageSpeedKmh = newDistanceInKm / (activeSeconds / 3600.0);
         }
+
         if (point.speed != null && point.speed! >= 0) {
-          curSpeed = point.speed! * 3.6;
+          _smoothedSpeedMps = (_smoothedSpeedMps == null)
+              ? point.speed!
+              : (_smoothedSpeedMps! * 0.7 + point.speed! * 0.3);
+          currentSpeedKmh = _smoothedSpeedMps! * 3.6;
         } else {
-          curSpeed = avgSpeed;
+          _smoothedSpeedMps = null;
+          currentSpeedKmh = averageSpeedKmh;
         }
+
+        final rollingSpeedMps = _calculateRollingSpeedMps(
+          updatedPoints,
+          window: const Duration(seconds: 20),
+        );
+
+        final rollingBaselineSpeedKmh = rollingSpeedMps != null
+            ? rollingSpeedMps * 3.6
+            : averageSpeedKmh;
+
         _sprintState = _sprintState.evaluate(
-          currentSpeedKmh: curSpeed,
-          averageSpeedKmh: avgSpeed,
+          currentSpeedKmh: currentSpeedKmh,
+          rollingBaselineSpeedKmh: rollingBaselineSpeedKmh,
           timestamp: point.timestamp,
         );
     }
-
-    final updatedPoints = [...current.pathPoints, point];
 
     final updatedMissions = _evaluateMissions(
       missions: current.missions,
       activityType: current.session.activityType,
       distanceInKm: newDistanceInKm,
       elapsedDuration: newMovingDuration,
-      averagePaceInSeconds: avgPace,
-      averageSpeedKmh: avgSpeed,
+      averagePaceInSeconds: averagePaceInSeconds,
+      averageSpeedKmh: averageSpeedKmh,
     );
     state = AsyncData(
       current.copyWith(
@@ -461,10 +520,10 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         elevationGainMeters: newElevationGain,
         caloriesBurned: newCalories,
         pathPoints: updatedPoints,
-        currentPaceInSeconds: () => curPace,
-        averagePaceInSeconds: () => avgPace,
-        currentSpeedKmh: () => curSpeed,
-        averageSpeedKmh: () => avgSpeed,
+        currentPaceInSeconds: () => currentPaceInSeconds,
+        averagePaceInSeconds: () => averagePaceInSeconds,
+        currentSpeedKmh: () => currentSpeedKmh,
+        averageSpeedKmh: () => averageSpeedKmh,
         missions: updatedMissions,
         session: current.session.copyWith(status: updatedStatus),
       ),
@@ -477,8 +536,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       elapsedDuration: newElapsedDuration,
       totalDistanceInMeters: newDistance,
       caloriesBurned: newCalories,
-      averagePaceInSeconds: avgPace,
-      averageSpeedKmh: avgSpeed,
+      averagePaceInSeconds: averagePaceInSeconds,
+      averageSpeedKmh: averageSpeedKmh,
     );
 
     for (final mission in updatedMissions) {
