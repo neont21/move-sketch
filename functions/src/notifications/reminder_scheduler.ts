@@ -80,20 +80,41 @@ export const sendDailyReminderNotification = onSchedule(
     }
 
     const todayStartIso = todayStartKst.toISOString();
+    const todayStartTimestamp =
+      admin.firestore.Timestamp.fromDate(todayStartKst);
+    const nowIso = now.toISOString();
+    const nowTimestamp = admin.firestore.Timestamp.fromDate(now);
+
     const messagesToSend: admin.messaging.Message[] = [];
 
     for (const user of eligibleUsers) {
       try {
-        const sessionsSnapshot = await db
+        const timestampQueryPromise = db
           .collection("session_results")
           .where("userId", "==", user.uid)
-          .where("endedAt", ">=", todayStartIso)
+          .where("endedAt", ">=", todayStartTimestamp)
+          .where("endedAt", "<=", nowTimestamp)
           .limit(5)
           .get();
 
-        const hasCompletedSessionToday = sessionsSnapshot.docs.some(
-          (doc) => !doc.data().deletedAt
-        );
+        const stringQueryPromise = db
+          .collection("session_results")
+          .where("userId", "==", user.uid)
+          .where("endedAt", ">=", todayStartIso)
+          .where("endedAt", "<=", nowIso)
+          .limit(5)
+          .get();
+
+        const [timestampSessionsSnapshot, stringSessionsSnapshot] =
+          await Promise.all([timestampQueryPromise, stringQueryPromise]);
+
+        const hasCompletedSessionToday =
+          timestampSessionsSnapshot.docs.some(
+            (documentSnapshot) => !documentSnapshot.data().deletedAt
+          ) ||
+          stringSessionsSnapshot.docs.some(
+            (documentSnapshot) => !documentSnapshot.data().deletedAt
+          );
 
         if (hasCompletedSessionToday) {
           logger.info(
