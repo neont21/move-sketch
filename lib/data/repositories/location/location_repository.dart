@@ -15,7 +15,11 @@ abstract interface class LocationRepository {
   Future<LocationPoint?> getLastKnownLocation();
 
   /// 실시간 좌표 스트림을 구독한다. (세션 경로 추적)
-  Stream<LocationPoint> getPositionStream({int distanceFilterMeters = 0});
+  Stream<LocationPoint> getPositionStream({
+    int distanceFilterMeters = 0,
+    String? notificationTitle,
+    String? notificationText,
+  });
 
   /// 기기 앱 설정 화면을 연다.
   Future<bool> openAppSettings();

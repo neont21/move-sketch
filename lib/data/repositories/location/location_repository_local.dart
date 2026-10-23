@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import '../../../domain/models/session/location_point.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -59,9 +58,15 @@ final class LocationRepositoryLocal implements LocationRepository {
   }
 
   @override
-  Stream<LocationPoint> getPositionStream({int distanceFilterMeters = 0}) {
+  Stream<LocationPoint> getPositionStream({
+    int distanceFilterMeters = 0,
+    String? notificationTitle,
+    String? notificationText,
+  }) {
     return locationService.getPositionStream(
       distanceFilterMeters: distanceFilterMeters,
+      notificationTitle: notificationTitle,
+      notificationText: notificationText,
     );
   }
 

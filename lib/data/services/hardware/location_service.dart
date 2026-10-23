@@ -62,18 +62,28 @@ class LocationService {
     return _toLocationPoint(pos);
   }
 
-  Stream<LocationPoint> getPositionStream({int distanceFilterMeters = 0}) {
+  Stream<LocationPoint> getPositionStream({
+    int distanceFilterMeters = 0,
+    String? notificationTitle,
+    String? notificationText,
+  }) {
     late final LocationSettings locationSettings;
     if (defaultTargetPlatform == TargetPlatform.android) {
+      final ForegroundNotificationConfig? foregroundNotificationConfig =
+          (notificationTitle != null && notificationText != null)
+          ? ForegroundNotificationConfig(
+              notificationTitle: notificationTitle,
+              notificationText: notificationText,
+              enableWakeLock: true,
+              setOngoing: true,
+            )
+          : null;
+
       locationSettings = AndroidSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: distanceFilterMeters,
         intervalDuration: const Duration(seconds: 1),
-        foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationTitle: 'MoveSketch 세션 기록 중',
-          notificationText: '운동 경로를 실시간으로 측정하고 있습니다.',
-          enableWakeLock: true,
-        ),
+        foregroundNotificationConfig: foregroundNotificationConfig,
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       locationSettings = AppleSettings(

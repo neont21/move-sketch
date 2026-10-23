@@ -202,6 +202,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
   DateTime? _lastTickTime;
   DateTime? _lastMovedAt;
 
+  SessionStatus _currentTrackingStatus = SessionStatus.ready;
+
   IntervalTrackingState _intervalState = const IntervalTrackingState();
   SprintTrackingState _sprintState = const SprintTrackingState();
   double? _smoothedSpeedMps;
@@ -320,6 +322,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         ref
             .read(sessionRepositoryProvider)
             .pauseSession(current.session.id, isAuto: true);
+
+        _updateForegroundNotification(SessionStatus.pausedAuto);
       }
 
       final newCalories = switch (current.session.activityType) {
@@ -416,6 +420,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         '운동 세션 자동 재개 감지 (sessionId=${current.session.id})',
       );
       ref.read(sessionRepositoryProvider).resumeSession(current.session.id);
+
+      _updateForegroundNotification(SessionStatus.active);
     }
 
     final newDistance = current.distanceInMeters + deltaDistance;
@@ -546,15 +552,43 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
   }
 
   void _startLocationTracking() {
+    _subscribeLocationStream(SessionStatus.active);
+  }
+
+  void _updateForegroundNotification(SessionStatus status) {
+    if (_locationSubscription != null && _currentTrackingStatus == status) {
+      return;
+    }
+    _subscribeLocationStream(status);
+  }
+
+  void _subscribeLocationStream(SessionStatus status) {
+    _currentTrackingStatus = status;
     _locationSubscription?.cancel();
+
+    final (notificationTitle, notificationText) = switch (status) {
+      SessionStatus.active => ('MoveSketch 세션 기록 중', '운동 경로를 실시간으로 측정하고 있습니다.'),
+      SessionStatus.pausedAuto => (
+        'MoveSketch 세션 자동 일시정지',
+        '정지가 감지되어 멈춰 있습니다. 다시 이동하면 자동으로 재개됩니다.',
+      ),
+      SessionStatus.pausedManual => (
+        'MoveSketch 세션 일시정지',
+        '운동 세션이 일시정지되었습니다. 앱에서 언제든 재개할 수 있습니다.',
+      ),
+      _ => (null, null),
+    };
+
     final locationRepository = ref.read(locationRepositoryProvider);
 
     _locationSubscription = locationRepository
-        .getPositionStream(distanceFilterMeters: 2)
+        .getPositionStream(
+          distanceFilterMeters: 2,
+          notificationTitle: notificationTitle,
+          notificationText: notificationText,
+        )
         .listen(
-          (point) {
-            _onNewLocationPoint(point);
-          },
+          _onNewLocationPoint,
           onError: (error, trace) {
             FirebaseCrashlytics.instance.recordError(
               error,
@@ -675,6 +709,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         session: current.session.copyWith(status: SessionStatus.pausedManual),
       ),
     );
+
+    _updateForegroundNotification(SessionStatus.pausedManual);
   }
 
   Future<void> resumeSession() async {
@@ -713,6 +749,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         session: current.session.copyWith(status: SessionStatus.active),
       ),
     );
+
+    _updateForegroundNotification(SessionStatus.active);
   }
 
   Future<void> discardSession() async {
