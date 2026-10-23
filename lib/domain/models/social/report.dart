@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
+import '../../../utils/date_time_utils.dart';
+import '../enums/report_status.dart';
 import '../enums/report_type.dart';
 import 'user.dart';
 
@@ -13,6 +15,7 @@ class Report {
   final String? commentId;
   final ReportType reportType;
   final String? description;
+  final ReportStatus status;
   final DateTime createdAt;
 
   const Report({
@@ -21,6 +24,7 @@ class Report {
     required this.reporter,
     required this.reportType,
     required this.createdAt,
+    this.status = ReportStatus.unconfirmed,
     this.sketchId,
     this.commentId,
     this.description,
@@ -44,7 +48,40 @@ class Report {
       description: description?.trim().isEmpty == true
           ? null
           : description?.trim(),
+      status: ReportStatus.unconfirmed,
       createdAt: DateTime.now(),
+    );
+  }
+
+  factory Report.fromMap(Map<String, dynamic> map, {String? documentId}) {
+    return Report(
+      id: documentId ?? (map['id'] as String? ?? ''),
+      targetUser: UserSummary.fromMap(
+        map['targetUser'] as Map<String, dynamic>? ?? const {},
+      ),
+      reporter: UserSummary.fromMap(
+        map['reporter'] as Map<String, dynamic>? ?? const {},
+      ),
+      reportType: ReportType.fromString(map['reportType'] as String?),
+      status: ReportStatus.fromString(map['status'] as String?),
+      sketchId: map['sketchId'] as String?,
+      commentId: map['commentId'] as String?,
+      description: map['description'] as String?,
+      createdAt: parseDateTime(map['createdAt']).toLocal(),
+    );
+  }
+
+  Report copyWith({ReportStatus? status, String? description}) {
+    return Report(
+      id: id,
+      targetUser: targetUser,
+      reporter: reporter,
+      reportType: reportType,
+      status: status ?? this.status,
+      sketchId: sketchId,
+      commentId: commentId,
+      description: description ?? this.description,
+      createdAt: createdAt,
     );
   }
 
@@ -55,8 +92,9 @@ class Report {
       'reporter': reporter.toMap(),
       'sketchId': sketchId,
       'commentId': commentId,
-      'reportType': reportType.label,
+      'reportType': reportType.name,
       'description': description,
+      'status': status.name,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }

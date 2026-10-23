@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../domain/models/system/app_device_info.dart';
 import 'exceptions.dart';
 import 'result.dart';
 
 abstract final class UrlLauncherUtils {
   static const String _iosAppId = '6819965333';
   static const String _androidPackageName = 'com.neonsigntrap.move_sketch';
+
+  static const String supportEmail = 'movesketch@neonsigntrap.com';
 
   static const String iosStoreUrl =
       'https://apps.apple.com/kr/app/id$_iosAppId';
@@ -76,5 +79,38 @@ abstract final class UrlLauncherUtils {
     } else {
       return const Result.error(ExternalAppException('지원되지 않는 운영체제입니다.'));
     }
+  }
+
+  static String? _encodeQueryParameters(Map<String, String> parameters) {
+    return parameters.entries
+        .map(
+          (MapEntry<String, String> parameterEntry) =>
+              '${Uri.encodeComponent(parameterEntry.key)}=${Uri.encodeComponent(parameterEntry.value)}',
+        )
+        .join('&');
+  }
+
+  static Future<Result<void>> openInquiryEmail({
+    required AppDeviceInfo deviceInfo,
+  }) async {
+    final String emailBody =
+        '아래에 문의나 겪으신 문제를 자유롭게 작성해 주세요.\n'
+        '(스크린샷을 함께 첨부해 주시면 더욱 신속한 확인이 가능합니다.)\n\n'
+        '-----------------------------\n'
+        '[기기 및 앱 정보]\n'
+        '※ 기기 및 OS 환경에 따른 문제 원인을 정확히 파악하고 신속하게 조치하기 위해 필요한 정보이므로 삭제하지 말아주세요.\n'
+        '${deviceInfo.toFormattedString()}\n'
+        '-----------------------------\n';
+
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: supportEmail,
+      query: _encodeQueryParameters(<String, String>{
+        'subject': '[MoveSketch] 문의 및 버그 제보',
+        'body': emailBody,
+      }),
+    );
+
+    return openExternalUrl(emailLaunchUri.toString());
   }
 }
