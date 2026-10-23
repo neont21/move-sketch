@@ -1,4 +1,4 @@
-import '../../../domain/models/notice.dart';
+import '../../../domain/models/system/notice.dart';
 import '../../../utils/result.dart';
 
 abstract interface class NoticeRepository {

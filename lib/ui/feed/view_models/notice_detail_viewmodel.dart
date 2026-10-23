@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../config/dependencies.dart';
-import '../../../domain/models/notice.dart';
+import '../../../domain/models/system/notice.dart';
 import '../../../utils/result.dart';
 
 class NoticeDetailViewModel extends AsyncNotifier<Notice> {

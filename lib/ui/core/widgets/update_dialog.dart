@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../../domain/models/app_version_policy.dart';
+import '../../../domain/models/system/app_version_policy.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../../utils/url_launcher_utils.dart';

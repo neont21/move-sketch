@@ -1,5 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
-import '../../../domain/models/app_version_policy.dart';
+import '../../../domain/models/system/app_version_policy.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../services/remote/firestore/app_version_service.dart';

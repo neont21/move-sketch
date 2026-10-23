@@ -1,5 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
-import '../../../domain/models/notice.dart';
+import '../../../domain/models/system/notice.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../services/remote/firestore/notice_service.dart';

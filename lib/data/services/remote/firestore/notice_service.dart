@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../../domain/models/notice.dart';
+import '../../../../domain/models/system/notice.dart';
 
 class NoticeService {
   final FirebaseFirestore _firestore;

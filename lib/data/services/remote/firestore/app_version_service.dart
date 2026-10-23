@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../../../domain/models/app_version_policy.dart';
+import '../../../../domain/models/system/app_version_policy.dart';
 
 class AppVersionService {
   final FirebaseFirestore _firestore;

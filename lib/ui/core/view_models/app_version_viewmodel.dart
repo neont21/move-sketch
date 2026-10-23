@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../../config/dependencies.dart';
-import '../../../domain/models/app_version_policy.dart';
+import '../../../domain/models/system/app_version_policy.dart';
 import '../../../domain/models/enums/update_type.dart';
 import '../../../utils/result.dart';
 

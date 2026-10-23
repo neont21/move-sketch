@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'enums/update_type.dart';
+import '../enums/update_type.dart';
 
 @immutable
 final class AppVersionPolicy {

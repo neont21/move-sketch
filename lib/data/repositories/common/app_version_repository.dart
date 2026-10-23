@@ -1,4 +1,4 @@
-import '../../../domain/models/app_version_policy.dart';
+import '../../../domain/models/system/app_version_policy.dart';
 import '../../../utils/result.dart';
 
 abstract interface class AppVersionRepository {

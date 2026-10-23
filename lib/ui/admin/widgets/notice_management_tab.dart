@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../domain/models/notice.dart';
+import '../../../domain/models/system/notice.dart';
 import '../../../utils/date_time_utils.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
