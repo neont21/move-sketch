@@ -61,3 +61,7 @@ env*.json
 .firebase/
 # Android Gradle build outputs
 /android/build/
+
+# FVM Version Cache
+.fvm/*
+!.fvm/fvm_config.json
