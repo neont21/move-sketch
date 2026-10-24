@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import '../../../domain/models/enums/report_status.dart';
 import '../../../domain/models/social/report.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -22,6 +23,44 @@ final class ReportRepositoryRemote implements ReportRepository {
       );
     } catch (e) {
       return Result.error(DatabaseException('신고 접수 중 오류가 발생했습니다.', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<List<Report>>> getReports({ReportStatus? statusFilter}) async {
+    try {
+      final reports = await reportService.getReports(
+        statusFilter: statusFilter,
+      );
+
+      return Result.ok(reports);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '신고 목록 조회 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('신고 목록 조회 중 오류가 발생했습니다.', cause: e),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void>> updateReportStatus(
+    String reportId,
+    ReportStatus status,
+  ) async {
+    try {
+      await reportService.updateReportStatus(reportId, status);
+      return const Result.ok(null);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '신고 상태 갱신 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('신고 상태 갱신 중 오류가 발생했습니다.', cause: e),
+      );
     }
   }
 }

@@ -34,7 +34,7 @@ class StorageService {
   Future<String> copyRemoteImageToProfile({
     required String userId,
     required String remoteUrl,
-}) async {
+  }) async {
     final http.Response response = await http.get(Uri.parse(remoteUrl));
     if (response.statusCode != 200) {
       throw const StorageException('외부 프로필 이미지를 다운로드하지 못했습니다.');
@@ -42,8 +42,7 @@ class StorageService {
 
     final int timestamp = DateTime.now().millisecondsSinceEpoch;
 
-    final String contentType =
-        response.headers['content-type'] ?? 'image/jpeg';
+    final String contentType = response.headers['content-type'] ?? 'image/jpeg';
     final String extension = contentType.contains('png') ? 'png' : 'jpg';
 
     final Reference ref = _storage.ref().child(
@@ -72,10 +71,56 @@ class StorageService {
     return await snapshot.ref.getDownloadURL();
   }
 
+  (String, String) _resolveImageFormat(Uint8List bytes) {
+    if (bytes.length >= 4 &&
+        bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
+        bytes[3] == 0x47) {
+      return ('png', 'image/png');
+    }
+    if (bytes.length >= 3 &&
+        bytes[0] == 0xFF &&
+        bytes[1] == 0xD8 &&
+        bytes[2] == 0xFF) {
+      return ('jpg', 'image/jpeg');
+    }
+    if (bytes.length >= 12 &&
+        bytes[0] == 0x52 &&
+        bytes[1] == 0x49 &&
+        bytes[2] == 0x46 &&
+        bytes[3] == 0x46 &&
+        bytes[8] == 0x57 &&
+        bytes[9] == 0x45 &&
+        bytes[10] == 0x42 &&
+        bytes[11] == 0x50) {
+      return ('webp', 'image/webp');
+    }
+    return ('jpg', 'image/jpeg');
+  }
+
+  Future<String> uploadInquiryImage({
+    required String inquiryId,
+    required int imageIndex,
+    required Uint8List bytes,
+  }) async {
+    final (extension, contentType) = _resolveImageFormat(bytes);
+
+    final ref = _storage.ref().child(
+      'inquiries/$inquiryId/image_$imageIndex.$extension',
+    );
+    final snapshot = await ref.putData(
+      bytes,
+      SettableMetadata(contentType: contentType),
+    );
+
+    return await snapshot.ref.getDownloadURL();
+  }
+
   Future<Uint8List> downloadFileByUrl(
-      String fileUrl, {
-        int maxSizeBytes = 10 * 1024 * 1024,
-      }) async {
+    String fileUrl, {
+    int maxSizeBytes = 10 * 1024 * 1024,
+  }) async {
     final ref = _storage.refFromURL(fileUrl);
     final bytes = await ref.getData(maxSizeBytes);
     if (bytes == null) {

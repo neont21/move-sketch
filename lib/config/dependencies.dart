@@ -9,6 +9,8 @@ import '../data/repositories/friendship/friendship_repository.dart';
 import '../data/repositories/friendship/friendship_repository_remote.dart';
 import '../data/repositories/geocoding/geocoding_repository.dart';
 import '../data/repositories/geocoding/geocoding_repository_remote.dart';
+import '../data/repositories/inquiry/inquiry_repository.dart';
+import '../data/repositories/inquiry/inquiry_repository_remote.dart';
 import '../data/repositories/location/location_repository.dart';
 import '../data/repositories/location/location_repository_local.dart';
 import '../data/repositories/network/network_connectivity_repository.dart';
@@ -34,6 +36,7 @@ import '../data/repositories/user/user_repository_remote.dart';
 import '../data/repositories/weather/weather_repository.dart';
 import '../data/repositories/weather/weather_repository_remote.dart';
 
+import '../data/services/hardware/device_info_service.dart';
 import '../data/services/hardware/location_service.dart';
 import '../data/services/hardware/network_connectivity_service.dart';
 import '../data/services/local/database/app_database.dart';
@@ -43,6 +46,7 @@ import '../data/services/remote/auth_service.dart';
 import '../data/services/remote/firebase_messaging_service.dart';
 import '../data/services/remote/firestore/app_version_service.dart';
 import '../data/services/remote/firestore/friendship_service.dart';
+import '../data/services/remote/firestore/inquiry_service.dart';
 import '../data/services/remote/firestore/notice_service.dart';
 import '../data/services/remote/firestore/notification_service.dart';
 import '../data/services/remote/firestore/report_service.dart';
@@ -179,6 +183,16 @@ final geocodingServiceProvider = Provider<GeocodingService>((ref) {
 /// AppVersionService Provider: 앱 버전 확인
 final appVersionServiceProvider = Provider<AppVersionService>((ref) {
   return AppVersionService();
+});
+
+/// DeviceInfoService Provider: 플랫폼 및 기기 하드웨어 메타데이터 수집
+final deviceInfoServiceProvider = Provider<DeviceInfoService>((ref) {
+  return DeviceInfoService();
+});
+
+/// InquiryService Provider: Firestore 기반 문의/제보 관리
+final inquiryServiceProvider = Provider<InquiryService>((ref) {
+  return InquiryService();
 });
 
 /// AuthRepository Provider: 계정 인증 및 세션 관리 저장소
@@ -331,6 +345,15 @@ final geocodingRepositoryProvider = Provider<GeocodingRepository>((ref) {
 final appVersionRepositoryProvider = Provider<AppVersionRepository>((ref) {
   return AppVersionRepositoryRemote(
     appVersionService: ref.watch(appVersionServiceProvider),
+  );
+});
+
+/// InquiryRepository Provider: 문의/제보 관리
+/// 참고 이미지가 있다면 저장하고 문의/제보 사항 기록
+final inquiryRepositoryProvider = Provider<InquiryRepository>((ref) {
+  return InquiryRepositoryRemote(
+    inquiryService: ref.watch(inquiryServiceProvider),
+    storageService: ref.watch(storageServiceProvider),
   );
 });
 

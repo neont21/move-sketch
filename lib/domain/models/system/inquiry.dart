@@ -77,6 +77,7 @@ class Inquiry {
   }
 
   Inquiry copyWith({
+    List<String>? imageUrls,
     InquiryStatus? status,
     String? adminNote,
     DateTime? updatedAt,
@@ -87,7 +88,7 @@ class Inquiry {
       userEmail: userEmail,
       deviceInfo: deviceInfo,
       content: content,
-      imageUrls: imageUrls,
+      imageUrls: imageUrls ?? this.imageUrls,
       status: status ?? this.status,
       adminNote: adminNote ?? this.adminNote,
       createdAt: createdAt,
