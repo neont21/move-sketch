@@ -133,7 +133,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               routes: [
                 GoRoute(
                   path: Routes.home,
-                  builder: (context, state) => HomeScreen(),
+                  builder: (context, state) => const HomeScreen(),
                 ),
               ],
             ),
@@ -143,7 +143,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.feed,
-                builder: (context, state) => FeedScreen(),
+                builder: (context, state) => const FeedScreen(),
                 routes: [
                   GoRoute(
                     path: Routes.postRelative,
@@ -154,7 +154,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: Routes.feedNotificationsRelative,
-                    builder: (context, state) => FeedNotificationsScreen(),
+                    builder: (context, state) => const FeedNotificationsScreen(),
                     routes: [
                       GoRoute(
                         path: Routes.postRelative,
@@ -215,7 +215,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.history,
-                builder: (context, state) => HistoryScreen(),
+                builder: (context, state) => const HistoryScreen(),
                 routes: [
                   GoRoute(
                     path: Routes.historyDetailsRelative,
@@ -248,15 +248,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.me,
-                builder: (context, state) => MyProfileScreen(),
+                builder: (context, state) => const MyProfileScreen(),
                 routes: [
                   GoRoute(
                     path: Routes.meFriendsRelative,
-                    builder: (context, state) => FriendsListScreen(),
+                    builder: (context, state) => const FriendsListScreen(),
                     routes: [
                       GoRoute(
                         path: Routes.meFriendsSearchRelative,
-                        builder: (context, state) => UserSearchScreen(),
+                        builder: (context, state) => const UserSearchScreen(),
                       ),
                     ],
                   ),
@@ -269,30 +269,30 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: Routes.meSettingsRelative,
-                    builder: (context, state) => SettingsScreen(),
+                    builder: (context, state) => const SettingsScreen(),
                     routes: [
                       GoRoute(
                         path: Routes.meSettingsAccountRelative,
-                        builder: (context, state) => AccountSettingsScreen(),
+                        builder: (context, state) => const AccountSettingsScreen(),
                         routes: [
                           GoRoute(
                             path: Routes.meSettingsPasswordRelative,
-                            builder: (context, state) => ModifyPasswordScreen(),
+                            builder: (context, state) => const ModifyPasswordScreen(),
                           ),
                         ],
                       ),
                       GoRoute(
                         path: Routes.meSettingsCharacterRelative,
-                        builder: (context, state) => ChangeCharacterScreen(),
+                        builder: (context, state) => const ChangeCharacterScreen(),
                       ),
                       GoRoute(
                         path: Routes.meSettingsNotificationsRelative,
                         builder: (context, state) =>
-                            NotificationSettingsScreen(),
+                            const NotificationSettingsScreen(),
                       ),
                       GoRoute(
                         path: Routes.meSettingsBlockedRelative,
-                        builder: (context, state) => BlockedUserScreen(),
+                        builder: (context, state) => const BlockedUserScreen(),
                       ),
                     ],
                   ),
@@ -304,11 +304,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.sessionStart,
-        builder: (context, state) => SessionStartScreen(),
+        builder: (context, state) => const SessionStartScreen(),
       ),
       GoRoute(
         path: Routes.sessionTracking,
-        builder: (context, state) => SessionTrackingScreen(),
+        builder: (context, state) => const SessionTrackingScreen(),
       ),
       GoRoute(
         path: Routes.sessionResultPath,
@@ -335,7 +335,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.license,
-        builder: (context, state) => OSSLicensesScreen(),
+        builder: (context, state) => const OSSLicensesScreen(),
       ),
       GoRoute(
         path: Routes.userProfilePath,
@@ -360,21 +360,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: Routes.loginRelative,
-            builder: (context, state) => LoginScreen(),
+            builder: (context, state) => const LoginScreen(),
           ),
           GoRoute(
             path: Routes.signupRelative,
-            builder: (context, state) => SignupScreen(),
+            builder: (context, state) => const SignupScreen(),
             routes: [
               GoRoute(
                 path: Routes.signupCompleteRelative,
-                builder: (context, state) => SignupCompleteScreen(),
+                builder: (context, state) => const SignupCompleteScreen(),
               ),
             ],
           ),
           GoRoute(
             path: Routes.resetPasswordRelative,
-            builder: (context, state) => ResetPasswordScreen(),
+            builder: (context, state) => const ResetPasswordScreen(),
           ),
           GoRoute(
             path: Routes.socialOnboardingRelative,
