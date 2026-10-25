@@ -140,4 +140,18 @@ abstract final class Validators {
     }
     return validateUrl(value);
   }
+
+  static String? validateInquiryContent(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return '문의 및 제보 내용을 입력해 주세요.';
+    }
+    final String trimmed = value.trim();
+    if (trimmed.length < 10) {
+      return '최소 10자 이상 구체적으로 작성해 주세요.';
+    }
+    if (trimmed.length > 1000) {
+      return '최대 1,000자까지 입력할 수 있습니다.';
+    }
+    return null;
+  }
 }

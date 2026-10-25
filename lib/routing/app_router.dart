@@ -29,6 +29,7 @@ import '../ui/session/widgets/session_share_screen.dart';
 import '../ui/session/widgets/session_start_screen.dart';
 import '../ui/session/widgets/session_tracking_screen.dart';
 import '../ui/settings/widgets/change_character_screen.dart';
+import '../ui/settings/widgets/inquiry_report_screen.dart';
 import '../ui/settings/widgets/modify_password_screen.dart';
 import '../ui/settings/widgets/oss_licenses_screen.dart';
 import '../ui/settings/widgets/account_settings_screen.dart';
@@ -293,6 +294,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                       GoRoute(
                         path: Routes.meSettingsBlockedRelative,
                         builder: (context, state) => const BlockedUserScreen(),
+                      ),
+                      GoRoute(
+                        path: Routes.meSettingsInquiryRelative,
+                        builder: (context, state) => const InquiryReportScreen(),
                       ),
                     ],
                   ),

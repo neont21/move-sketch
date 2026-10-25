@@ -127,6 +127,16 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               ListTile(
+                onTap: () {
+                  context.push(Routes.meSettingsInquiry);
+                },
+                title: Text('문의 및 버그 제보', style: textTheme.bodyMedium),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: colorScheme.tertiaryContainer,
+                ),
+              ),
+              ListTile(
                 onTap: () async {
                   final result = await UrlLauncherUtils.openExternalUrl(
                     UrlLauncherUtils.privacyWebUrl,

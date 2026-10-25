@@ -80,6 +80,9 @@ abstract final class Routes {
   static const meSettingsBlockedRelative = 'blocked';
   static const meSettingsBlocked = '$meSettings/$meSettingsBlockedRelative';
 
+  static const meSettingsInquiryRelative = 'inquiry';
+  static const meSettingsInquiry = '$meSettings/$meSettingsInquiryRelative';
+
   static const sessionStart = '/session-start';
   static const sessionTracking = '/session-tracking';
 
