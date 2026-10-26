@@ -8,7 +8,6 @@ import '../../../utils/url_launcher_utils.dart';
 import '../../../utils/validators.dart';
 import '../../core/widgets/responsive_container.dart';
 import '../view_models/inquiry_viewmodel.dart';
-import 'inquiry_device_info_section.dart';
 import 'inquiry_image_picker_section.dart';
 
 class InquiryReportScreen extends ConsumerStatefulWidget {
@@ -236,15 +235,11 @@ class _InquiryReportScreenState extends ConsumerState<InquiryReportScreen> {
                         ],
                       ),
                     ),
-                    InquiryDeviceInfoSection(
-                      deviceInfo: inquiryState.deviceInfo,
-                      isLoading: inquiryState.isLoadingDeviceInfo,
-                    ),
                     TextFormField(
                       controller: _contentController,
                       enabled: !inquiryState.isSubmitting,
-                      minLines: 5,
-                      maxLines: 8,
+                      minLines: 4,
+                      maxLines: 12,
                       maxLength: 1000,
                       textInputAction: TextInputAction.newline,
                       autovalidateMode: AutovalidateMode.onUserInteraction,

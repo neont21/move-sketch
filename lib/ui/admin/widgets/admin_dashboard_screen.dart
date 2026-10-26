@@ -6,6 +6,7 @@ import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../view_models/admin_viewmodel.dart';
 import 'app_version_tab.dart';
+import 'inquiry_management_tab.dart';
 import 'notice_management_tab.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
@@ -48,7 +49,7 @@ class AdminDashboardScreen extends ConsumerWidget {
         : adminEmail;
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         body: Center(
           child: ConstrainedBox(
@@ -139,6 +140,16 @@ class AdminDashboardScreen extends ConsumerWidget {
                           ],
                         ),
                       ),
+                      Tab(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.support_agent_outlined, size: 18),
+                            SizedBox(width: 8),
+                            Text('인앱 제보 관리'),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                   const Divider(height: 1),
@@ -147,6 +158,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                       children: [
                         NoticeManagementTab(),
                         AppVersionTab(),
+                        InquiryManagementTab(),
                       ],
                     ),
                   ),
