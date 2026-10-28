@@ -134,6 +134,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final syncState = ref.watch(sessionSyncViewModelProvider);
     final latestResult = homeState?.latestResult;
     final weatherInfo = homeState?.weatherInfo;
+    final bool isLoadingWeather = homeState?.isLoadingWeather ?? true;
 
     return Scaffold(
       body: SafeArea(
@@ -163,29 +164,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              Row(
-                spacing: 8.0,
-                children: [
-                  if (weatherInfo != null)
-                    Image.network(
-                      weatherInfo.iconUrl,
-                      width: 20,
-                      height: 20,
-                      errorBuilder: (_, _, _) => Icon(
-                        Icons.wb_sunny,
-                        size: 20,
-                        color: colorScheme.primary,
-                      ),
-                    )
-                  else
-                    Icon(Icons.wb_sunny, size: 20, color: colorScheme.primary),
-                  Text(
-                    weatherInfo != null
-                        ? '${weatherInfo.summaryWithCity} · ${weatherInfo.recommendation}'
-                        : '날씨 정보를 불러오는 중...',
-                    style: textTheme.bodySmall,
-                  ),
-                ],
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  if (weatherInfo == null && !isLoadingWeather) {
+                    ref.invalidate(homeViewModelProvider);
+                  }
+                },
+                child: Row(
+                  spacing: 8.0,
+                  children: [
+                    if (weatherInfo != null)
+                      Image.network(
+                        weatherInfo.iconUrl,
+                        width: 20,
+                        height: 20,
+                        errorBuilder: (_, _, _) => Icon(
+                          Icons.wb_sunny,
+                          size: 20,
+                          color: colorScheme.primary,
+                        ),
+                      )
+                    else
+                      Icon(Icons.wb_sunny, size: 20, color: colorScheme.primary),
+                    Text(
+                      weatherInfo != null
+                          ? '${weatherInfo.summaryWithCity} · ${weatherInfo.recommendation}'
+                          : (isLoadingWeather
+                                ? '날씨 정보를 불러오는 중...'
+                                : '날씨 정보를 가져올 수 없습니다'),
+                      style: textTheme.bodySmall,
+                    ),
+                  ],
+                ),
               ),
               if (syncState.pendingCount > 0)
                 Container(
@@ -249,18 +260,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         horizontal: 16,
                         vertical: 8,
                       ),
-                      child: Transform.rotate(
-                        angle: 0.05,
-                        child: SketchCard(
-                          imageProvider:
-                              latestResult?.resultSketchImageUrl != null &&
-                                  latestResult!.resultSketchImageUrl!.isNotEmpty
-                              ? NetworkImage(latestResult.resultSketchImageUrl!)
-                              : const AssetImage(Assets.sampleSketch),
-                          caption: latestResult != null
-                              ? '${latestResult.endedAt.formattedDateDot} ${latestResult.activityType.label}'
-                              : '첫 장을 기다리는 중',
-                          isHome: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          if (latestResult == null) {
+                            ref.invalidate(homeViewModelProvider);
+                            return;
+                          }
+                          if (latestResult.isShared) {
+                            context.go(Routes.feedPost(latestResult.id));
+                          } else {
+                            context.go(Routes.historyDetails(latestResult.id));
+                          }
+                        },
+                        child: Transform.rotate(
+                          angle: 0.05,
+                          child: SketchCard(
+                            imageProvider:
+                                latestResult?.resultSketchImageUrl != null &&
+                                    latestResult!.resultSketchImageUrl!.isNotEmpty
+                                ? NetworkImage(latestResult.resultSketchImageUrl!)
+                                : const AssetImage(Assets.sampleSketch),
+                            caption: latestResult != null
+                                ? '${latestResult.endedAt.formattedDateDot} ${latestResult.activityType.label}'
+                                : '첫 장을 기다리는 중',
+                            isHome: true,
+                          ),
                         ),
                       ),
                     ),
