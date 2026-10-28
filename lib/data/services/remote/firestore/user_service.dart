@@ -101,8 +101,11 @@ class UserService {
     await batch.commit();
   }
 
-  Future<User?> getUserProfile(String uid) async {
-    final doc = await _usersRef.doc(uid).get();
+  Future<User?> getUserProfile(
+    String uid, {
+    Source source = Source.serverAndCache,
+  }) async {
+    final doc = await _usersRef.doc(uid).get(GetOptions(source: source));
     if (!doc.exists || doc.data() == null) {
       return null;
     }
@@ -249,7 +252,7 @@ class UserService {
   Future<void> updateFcmToken({
     required String uid,
     required String? fcmToken,
-}) async {
+  }) async {
     await _usersRef.doc(uid).update({
       'fcmToken': fcmToken,
       'updatedAt': FieldValue.serverTimestamp(),

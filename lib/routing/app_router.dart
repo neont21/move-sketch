@@ -95,6 +95,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           location.startsWith(Routes.admin);
 
       if (user == null) {
+        if (authState.hasError) {
+          return null;
+        }
+
         return isPublicRoute ? null : Routes.login;
       }
 
