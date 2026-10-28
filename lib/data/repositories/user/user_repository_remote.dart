@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/social/notification_settings.dart';
@@ -27,6 +26,24 @@ final class UserRepositoryRemote implements UserRepository {
     required this.friendshipService,
   });
 
+  Future<Result<User?>> _fetchUserProfile(
+    String uid, {
+    required Source source,
+  }) async {
+    try {
+      final userProfile = await userService.getUserProfile(uid, source: source);
+      return Result.ok(userProfile);
+    } on FirebaseException catch (e) {
+      return Result.error(
+        e.toAppException(defaultMessage: '사용자 프로필을 가져오는 중 오류가 발생했습니다.'),
+      );
+    } catch (e) {
+      return Result.error(
+        DatabaseException('사용자 프로필을 가져오는 중 오류가 발생했습니다.', cause: e),
+      );
+    }
+  }
+
   @override
   Future<Result<User?>> getCurrentUserProfile() async {
     final user = authService.currentUser;
@@ -47,18 +64,18 @@ final class UserRepositoryRemote implements UserRepository {
     }
 
     final uid = user.uid;
-    try {
-      final userProfile = await userService.getUserProfile(uid);
-      return Result.ok(userProfile);
-    } on FirebaseException catch (e) {
-      return Result.error(
-        e.toAppException(defaultMessage: '사용자 프로필을 가져오는 중 오류가 발생했습니다.'),
-      );
-    } catch (e) {
-      return Result.error(
-        DatabaseException('사용자 프로필을 가져오는 중 오류가 발생했습니다.', cause: e),
-      );
-    }
+
+    final primaryResult = await _fetchUserProfile(
+      uid,
+      source: Source.serverAndCache,
+    );
+
+    return switch (primaryResult) {
+      Ok() => primaryResult,
+      Error(:final error) when error is NetworkException =>
+        await _fetchUserProfile(uid, source: Source.cache),
+      Error() => primaryResult,
+    };
   }
 
   @override

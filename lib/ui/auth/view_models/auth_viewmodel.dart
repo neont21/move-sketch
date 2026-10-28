@@ -83,8 +83,6 @@ class AuthViewModel extends AsyncNotifier<User?> {
       }
     }
 
-    _listenAuthState();
-
     if (uid == null) {
       return null;
     }
