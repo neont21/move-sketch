@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -11,6 +13,7 @@ import 'firebase_options.dart';
 import 'routing/app_router.dart';
 import 'ui/core/theme/theme.dart';
 import 'ui/core/view_models/push_notification_viewmodel.dart';
+import 'utils/exceptions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +30,16 @@ void main() async {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
     PlatformDispatcher.instance.onError = (error, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(error, stackTrace, fatal: true);
+      final bool isFatal = error is! AppException &&
+          error is! SocketException &&
+          error is! HttpException;
+
+      FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        fatal: isFatal,
+      );
+
       return true;
     };
   }
