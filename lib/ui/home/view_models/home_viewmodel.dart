@@ -15,6 +15,7 @@ class HomeState {
   final SessionResult? latestResult;
   final List<bool> weeklyIndicator;
   final TrackingSession? uncompletedSession;
+  final bool isLoadingWeather;
 
   const HomeState({
     this.weatherInfo,
@@ -29,6 +30,7 @@ class HomeState {
       false,
     ],
     this.uncompletedSession,
+    this.isLoadingWeather = true,
   });
 
   HomeState copyWith({
@@ -36,6 +38,7 @@ class HomeState {
     ValueGetter<SessionResult?>? latestResult,
     List<bool>? weeklyIndicator,
     ValueGetter<TrackingSession?>? uncompletedSession,
+    bool? isLoadingWeather,
   }) {
     return HomeState(
       weatherInfo: weatherInfo != null ? weatherInfo() : this.weatherInfo,
@@ -44,6 +47,7 @@ class HomeState {
       uncompletedSession: uncompletedSession != null
           ? uncompletedSession()
           : this.uncompletedSession,
+      isLoadingWeather: isLoadingWeather ?? this.isLoadingWeather,
     );
   }
 }
@@ -139,7 +143,10 @@ class HomeViewModel extends AsyncNotifier<HomeState> {
     unawaited(() async {
       final weatherInfo = await _fetchWeather();
       state = state.whenData(
-        (current) => current.copyWith(weatherInfo: () => weatherInfo),
+        (current) => current.copyWith(
+          weatherInfo: () => weatherInfo,
+          isLoadingWeather: false,
+        ),
       );
     }());
   }
