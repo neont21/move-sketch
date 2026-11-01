@@ -24,8 +24,9 @@ part 'app_database.g.dart';
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
+
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -36,8 +37,15 @@ class AppDatabase extends _$AppDatabase {
       if (from < 2) {
         await migrator.createTable(offlineSessionQueueTable);
       }
+      if (from < 3) {
+        await migrator.addColumn(
+          trackingSessionsTable,
+          trackingSessionsTable.movingDurationSeconds,
+        );
+      }
     },
   );
+
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'move_sketch');
   }

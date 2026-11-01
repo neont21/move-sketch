@@ -72,6 +72,17 @@ class $TrackingSessionsTableTable extends TrackingSessionsTable
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _movingDurationSecondsMeta =
+      const VerificationMeta('movingDurationSeconds');
+  @override
+  late final GeneratedColumn<int> movingDurationSeconds = GeneratedColumn<int>(
+    'moving_duration_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _distanceInMetersMeta = const VerificationMeta(
     'distanceInMeters',
   );
@@ -125,6 +136,7 @@ class $TrackingSessionsTableTable extends TrackingSessionsTable
     status,
     startedAt,
     elapsedDurationSeconds,
+    movingDurationSeconds,
     distanceInMeters,
     caloriesBurned,
     averagePaceInSeconds,
@@ -169,6 +181,15 @@ class $TrackingSessionsTableTable extends TrackingSessionsTable
         elapsedDurationSeconds.isAcceptableOrUnknown(
           data['elapsed_duration_seconds']!,
           _elapsedDurationSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('moving_duration_seconds')) {
+      context.handle(
+        _movingDurationSecondsMeta,
+        movingDurationSeconds.isAcceptableOrUnknown(
+          data['moving_duration_seconds']!,
+          _movingDurationSecondsMeta,
         ),
       );
     }
@@ -248,6 +269,10 @@ class $TrackingSessionsTableTable extends TrackingSessionsTable
         DriftSqlType.int,
         data['${effectivePrefix}elapsed_duration_seconds'],
       )!,
+      movingDurationSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}moving_duration_seconds'],
+      )!,
       distanceInMeters: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}distance_in_meters'],
@@ -288,6 +313,7 @@ class TrackingSessionsTableData extends DataClass
   final SessionStatus status;
   final DateTime startedAt;
   final int elapsedDurationSeconds;
+  final int movingDurationSeconds;
   final double distanceInMeters;
   final int caloriesBurned;
   final int? averagePaceInSeconds;
@@ -299,6 +325,7 @@ class TrackingSessionsTableData extends DataClass
     required this.status,
     required this.startedAt,
     required this.elapsedDurationSeconds,
+    required this.movingDurationSeconds,
     required this.distanceInMeters,
     required this.caloriesBurned,
     this.averagePaceInSeconds,
@@ -321,6 +348,7 @@ class TrackingSessionsTableData extends DataClass
     }
     map['started_at'] = Variable<DateTime>(startedAt);
     map['elapsed_duration_seconds'] = Variable<int>(elapsedDurationSeconds);
+    map['moving_duration_seconds'] = Variable<int>(movingDurationSeconds);
     map['distance_in_meters'] = Variable<double>(distanceInMeters);
     map['calories_burned'] = Variable<int>(caloriesBurned);
     if (!nullToAbsent || averagePaceInSeconds != null) {
@@ -340,6 +368,7 @@ class TrackingSessionsTableData extends DataClass
       status: Value(status),
       startedAt: Value(startedAt),
       elapsedDurationSeconds: Value(elapsedDurationSeconds),
+      movingDurationSeconds: Value(movingDurationSeconds),
       distanceInMeters: Value(distanceInMeters),
       caloriesBurned: Value(caloriesBurned),
       averagePaceInSeconds: averagePaceInSeconds == null && nullToAbsent
@@ -369,6 +398,9 @@ class TrackingSessionsTableData extends DataClass
       elapsedDurationSeconds: serializer.fromJson<int>(
         json['elapsedDurationSeconds'],
       ),
+      movingDurationSeconds: serializer.fromJson<int>(
+        json['movingDurationSeconds'],
+      ),
       distanceInMeters: serializer.fromJson<double>(json['distanceInMeters']),
       caloriesBurned: serializer.fromJson<int>(json['caloriesBurned']),
       averagePaceInSeconds: serializer.fromJson<int?>(
@@ -391,6 +423,7 @@ class TrackingSessionsTableData extends DataClass
       ),
       'startedAt': serializer.toJson<DateTime>(startedAt),
       'elapsedDurationSeconds': serializer.toJson<int>(elapsedDurationSeconds),
+      'movingDurationSeconds': serializer.toJson<int>(movingDurationSeconds),
       'distanceInMeters': serializer.toJson<double>(distanceInMeters),
       'caloriesBurned': serializer.toJson<int>(caloriesBurned),
       'averagePaceInSeconds': serializer.toJson<int?>(averagePaceInSeconds),
@@ -405,6 +438,7 @@ class TrackingSessionsTableData extends DataClass
     SessionStatus? status,
     DateTime? startedAt,
     int? elapsedDurationSeconds,
+    int? movingDurationSeconds,
     double? distanceInMeters,
     int? caloriesBurned,
     Value<int?> averagePaceInSeconds = const Value.absent(),
@@ -417,6 +451,7 @@ class TrackingSessionsTableData extends DataClass
     startedAt: startedAt ?? this.startedAt,
     elapsedDurationSeconds:
         elapsedDurationSeconds ?? this.elapsedDurationSeconds,
+    movingDurationSeconds: movingDurationSeconds ?? this.movingDurationSeconds,
     distanceInMeters: distanceInMeters ?? this.distanceInMeters,
     caloriesBurned: caloriesBurned ?? this.caloriesBurned,
     averagePaceInSeconds: averagePaceInSeconds.present
@@ -440,6 +475,9 @@ class TrackingSessionsTableData extends DataClass
       elapsedDurationSeconds: data.elapsedDurationSeconds.present
           ? data.elapsedDurationSeconds.value
           : this.elapsedDurationSeconds,
+      movingDurationSeconds: data.movingDurationSeconds.present
+          ? data.movingDurationSeconds.value
+          : this.movingDurationSeconds,
       distanceInMeters: data.distanceInMeters.present
           ? data.distanceInMeters.value
           : this.distanceInMeters,
@@ -464,6 +502,7 @@ class TrackingSessionsTableData extends DataClass
           ..write('status: $status, ')
           ..write('startedAt: $startedAt, ')
           ..write('elapsedDurationSeconds: $elapsedDurationSeconds, ')
+          ..write('movingDurationSeconds: $movingDurationSeconds, ')
           ..write('distanceInMeters: $distanceInMeters, ')
           ..write('caloriesBurned: $caloriesBurned, ')
           ..write('averagePaceInSeconds: $averagePaceInSeconds, ')
@@ -480,6 +519,7 @@ class TrackingSessionsTableData extends DataClass
     status,
     startedAt,
     elapsedDurationSeconds,
+    movingDurationSeconds,
     distanceInMeters,
     caloriesBurned,
     averagePaceInSeconds,
@@ -495,6 +535,7 @@ class TrackingSessionsTableData extends DataClass
           other.status == this.status &&
           other.startedAt == this.startedAt &&
           other.elapsedDurationSeconds == this.elapsedDurationSeconds &&
+          other.movingDurationSeconds == this.movingDurationSeconds &&
           other.distanceInMeters == this.distanceInMeters &&
           other.caloriesBurned == this.caloriesBurned &&
           other.averagePaceInSeconds == this.averagePaceInSeconds &&
@@ -509,6 +550,7 @@ class TrackingSessionsTableCompanion
   final Value<SessionStatus> status;
   final Value<DateTime> startedAt;
   final Value<int> elapsedDurationSeconds;
+  final Value<int> movingDurationSeconds;
   final Value<double> distanceInMeters;
   final Value<int> caloriesBurned;
   final Value<int?> averagePaceInSeconds;
@@ -521,6 +563,7 @@ class TrackingSessionsTableCompanion
     this.status = const Value.absent(),
     this.startedAt = const Value.absent(),
     this.elapsedDurationSeconds = const Value.absent(),
+    this.movingDurationSeconds = const Value.absent(),
     this.distanceInMeters = const Value.absent(),
     this.caloriesBurned = const Value.absent(),
     this.averagePaceInSeconds = const Value.absent(),
@@ -534,6 +577,7 @@ class TrackingSessionsTableCompanion
     required SessionStatus status,
     required DateTime startedAt,
     this.elapsedDurationSeconds = const Value.absent(),
+    this.movingDurationSeconds = const Value.absent(),
     this.distanceInMeters = const Value.absent(),
     this.caloriesBurned = const Value.absent(),
     this.averagePaceInSeconds = const Value.absent(),
@@ -551,6 +595,7 @@ class TrackingSessionsTableCompanion
     Expression<String>? status,
     Expression<DateTime>? startedAt,
     Expression<int>? elapsedDurationSeconds,
+    Expression<int>? movingDurationSeconds,
     Expression<double>? distanceInMeters,
     Expression<int>? caloriesBurned,
     Expression<int>? averagePaceInSeconds,
@@ -565,6 +610,8 @@ class TrackingSessionsTableCompanion
       if (startedAt != null) 'started_at': startedAt,
       if (elapsedDurationSeconds != null)
         'elapsed_duration_seconds': elapsedDurationSeconds,
+      if (movingDurationSeconds != null)
+        'moving_duration_seconds': movingDurationSeconds,
       if (distanceInMeters != null) 'distance_in_meters': distanceInMeters,
       if (caloriesBurned != null) 'calories_burned': caloriesBurned,
       if (averagePaceInSeconds != null)
@@ -581,6 +628,7 @@ class TrackingSessionsTableCompanion
     Value<SessionStatus>? status,
     Value<DateTime>? startedAt,
     Value<int>? elapsedDurationSeconds,
+    Value<int>? movingDurationSeconds,
     Value<double>? distanceInMeters,
     Value<int>? caloriesBurned,
     Value<int?>? averagePaceInSeconds,
@@ -595,6 +643,8 @@ class TrackingSessionsTableCompanion
       startedAt: startedAt ?? this.startedAt,
       elapsedDurationSeconds:
           elapsedDurationSeconds ?? this.elapsedDurationSeconds,
+      movingDurationSeconds:
+          movingDurationSeconds ?? this.movingDurationSeconds,
       distanceInMeters: distanceInMeters ?? this.distanceInMeters,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
       averagePaceInSeconds: averagePaceInSeconds ?? this.averagePaceInSeconds,
@@ -632,6 +682,11 @@ class TrackingSessionsTableCompanion
         elapsedDurationSeconds.value,
       );
     }
+    if (movingDurationSeconds.present) {
+      map['moving_duration_seconds'] = Variable<int>(
+        movingDurationSeconds.value,
+      );
+    }
     if (distanceInMeters.present) {
       map['distance_in_meters'] = Variable<double>(distanceInMeters.value);
     }
@@ -661,6 +716,7 @@ class TrackingSessionsTableCompanion
           ..write('status: $status, ')
           ..write('startedAt: $startedAt, ')
           ..write('elapsedDurationSeconds: $elapsedDurationSeconds, ')
+          ..write('movingDurationSeconds: $movingDurationSeconds, ')
           ..write('distanceInMeters: $distanceInMeters, ')
           ..write('caloriesBurned: $caloriesBurned, ')
           ..write('averagePaceInSeconds: $averagePaceInSeconds, ')
@@ -2343,6 +2399,7 @@ typedef $$TrackingSessionsTableTableCreateCompanionBuilder =
       required SessionStatus status,
       required DateTime startedAt,
       Value<int> elapsedDurationSeconds,
+      Value<int> movingDurationSeconds,
       Value<double> distanceInMeters,
       Value<int> caloriesBurned,
       Value<int?> averagePaceInSeconds,
@@ -2357,6 +2414,7 @@ typedef $$TrackingSessionsTableTableUpdateCompanionBuilder =
       Value<SessionStatus> status,
       Value<DateTime> startedAt,
       Value<int> elapsedDurationSeconds,
+      Value<int> movingDurationSeconds,
       Value<double> distanceInMeters,
       Value<int> caloriesBurned,
       Value<int?> averagePaceInSeconds,
@@ -2467,6 +2525,11 @@ class $$TrackingSessionsTableTableFilterComposer
 
   ColumnFilters<int> get elapsedDurationSeconds => $composableBuilder(
     column: $table.elapsedDurationSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get movingDurationSeconds => $composableBuilder(
+    column: $table.movingDurationSeconds,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2581,6 +2644,11 @@ class $$TrackingSessionsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get movingDurationSeconds => $composableBuilder(
+    column: $table.movingDurationSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get distanceInMeters => $composableBuilder(
     column: $table.distanceInMeters,
     builder: (column) => ColumnOrderings(column),
@@ -2631,6 +2699,11 @@ class $$TrackingSessionsTableTableAnnotationComposer
 
   GeneratedColumn<int> get elapsedDurationSeconds => $composableBuilder(
     column: $table.elapsedDurationSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get movingDurationSeconds => $composableBuilder(
+    column: $table.movingDurationSeconds,
     builder: (column) => column,
   );
 
@@ -2755,6 +2828,7 @@ class $$TrackingSessionsTableTableTableManager
                 Value<SessionStatus> status = const Value.absent(),
                 Value<DateTime> startedAt = const Value.absent(),
                 Value<int> elapsedDurationSeconds = const Value.absent(),
+                Value<int> movingDurationSeconds = const Value.absent(),
                 Value<double> distanceInMeters = const Value.absent(),
                 Value<int> caloriesBurned = const Value.absent(),
                 Value<int?> averagePaceInSeconds = const Value.absent(),
@@ -2767,6 +2841,7 @@ class $$TrackingSessionsTableTableTableManager
                 status: status,
                 startedAt: startedAt,
                 elapsedDurationSeconds: elapsedDurationSeconds,
+                movingDurationSeconds: movingDurationSeconds,
                 distanceInMeters: distanceInMeters,
                 caloriesBurned: caloriesBurned,
                 averagePaceInSeconds: averagePaceInSeconds,
@@ -2781,6 +2856,7 @@ class $$TrackingSessionsTableTableTableManager
                 required SessionStatus status,
                 required DateTime startedAt,
                 Value<int> elapsedDurationSeconds = const Value.absent(),
+                Value<int> movingDurationSeconds = const Value.absent(),
                 Value<double> distanceInMeters = const Value.absent(),
                 Value<int> caloriesBurned = const Value.absent(),
                 Value<int?> averagePaceInSeconds = const Value.absent(),
@@ -2793,6 +2869,7 @@ class $$TrackingSessionsTableTableTableManager
                 status: status,
                 startedAt: startedAt,
                 elapsedDurationSeconds: elapsedDurationSeconds,
+                movingDurationSeconds: movingDurationSeconds,
                 distanceInMeters: distanceInMeters,
                 caloriesBurned: caloriesBurned,
                 averagePaceInSeconds: averagePaceInSeconds,

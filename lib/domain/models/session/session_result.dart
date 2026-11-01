@@ -16,6 +16,7 @@ class SessionResult {
   final DateTime startedAt;
   final DateTime endedAt;
   final Duration elapsedDuration;
+  final Duration movingDuration;
   final double distanceInMeters;
   final int caloriesBurned;
   final int? averagePaceInSeconds;
@@ -47,6 +48,7 @@ class SessionResult {
     required this.startedAt,
     required this.endedAt,
     required this.elapsedDuration,
+    Duration? movingDuration,
     required this.distanceInMeters,
     required this.caloriesBurned,
     required this.startLocation,
@@ -65,7 +67,7 @@ class SessionResult {
     this.syncStatus = SyncStatus.synced,
     this.updatedAt,
     this.deletedAt,
-  });
+  }) : movingDuration = movingDuration ?? elapsedDuration;
 
   double get distanceInKm => distanceInMeters / 1000.0;
   bool get isDeleted => deletedAt != null;
@@ -78,6 +80,7 @@ class SessionResult {
       'startedAt': Timestamp.fromDate(startedAt),
       'endedAt': Timestamp.fromDate(endedAt),
       'elapsedSeconds': elapsedDuration.inSeconds,
+      'movingSeconds': movingDuration.inSeconds,
       'distanceInMeters': distanceInMeters,
       'caloriesBurned': caloriesBurned,
       'averagePaceInSeconds': averagePaceInSeconds,
@@ -108,6 +111,11 @@ class SessionResult {
       endedAt: parseDateTime(map['endedAt']).toLocal(),
       elapsedDuration: Duration(
         seconds: (map['elapsedSeconds'] as num?)?.toInt() ?? 0,
+      ),
+      movingDuration: Duration(
+        seconds: (map['movingSeconds'] as num?)?.toInt() ??
+            (map['elapsedSeconds'] as num?)?.toInt() ??
+            0,
       ),
       distanceInMeters: (map['distanceInMeters'] as num?)?.toDouble() ?? 0.0,
       caloriesBurned: (map['caloriesBurned'] as num?)?.toInt() ?? 0,
@@ -151,6 +159,7 @@ class SessionResult {
     DateTime? startedAt,
     DateTime? endedAt,
     Duration? elapsedDuration,
+    Duration? movingDuration,
     double? distanceInMeters,
     int? caloriesBurned,
     ValueGetter<int?>? averagePaceInSeconds,
@@ -178,6 +187,7 @@ class SessionResult {
       startedAt: startedAt ?? this.startedAt,
       endedAt: endedAt ?? this.endedAt,
       elapsedDuration: elapsedDuration ?? this.elapsedDuration,
+      movingDuration: movingDuration ?? this.movingDuration,
       distanceInMeters: distanceInMeters ?? this.distanceInMeters,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
       averagePaceInSeconds: averagePaceInSeconds != null
