@@ -14,6 +14,7 @@ class TrackingSession {
   final SessionStatus status;
   final DateTime startedAt;
   final Duration elapsedDuration;
+  final Duration movingDuration;
   final double distanceInMeters;
   final int caloriesBurned;
   final int? averagePaceInSeconds;
@@ -29,6 +30,7 @@ class TrackingSession {
     required this.startedAt,
     this.status = SessionStatus.ready,
     this.elapsedDuration = Duration.zero,
+    this.movingDuration = Duration.zero,
     this.distanceInMeters = 0.0,
     this.caloriesBurned = 0,
     this.averagePaceInSeconds,
@@ -85,6 +87,7 @@ class TrackingSession {
       status: sessionRow.status,
       startedAt: sessionRow.startedAt,
       elapsedDuration: Duration(seconds: sessionRow.elapsedDurationSeconds),
+      movingDuration: Duration(seconds: sessionRow.movingDurationSeconds),
       distanceInMeters: sessionRow.distanceInMeters,
       caloriesBurned: sessionRow.caloriesBurned,
       averagePaceInSeconds: sessionRow.averagePaceInSeconds,
@@ -97,6 +100,7 @@ class TrackingSession {
   TrackingSession copyWith({
     SessionStatus? status,
     Duration? elapsedDuration,
+    Duration? movingDuration,
     double? distanceInMeters,
     int? caloriesBurned,
     ValueGetter<int?>? averagePaceInSeconds,
@@ -111,6 +115,7 @@ class TrackingSession {
       startedAt: startedAt,
       status: status ?? this.status,
       elapsedDuration: elapsedDuration ?? this.elapsedDuration,
+      movingDuration: movingDuration ?? this.movingDuration,
       distanceInMeters: distanceInMeters ?? this.distanceInMeters,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
       averagePaceInSeconds: averagePaceInSeconds != null

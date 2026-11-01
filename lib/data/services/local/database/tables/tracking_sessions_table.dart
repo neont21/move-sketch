@@ -12,6 +12,8 @@ class TrackingSessionsTable extends Table {
   DateTimeColumn get startedAt => dateTime()();
   IntColumn get elapsedDurationSeconds =>
       integer().withDefault(const Constant(0))();
+  IntColumn get movingDurationSeconds =>
+      integer().withDefault(const Constant(0))();
   RealColumn get distanceInMeters => real().withDefault(const Constant(0.0))();
   IntColumn get caloriesBurned => integer().withDefault(const Constant(0))();
   IntColumn get averagePaceInSeconds => integer().nullable()();
