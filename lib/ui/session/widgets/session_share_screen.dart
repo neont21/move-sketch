@@ -1,4 +1,5 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -109,7 +110,7 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
   }) {
     final url = result?.resultSketchImageUrl ?? existingUrl;
     if (url != null && url.isNotEmpty) {
-      return NetworkImage(url);
+      return CachedNetworkImageProvider(url);
     }
     return AssetImage(character.defaultImagePath);
   }

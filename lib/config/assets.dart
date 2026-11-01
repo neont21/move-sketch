@@ -1,6 +1,7 @@
 abstract final class Assets {
   // 공통 / 기본 에셋
   static const String sampleSketch = 'assets/sample_sketch.png';
+  static const String errorSketch = 'assets/error_sketch.png';
   static const String logoMark = 'assets/brand/logo-mark.svg';
   static const String partsDir = 'assets/parts';
 

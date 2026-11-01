@@ -1,10 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:move_sketch/ui/auth/view_models/auth_viewmodel.dart';
 import '../../../domain/models/social/sketch_post.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
+import '../../auth/view_models/auth_viewmodel.dart';
 import '../../core/widgets/activity_badge.dart';
 import '../../core/widgets/bottom_sheet_button.dart';
 import '../../core/widgets/user_avatar.dart';
@@ -123,7 +124,7 @@ class FeedPostCard extends ConsumerWidget {
             child: Transform.rotate(
               angle: _calculateRotationAngle(sketch.id),
               child: SketchCard(
-                imageProvider: NetworkImage(sketch.sketchUrl),
+                imageProvider: CachedNetworkImageProvider(sketch.sketchUrl),
                 caption: sketch.caption,
               ),
             ),
