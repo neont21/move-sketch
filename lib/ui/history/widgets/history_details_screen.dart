@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -201,7 +202,9 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
                       imageProvider:
                           result.resultSketchImageUrl != null &&
                               result.resultSketchImageUrl!.isNotEmpty
-                          ? NetworkImage(result.resultSketchImageUrl!)
+                          ? CachedNetworkImageProvider(
+                              result.resultSketchImageUrl!,
+                            )
                           : const AssetImage(Assets.sampleSketch),
                     ),
                     ElevatedButton.icon(

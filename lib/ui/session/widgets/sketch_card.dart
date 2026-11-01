@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../config/assets.dart';
+
 class SketchCard extends StatelessWidget {
   final ImageProvider imageProvider;
   final String? caption;
@@ -41,12 +43,12 @@ class SketchCard extends StatelessWidget {
           children: [
             AspectRatio(
               aspectRatio: 1.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: imageProvider,
-                    fit: BoxFit.cover,
-                  ),
+              child: Image(
+                image: imageProvider,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Image(
+                  image: AssetImage(Assets.errorSketch),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),

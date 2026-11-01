@@ -34,12 +34,23 @@ void main() async {
   } else {
     await GoogleSignIn.instance.initialize();
 
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    bool isFatalError(Object error) {
+      return error is! AppException &&
+          error is! SocketException &&
+          error is! HttpException &&
+          error is! HandshakeException;
+    }
+
+    FlutterError.onError = (details) {
+      final bool isFatal = isFatalError(details.exception);
+      FirebaseCrashlytics.instance.recordFlutterError(
+        details,
+        fatal: isFatal,
+      );
+    };
 
     PlatformDispatcher.instance.onError = (error, stackTrace) {
-      final bool isFatal = error is! AppException &&
-          error is! SocketException &&
-          error is! HttpException;
+      final bool isFatal = isFatalError(error);
 
       FirebaseCrashlytics.instance.recordError(
         error,

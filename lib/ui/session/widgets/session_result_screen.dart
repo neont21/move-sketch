@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gal/gal.dart';
@@ -154,7 +155,7 @@ class _SessionResultScreenState extends ConsumerState<SessionResultScreen> {
                   ? MemoryImage(state.sketchBytes!)
                   : (state.sketchImageUrl != null &&
                             state.sketchImageUrl!.isNotEmpty
-                        ? NetworkImage(state.sketchImageUrl!)
+                        ? CachedNetworkImageProvider(state.sketchImageUrl!)
                         : AssetImage(state.character.defaultImagePath)
                               as ImageProvider);
 

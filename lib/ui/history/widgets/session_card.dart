@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/assets.dart';
@@ -42,24 +43,31 @@ class SessionCard extends StatelessWidget {
         onLongPress: () {
           showDialog(
             context: context,
-            builder: (context) =>
-                Dialog(child: DeleteHistoryDialog(sessionId: result.id, isShared: result.isShared)),
+            builder: (context) => Dialog(
+              child: DeleteHistoryDialog(
+                sessionId: result.id,
+                isShared: result.isShared,
+              ),
+            ),
           );
         },
-        leading:ClipRRect(
+        leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: result.resultSketchImageUrl != null &&
-              result.resultSketchImageUrl!.isNotEmpty
-              ? Image.network(
-            result.resultSketchImageUrl!,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) =>
-            const Image(image: AssetImage(Assets.sampleSketch)),
-          )
+          child:
+              result.resultSketchImageUrl != null &&
+                  result.resultSketchImageUrl!.isNotEmpty
+              ? Image(
+                  image: CachedNetworkImageProvider(
+                    result.resultSketchImageUrl!,
+                  ),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Image(image: AssetImage(Assets.errorSketch)),
+                )
               : const Image(
-            image: AssetImage(Assets.sampleSketch),
-            fit: BoxFit.cover,
-          ),
+                  image: AssetImage(Assets.sampleSketch),
+                  fit: BoxFit.cover,
+                ),
         ),
         title: Row(
           spacing: 8,
@@ -90,10 +98,7 @@ class SessionCard extends StatelessWidget {
           ],
         ),
         subtitle: Text.rich(
-          TextSpan(
-            children: _buildMetadata(),
-            style: textTheme.labelSmall,
-          ),
+          TextSpan(children: _buildMetadata(), style: textTheme.labelSmall),
         ),
       ),
     );

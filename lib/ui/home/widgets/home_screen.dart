@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -186,7 +187,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       )
                     else
-                      Icon(Icons.wb_sunny, size: 20, color: colorScheme.primary),
+                      Icon(
+                        Icons.wb_sunny,
+                        size: 20,
+                        color: colorScheme.primary,
+                      ),
                     Text(
                       weatherInfo != null
                           ? '${weatherInfo.summaryWithCity} · ${weatherInfo.recommendation}'
@@ -278,8 +283,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           child: SketchCard(
                             imageProvider:
                                 latestResult?.resultSketchImageUrl != null &&
-                                    latestResult!.resultSketchImageUrl!.isNotEmpty
-                                ? NetworkImage(latestResult.resultSketchImageUrl!)
+                                    latestResult!
+                                        .resultSketchImageUrl!
+                                        .isNotEmpty
+                                ? CachedNetworkImageProvider(
+                                    latestResult.resultSketchImageUrl!,
+                                  )
                                 : const AssetImage(Assets.sampleSketch),
                             caption: latestResult != null
                                 ? '${latestResult.endedAt.formattedDateDot} ${latestResult.activityType.label}'
