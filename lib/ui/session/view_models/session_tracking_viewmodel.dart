@@ -540,6 +540,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       sessionId: current.session.id,
       point: point,
       elapsedDuration: newElapsedDuration,
+      movingDuration: newMovingDuration,
       totalDistanceInMeters: newDistance,
       caloriesBurned: newCalories,
       averagePaceInSeconds: averagePaceInSeconds,

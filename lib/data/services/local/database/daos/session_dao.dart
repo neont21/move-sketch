@@ -60,6 +60,7 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
   Future<void> updateSessionProgress({
     required String sessionId,
     required int elapsedSeconds,
+    required int movingSeconds,
     required double distance,
     required int calories,
     int? pace,
@@ -70,6 +71,7 @@ class SessionDao extends DatabaseAccessor<AppDatabase> with _$SessionDaoMixin {
     )..where((table) => table.id.equals(sessionId))).write(
       TrackingSessionsTableCompanion(
         elapsedDurationSeconds: Value(elapsedSeconds),
+        movingDurationSeconds: Value(movingSeconds),
         distanceInMeters: Value(distance),
         caloriesBurned: Value(calories),
         averagePaceInSeconds: Value(pace),

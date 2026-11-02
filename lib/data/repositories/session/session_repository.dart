@@ -25,6 +25,7 @@ abstract interface class SessionRepository {
     required String sessionId,
     required LocationPoint point,
     required Duration elapsedDuration,
+    required Duration movingDuration,
     required double totalDistanceInMeters,
     required int caloriesBurned,
     int? averagePaceInSeconds,
