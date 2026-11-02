@@ -7,9 +7,10 @@ class ResultStatsView extends StatelessWidget {
   final Duration elapsedDuration;
   final int caloriesBurned;
 
-  const ResultStatsView({super.key,
+  const ResultStatsView({
+    super.key,
     required this.missions,
-    required this. distanceInMeters,
+    required this.distanceInMeters,
     required this.elapsedDuration,
     required this.caloriesBurned,
   });

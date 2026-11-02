@@ -110,7 +110,7 @@ class SessionTrackingScreen extends ConsumerWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('움직인 시간', style: textTheme.bodyMedium),
+                            Text('총 시간', style: textTheme.bodyMedium),
                             BlinkingDurationText(
                               text: _formatDuration(state.elapsedDuration),
                               style: textTheme.headlineLarge,

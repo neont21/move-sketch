@@ -90,7 +90,7 @@ class SessionStartViewModel extends Notifier<SessionStartState> {
     }
 
     final durations = results
-        .map((result) => result.elapsedDuration.inMinutes.toDouble())
+        .map((result) => result.movingDuration.inMinutes.toDouble())
         .toList();
     if (durations.isNotEmpty) {
       baselines[MissionAxis.duration] =
@@ -235,9 +235,7 @@ class SessionStartViewModel extends Notifier<SessionStartState> {
     if (currentUser == null) {
       state = state.copyWith(isLoading: false);
 
-      return const Result.error(
-        AuthException('로그인된 사용자 정보를 찾을 수 없습니다.'),
-      );
+      return const Result.error(AuthException('로그인된 사용자 정보를 찾을 수 없습니다.'));
     }
 
     final selectedMissions = state.missions

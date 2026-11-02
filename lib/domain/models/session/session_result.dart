@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../../utils/date_time_utils.dart';
 import '../enums/activity_type.dart';
+import '../enums/mission_axis.dart';
 import '../enums/sync_status.dart';
 import '../fixed/sketch_parts.dart';
 import 'location_point.dart';
@@ -103,6 +104,30 @@ class SessionResult {
   }
 
   factory SessionResult.fromMap(Map<String, dynamic> map, {String? id}) {
+    final parsedMissions =
+        (map['missions'] as List<dynamic>?)
+            ?.map(
+              (element) =>
+                  MissionInstance.fromMap(element as Map<String, dynamic>),
+            )
+            .toList() ??
+        [];
+
+    final int? storedMovingSeconds = (map['movingSeconds'] as num?)?.toInt();
+    final int movingSeconds;
+    if (storedMovingSeconds != null) {
+      movingSeconds = storedMovingSeconds;
+    } else {
+      final durationMission = parsedMissions
+          .where((mission) => mission.axis == MissionAxis.duration)
+          .firstOrNull;
+      if (durationMission != null && durationMission.currentValue > 0) {
+        movingSeconds = (durationMission.currentValue * 60).round();
+      } else {
+        movingSeconds = (map['elapsedSeconds'] as num?)?.toInt() ?? 0;
+      }
+    }
+
     return SessionResult(
       id: (map['id'] as String?) ?? id ?? '',
       userId: map['userId'] as String,
@@ -112,11 +137,7 @@ class SessionResult {
       elapsedDuration: Duration(
         seconds: (map['elapsedSeconds'] as num?)?.toInt() ?? 0,
       ),
-      movingDuration: Duration(
-        seconds: (map['movingSeconds'] as num?)?.toInt() ??
-            (map['elapsedSeconds'] as num?)?.toInt() ??
-            0,
-      ),
+      movingDuration: Duration(seconds: movingSeconds),
       distanceInMeters: (map['distanceInMeters'] as num?)?.toDouble() ?? 0.0,
       caloriesBurned: (map['caloriesBurned'] as num?)?.toInt() ?? 0,
       averagePaceInSeconds: (map['averagePaceInSeconds'] as num?)?.toInt(),
@@ -131,11 +152,7 @@ class SessionResult {
       sketchComposition: SketchComposition.fromMap(
         map['sketchComposition'] as Map<String, dynamic>,
       ),
-      missions:
-          (map['missions'] as List<dynamic>?)
-              ?.map((e) => MissionInstance.fromMap(e as Map<String, dynamic>))
-              .toList() ??
-          [],
+      missions: parsedMissions,
       routePolyline: map['routePolyline'] as String?,
       resultSketchImageUrl: map['resultSketchImageUrl'] as String?,
       secretMemo: map['secretMemo'] as String?,
