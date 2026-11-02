@@ -20,6 +20,7 @@ class SessionService {
       status: session.status,
       startedAt: session.startedAt,
       elapsedDurationSeconds: Value(session.elapsedDuration.inSeconds),
+      movingDurationSeconds: Value(session.movingDuration.inSeconds),
       distanceInMeters: Value(session.distanceInMeters),
       caloriesBurned: Value(session.caloriesBurned),
     );
@@ -96,6 +97,7 @@ class SessionService {
   Future<void> updateSessionProgress({
     required String sessionId,
     required int elapsedSeconds,
+    required int movingSeconds,
     required double distance,
     required int calories,
     int? pace,
@@ -104,6 +106,7 @@ class SessionService {
     return _dao.updateSessionProgress(
       sessionId: sessionId,
       elapsedSeconds: elapsedSeconds,
+      movingSeconds: movingSeconds,
       distance: distance,
       calories: calories,
       pace: pace,

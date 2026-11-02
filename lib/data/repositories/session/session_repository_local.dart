@@ -65,6 +65,7 @@ final class SessionRepositoryLocal implements SessionRepository {
     required String sessionId,
     required LocationPoint point,
     required Duration elapsedDuration,
+    required Duration movingDuration,
     required double totalDistanceInMeters,
     required int caloriesBurned,
     int? averagePaceInSeconds,
@@ -75,6 +76,7 @@ final class SessionRepositoryLocal implements SessionRepository {
       await sessionService.updateSessionProgress(
         sessionId: sessionId,
         elapsedSeconds: elapsedDuration.inSeconds,
+        movingSeconds: movingDuration.inSeconds,
         distance: totalDistanceInMeters,
         calories: caloriesBurned,
         pace: averagePaceInSeconds,
@@ -160,6 +162,7 @@ final class SessionRepositoryLocal implements SessionRepository {
         startedAt: session.startedAt,
         endedAt: now,
         elapsedDuration: session.elapsedDuration,
+        movingDuration: session.movingDuration,
         distanceInMeters: session.distanceInMeters,
         caloriesBurned: session.caloriesBurned,
         averagePaceInSeconds: session.averagePaceInSeconds,
