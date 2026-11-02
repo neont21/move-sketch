@@ -323,7 +323,7 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: '소요 시간\n',
+                                text: '총 시간\n',
                                 style: textTheme.bodySmall,
                               ),
                               TextSpan(

@@ -261,7 +261,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     required List<MissionInstance> missions,
     required ActivityType activityType,
     required double distanceInKm,
-    required Duration elapsedDuration,
+    required Duration movingDuration,
     required int? averagePaceInSeconds,
     required double? averageSpeedKmh,
   }) {
@@ -278,7 +278,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
       final double evalValue = switch (mission.axis) {
         MissionAxis.distance => distanceInKm,
-        MissionAxis.duration => elapsedDuration.inMinutes.toDouble(),
+        MissionAxis.duration => movingDuration.inMinutes.toDouble(),
         MissionAxis.pace => averagePaceInSeconds!.toDouble(),
         MissionAxis.speed => averageSpeedKmh ?? 0.0,
         MissionAxis.routeExploration => mission.currentValue,
@@ -339,7 +339,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         missions: current.missions,
         activityType: current.session.activityType,
         distanceInKm: current.distanceInKm,
-        elapsedDuration: current.movingDuration,
+        movingDuration: current.movingDuration,
         averagePaceInSeconds: current.averagePaceInSeconds,
         averageSpeedKmh: current.averageSpeedKmh,
       );
@@ -514,7 +514,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       missions: current.missions,
       activityType: current.session.activityType,
       distanceInKm: newDistanceInKm,
-      elapsedDuration: newMovingDuration,
+      movingDuration: newMovingDuration,
       averagePaceInSeconds: averagePaceInSeconds,
       averageSpeedKmh: averageSpeedKmh,
     );

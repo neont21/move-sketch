@@ -38,7 +38,7 @@ class SessionResumeDialog extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('소요 시간', style: textTheme.bodyLarge),
+              Text('총 시간', style: textTheme.bodyLarge),
               Text('$minutes분 $seconds초', style: textTheme.bodyMedium),
             ],
           ),
