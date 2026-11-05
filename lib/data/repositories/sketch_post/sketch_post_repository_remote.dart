@@ -113,6 +113,8 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
     String? caption,
     int? locationIndex,
     WeatherInfo? weather,
+    bool? useSignature,
+    String? routePolyline,
   }) async {
     try {
       final sketchPost = await sketchPostService.updatePost(
@@ -120,6 +122,8 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
         caption: caption?.trim(),
         locationIndex: locationIndex,
         weather: weather,
+        useSignature: useSignature,
+        routePolyline: routePolyline,
       );
 
       return Result.ok(sketchPost);

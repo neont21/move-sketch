@@ -18,6 +18,8 @@ class SketchPost {
   final ActivityType activityType;
   final Set<String> cheeredUserIds;
   final int commentCount;
+  final bool useSignature;
+  final String? routePolyline;
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? deletedAt;
@@ -37,6 +39,8 @@ class SketchPost {
     this.weather,
     this.cheeredUserIds = const {},
     this.commentCount = 0,
+    this.useSignature = false,
+    this.routePolyline,
   });
 
   String get sessionId => id;
@@ -72,6 +76,8 @@ class SketchPost {
       'activityType': activityType.name,
       'cheeredUserIds': cheeredUserIds.toList(),
       'commentCount': commentCount,
+      'useSignature': useSignature,
+      'routePolyline': routePolyline,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': updatedAt != null ? Timestamp.fromDate(updatedAt!) : null,
       'deletedAt': deletedAt != null ? Timestamp.fromDate(deletedAt!) : null,
@@ -102,6 +108,8 @@ class SketchPost {
       activityType: ActivityType.fromString(map['activityType'] as String?),
       cheeredUserIds: cheeredList.toSet(),
       commentCount: (map['commentCount'] as num?)?.toInt() ?? 0,
+      useSignature: (map['useSignature'] as bool?) ?? false,
+      routePolyline: map['routePolyline'] as String?,
       createdAt: parseDateTime(map['createdAt']).toLocal(),
       updatedAt: tryParseDateTime(map['updatedAt'])?.toLocal(),
       deletedAt: tryParseDateTime(map['deletedAt'])?.toLocal(),
@@ -120,6 +128,8 @@ class SketchPost {
     ActivityType? activityType,
     Set<String>? cheeredUserIds,
     int? commentCount,
+    bool? useSignature,
+    String? routePolyline,
     DateTime? createdAt,
     ValueGetter<DateTime?>? updatedAt,
     ValueGetter<DateTime?>? deletedAt,
@@ -136,6 +146,8 @@ class SketchPost {
       activityType: activityType ?? this.activityType,
       cheeredUserIds: cheeredUserIds ?? this.cheeredUserIds,
       commentCount: commentCount ?? this.commentCount,
+      useSignature: useSignature ?? this.useSignature,
+      routePolyline: routePolyline ?? this.routePolyline,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt != null ? updatedAt() : this.updatedAt,
       deletedAt: deletedAt != null ? deletedAt() : this.deletedAt,

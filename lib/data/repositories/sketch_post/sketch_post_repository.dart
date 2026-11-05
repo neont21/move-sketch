@@ -31,6 +31,8 @@ abstract interface class SketchPostRepository {
     String? caption,
     int? locationIndex,
     WeatherInfo? weather,
+    bool? useSignature,
+    String? routePolyline,
   });
 
   /// 게시물을 삭제한다. (게시물 상세 화면 혹은 피드 탭)

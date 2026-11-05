@@ -32,6 +32,8 @@ class SketchPostService {
     String? caption,
     int? locationIndex,
     WeatherInfo? weather,
+    bool? useSignature,
+    String? routePolyline,
   }) async {
     final updates = <String, dynamic>{
       'updatedAt': FieldValue.serverTimestamp(),
@@ -45,6 +47,12 @@ class SketchPostService {
     }
     if (weather != null) {
       updates['weather'] = weather.toMap();
+    }
+    if (useSignature != null) {
+      updates['useSignature'] = useSignature;
+    }
+    if (routePolyline != null) {
+      updates['routePolyline'] = routePolyline;
     }
 
     final postRef = _sketchesRef.doc(sketchId);
