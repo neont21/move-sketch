@@ -21,6 +21,7 @@ class SessionShareState {
   final String caption;
   final bool isEdit;
   final bool isPublishing;
+  final bool useSignature;
 
   const SessionShareState({
     this.sessionResult,
@@ -32,6 +33,7 @@ class SessionShareState {
     this.caption = '',
     this.isEdit = false,
     this.isPublishing = false,
+    this.useSignature = false,
   });
 
   SessionShareState copyWith({
@@ -44,6 +46,7 @@ class SessionShareState {
     String? caption,
     bool? isEdit,
     bool? isPublishing,
+    bool? useSignature,
   }) {
     return SessionShareState(
       sessionResult: sessionResult ?? this.sessionResult,
@@ -55,6 +58,7 @@ class SessionShareState {
       caption: caption ?? this.caption,
       isEdit: isEdit ?? this.isEdit,
       isPublishing: isPublishing ?? this.isPublishing,
+      useSignature: useSignature ?? this.useSignature,
     );
   }
 }
@@ -135,6 +139,7 @@ class SessionShareViewModel extends AsyncNotifier<SessionShareState> {
       weatherInfo: weatherInfo,
       caption: sketchPost?.caption ?? '',
       isEdit: isEdit,
+      useSignature: sketchPost?.useSignature ?? false,
     );
   }
 
@@ -144,6 +149,12 @@ class SessionShareViewModel extends AsyncNotifier<SessionShareState> {
 
   void updateCaption(String text) {
     state = state.whenData((current) => current.copyWith(caption: text));
+  }
+
+  void toggleSignature(bool enabled) {
+    state = state.whenData(
+      (current) => current.copyWith(useSignature: enabled),
+    );
   }
 
   Future<Result<void>> publishPost() async {
@@ -163,6 +174,10 @@ class SessionShareViewModel extends AsyncNotifier<SessionShareState> {
           caption: current.caption,
           locationIndex: current.locationIndex,
           weather: current.weatherInfo,
+          useSignature: current.useSignature,
+          routePolyline:
+              current.sessionResult?.routePolyline ??
+              current.existingPost?.routePolyline,
         );
 
         state = AsyncData(current.copyWith(isPublishing: false));
@@ -195,6 +210,8 @@ class SessionShareViewModel extends AsyncNotifier<SessionShareState> {
           locationIndex: current.locationIndex,
           weather: current.weatherInfo,
           activityType: sessionResult.activityType,
+          useSignature: current.useSignature,
+          routePolyline: sessionResult.routePolyline,
           createdAt: DateTime.now(),
         );
 

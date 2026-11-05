@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/assets.dart';
+import 'sketch_signature_view.dart';
 
 class SketchCard extends StatelessWidget {
   final ImageProvider imageProvider;
   final String? caption;
   final bool isHome;
   final bool isGrid;
+  final bool useSignature;
+  final String? routePolyline;
 
   const SketchCard({
     super.key,
@@ -14,6 +17,8 @@ class SketchCard extends StatelessWidget {
     this.caption,
     this.isHome = false,
     this.isGrid = false,
+    this.useSignature = false,
+    this.routePolyline,
   });
 
   @override
@@ -43,13 +48,30 @@ class SketchCard extends StatelessWidget {
           children: [
             AspectRatio(
               aspectRatio: 1.0,
-              child: Image(
-                image: imageProvider,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const Image(
-                  image: AssetImage(Assets.errorSketch),
-                  fit: BoxFit.cover,
-                ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Image(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Image(
+                        image: AssetImage(Assets.errorSketch),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  if (useSignature &&
+                      routePolyline != null &&
+                      routePolyline!.isNotEmpty)
+                    Positioned(
+                      right: isGrid ? 4 : 8,
+                      bottom: isGrid ? 4 : 8,
+                      child: SketchSignatureView(
+                        routePolyline: routePolyline,
+                        size: isGrid ? 28 : (isHome ? 68 : 80),
+                      ),
+                    ),
+                ],
               ),
             ),
             caption != null

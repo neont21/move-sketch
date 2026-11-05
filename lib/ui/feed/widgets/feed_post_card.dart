@@ -126,6 +126,8 @@ class FeedPostCard extends ConsumerWidget {
               child: SketchCard(
                 imageProvider: CachedNetworkImageProvider(sketch.sketchUrl),
                 caption: sketch.caption,
+                useSignature: sketch.useSignature,
+                routePolyline: sketch.routePolyline,
               ),
             ),
           ),

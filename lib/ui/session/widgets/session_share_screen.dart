@@ -181,65 +181,96 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
             final locationDisplayText = rawTag == '알 수 없는 위치'
                 ? rawTag
                 : '$rawTag 인근';
-      
+
             return SafeArea(
               top: false,
               child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    spacing: 20,
-                    children: [
-                      SketchCard(imageProvider: imageProvider),
-                      Text(
-                        '위치 태그 선택',
-                        style: textTheme.labelSmall?.copyWith(
-                          color: colorScheme.secondary,
-                        ),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  spacing: 20,
+                  children: [
+                    SketchCard(
+                      imageProvider: imageProvider,
+                      useSignature: state.useSignature,
+                      routePolyline:
+                          state.sessionResult?.routePolyline ??
+                          state.existingPost?.routePolyline,
+                    ),
+                    Text(
+                      '위치 태그 선택',
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colorScheme.secondary,
                       ),
-                      AnimatedToggleSwitch<int>.size(
-                        current: state.locationIndex,
-                        values: const [0, 1, 2],
-                        onChanged: (i) {
-                          ref
-                              .read(
-                                sessionShareViewModelProvider(
-                                  widget.sessionId,
-                                ).notifier,
-                              )
-                              .selectTag(i);
-                        },
-                        selectedIconScale: 1.0,
-                        height: 40,
-                        indicatorSize: const Size(80, 32),
-                        style: ToggleStyle(
-                          backgroundColor: colorScheme.outline,
-                          borderColor: colorScheme.outline,
-                          indicatorColor: colorScheme.primary,
-                          borderRadius: BorderRadius.circular(80),
-                        ),
-                        borderWidth: 4,
-                        iconBuilder: (value) {
-                          final label = switch (value) {
-                            0 => '출발지',
-                            1 => '경유지',
-                            2 => '도착지',
-                            _ => '위치',
-                          };
-                          return Center(
-                            child: Text(
-                              label,
-                              style: textTheme.bodyLarge?.copyWith(
-                                color: (value == state.locationIndex)
-                                    ? colorScheme.onPrimary
-                                    : colorScheme.tertiaryFixed,
-                              ),
+                    ),
+                    AnimatedToggleSwitch<int>.size(
+                      current: state.locationIndex,
+                      values: const [0, 1, 2],
+                      onChanged: (i) {
+                        ref
+                            .read(
+                              sessionShareViewModelProvider(
+                                widget.sessionId,
+                              ).notifier,
+                            )
+                            .selectTag(i);
+                      },
+                      selectedIconScale: 1.0,
+                      height: 40,
+                      indicatorSize: const Size(80, 32),
+                      style: ToggleStyle(
+                        backgroundColor: colorScheme.outline,
+                        borderColor: colorScheme.outline,
+                        indicatorColor: colorScheme.primary,
+                        borderRadius: BorderRadius.circular(80),
+                      ),
+                      borderWidth: 4,
+                      iconBuilder: (value) {
+                        final label = switch (value) {
+                          0 => '출발지',
+                          1 => '경유지',
+                          2 => '도착지',
+                          _ => '위치',
+                        };
+                        return Center(
+                          child: Text(
+                            label,
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: (value == state.locationIndex)
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.tertiaryFixed,
                             ),
-                          );
-                        },
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
+                          ),
+                        );
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: colorScheme.outline),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.location_pin,
+                                color: colorScheme.primary,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                locationDisplayText,
+                                style: textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (state.weatherInfo != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
@@ -252,74 +283,94 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  Icons.location_pin,
-                                  color: colorScheme.primary,
+                                Image.network(
+                                  state.weatherInfo!.iconUrl,
+                                  width: 20,
+                                  height: 20,
+                                  errorBuilder: (_, _, _) => Icon(
+                                    Icons.wb_sunny,
+                                    size: 20,
+                                    color: colorScheme.primary,
+                                  ),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  locationDisplayText,
+                                  state.weatherInfo!.shortSummary,
                                   style: textTheme.bodyMedium,
                                 ),
                               ],
                             ),
                           ),
-                          if (state.weatherInfo != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 12,
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest.withValues(
+                          alpha: 0.5,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.gesture,
+                                size: 20,
+                                color: colorScheme.primary,
                               ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: colorScheme.outline),
+                              const SizedBox(width: 8),
+                              Text(
+                                '이동 경로 서명 남기기',
+                                style: textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Image.network(
-                                    state.weatherInfo!.iconUrl,
-                                    width: 20,
-                                    height: 20,
-                                    errorBuilder: (_, _, _) => Icon(
-                                      Icons.wb_sunny,
-                                      size: 20,
-                                      color: colorScheme.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    state.weatherInfo!.shortSummary,
-                                    style: textTheme.bodyMedium,
-                                  ),
-                                ],
-                              ),
-                            ),
+                            ],
+                          ),
+                          Switch.adaptive(
+                            value: state.useSignature,
+                            onChanged: (enabled) {
+                              ref
+                                  .read(
+                                    sessionShareViewModelProvider(
+                                      widget.sessionId,
+                                    ).notifier,
+                                  )
+                                  .toggleSignature(enabled);
+                            },
+                          ),
                         ],
                       ),
-                      TextField(
-                        controller: _captionController,
-                        keyboardType: TextInputType.multiline,
-                        maxLines: 4,
-                        minLines: 4,
-                        maxLength: 60,
-                        style: textTheme.bodyMedium,
-                        onChanged: (text) {
-                          ref
-                              .read(
-                                sessionShareViewModelProvider(
-                                  widget.sessionId,
-                                ).notifier,
-                              )
-                              .updateCaption(text);
-                        },
-                        decoration: const InputDecoration(
-                          hintText: '오늘의 한마디를 적어보세요. (선택)',
-                        ),
+                    ),
+                    TextField(
+                      controller: _captionController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 4,
+                      minLines: 4,
+                      maxLength: 60,
+                      style: textTheme.bodyMedium,
+                      onChanged: (text) {
+                        ref
+                            .read(
+                              sessionShareViewModelProvider(
+                                widget.sessionId,
+                              ).notifier,
+                            )
+                            .updateCaption(text);
+                      },
+                      decoration: const InputDecoration(
+                        hintText: '오늘의 한마디를 적어보세요. (선택)',
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
             );
           },
         ),
