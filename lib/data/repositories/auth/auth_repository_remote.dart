@@ -258,7 +258,7 @@ final class AuthRepositoryRemote implements AuthRepository {
         return const Result.ok(SocialAuthCanceled());
       }
 
-      return _handleSocialUserVerification(credential.user!);
+      return await _handleSocialUserVerification(credential.user!);
     } on FirebaseAuthException catch (error) {
       return Result.error(
         error.toAuthException(defaultMessage: 'Google 로그인 중 오류가 발생했습니다.'),
@@ -282,7 +282,7 @@ final class AuthRepositoryRemote implements AuthRepository {
         return const Result.ok(SocialAuthCanceled());
       }
 
-      return _handleSocialUserVerification(credential.user!);
+      return await _handleSocialUserVerification(credential.user!);
     } on SignInWithAppleAuthorizationException catch (error) {
       if (error.code == AuthorizationErrorCode.canceled) {
         return const Result.ok(SocialAuthCanceled());

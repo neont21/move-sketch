@@ -62,6 +62,7 @@ env*.json
 # Android Gradle build outputs
 /android/build/
 
-# FVM Version Cache
-.fvm/*
 !.fvm/fvm_config.json
+
+# FVM Version Cache
+.fvm/
