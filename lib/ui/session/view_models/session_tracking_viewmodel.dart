@@ -195,7 +195,11 @@ class SessionTrackingState {
 }
 
 class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
-  static const Duration _autoPauseThreshold = Duration(seconds: 3);
+  static const Duration _autoPauseThreshold = Duration(seconds: 10);
+  static const double _maxGpsAccuracyMeters = 50.0;
+  static const double _minimumMovingSpeedMps = 0.2;
+  static const double _stationarySensorSpeedThresholdMps = 0.2;
+  static const int _locationDistanceFilterMeters = 1;
 
   Timer? _timer;
   StreamSubscription<LocationPoint>? _locationSubscription;
@@ -224,7 +228,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       if (latestTimestamp.difference(locationPoint.timestamp) > window) {
         break;
       }
-      if (locationPoint.speed != null && locationPoint.speed! > 0.4) {
+      if (locationPoint.speed != null &&
+          locationPoint.speed! >= _minimumMovingSpeedMps) {
         validSpeeds.add(locationPoint.speed!);
       }
     }
@@ -362,7 +367,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       return;
     }
 
-    if (point.accuracy != null && point.accuracy! > 35) {
+    if (point.accuracy != null && point.accuracy! > _maxGpsAccuracyMeters) {
       return;
     }
 
@@ -391,9 +396,12 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
       final speedMps = deltaDistance / timeDiffSeconds;
 
-      final isStationaryBySensor = point.speed != null && point.speed! < 0.3;
-
-      if (!isStationaryBySensor && deltaDistance >= 1.0 && speedMps >= 0.4) {
+      final isStationaryBySensor =
+          point.speed != null &&
+          point.speed! < _stationarySensorSpeedThresholdMps;
+      if (!isStationaryBySensor &&
+          deltaDistance >= 1.0 &&
+          speedMps >= _minimumMovingSpeedMps) {
         movingDurationDelta = Duration(milliseconds: timeDiffMillis);
         _lastMovedAt = DateTime.now();
 
@@ -453,7 +461,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
           averagePaceInSeconds = (activeSeconds / newDistanceInKm).round();
         }
 
-        if (point.speed != null && point.speed! > 0.4) {
+        if (point.speed != null && point.speed! >= _minimumMovingSpeedMps) {
           _smoothedSpeedMps = (_smoothedSpeedMps == null)
               ? point.speed!
               : (_smoothedSpeedMps! * 0.7 + point.speed! * 0.3);
@@ -470,7 +478,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         );
 
         final rollingBaselinePace =
-            rollingSpeedMps != null && rollingSpeedMps > 0.4
+            rollingSpeedMps != null && rollingSpeedMps >= _minimumMovingSpeedMps
             ? (1000.0 / rollingSpeedMps).round()
             : averagePaceInSeconds;
 
@@ -584,7 +592,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
     _locationSubscription = locationRepository
         .getPositionStream(
-          distanceFilterMeters: 2,
+          distanceFilterMeters: _locationDistanceFilterMeters,
           notificationTitle: notificationTitle,
           notificationText: notificationText,
         )
