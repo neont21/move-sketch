@@ -8,8 +8,10 @@ import 'tables/offline_session_queue_table.dart';
 import 'tables/tracking_sessions_table.dart';
 import 'tables/location_points_table.dart';
 import 'tables/mission_instances_table.dart';
+import 'tables/visited_geohashes_table.dart';
 import 'daos/session_dao.dart';
 import 'daos/offline_session_queue_dao.dart';
+import 'daos/exploration_dao.dart';
 
 part 'app_database.g.dart';
 
@@ -19,14 +21,15 @@ part 'app_database.g.dart';
     LocationPointsTable,
     MissionInstancesTable,
     OfflineSessionQueueTable,
+    VisitedGeohashesTable,
   ],
-  daos: [SessionDao, OfflineSessionQueueDao],
+  daos: [SessionDao, OfflineSessionQueueDao, ExplorationDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -42,6 +45,9 @@ class AppDatabase extends _$AppDatabase {
           trackingSessionsTable,
           trackingSessionsTable.movingDurationSeconds,
         );
+      }
+      if (from < 4) {
+        await migrator.createTable(visitedGeohashesTable);
       }
     },
   );

@@ -2348,6 +2348,391 @@ class OfflineSessionQueueTableCompanion
   }
 }
 
+class $VisitedGeohashesTableTable extends VisitedGeohashesTable
+    with TableInfo<$VisitedGeohashesTableTable, VisitedGeohashesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VisitedGeohashesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _geohashMeta = const VerificationMeta(
+    'geohash',
+  );
+  @override
+  late final GeneratedColumn<String> geohash = GeneratedColumn<String>(
+    'geohash',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firstVisitedAtMeta = const VerificationMeta(
+    'firstVisitedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> firstVisitedAt =
+      GeneratedColumn<DateTime>(
+        'first_visited_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _lastVisitedAtMeta = const VerificationMeta(
+    'lastVisitedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastVisitedAt =
+      GeneratedColumn<DateTime>(
+        'last_visited_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _visitCountMeta = const VerificationMeta(
+    'visitCount',
+  );
+  @override
+  late final GeneratedColumn<int> visitCount = GeneratedColumn<int>(
+    'visit_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    geohash,
+    userId,
+    firstVisitedAt,
+    lastVisitedAt,
+    visitCount,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'visited_geohashes_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<VisitedGeohashesTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('geohash')) {
+      context.handle(
+        _geohashMeta,
+        geohash.isAcceptableOrUnknown(data['geohash']!, _geohashMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_geohashMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('first_visited_at')) {
+      context.handle(
+        _firstVisitedAtMeta,
+        firstVisitedAt.isAcceptableOrUnknown(
+          data['first_visited_at']!,
+          _firstVisitedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_firstVisitedAtMeta);
+    }
+    if (data.containsKey('last_visited_at')) {
+      context.handle(
+        _lastVisitedAtMeta,
+        lastVisitedAt.isAcceptableOrUnknown(
+          data['last_visited_at']!,
+          _lastVisitedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lastVisitedAtMeta);
+    }
+    if (data.containsKey('visit_count')) {
+      context.handle(
+        _visitCountMeta,
+        visitCount.isAcceptableOrUnknown(data['visit_count']!, _visitCountMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {geohash, userId};
+  @override
+  VisitedGeohashesTableData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VisitedGeohashesTableData(
+      geohash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}geohash'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
+      firstVisitedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}first_visited_at'],
+      )!,
+      lastVisitedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_visited_at'],
+      )!,
+      visitCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}visit_count'],
+      )!,
+    );
+  }
+
+  @override
+  $VisitedGeohashesTableTable createAlias(String alias) {
+    return $VisitedGeohashesTableTable(attachedDatabase, alias);
+  }
+}
+
+class VisitedGeohashesTableData extends DataClass
+    implements Insertable<VisitedGeohashesTableData> {
+  final String geohash;
+  final String userId;
+  final DateTime firstVisitedAt;
+  final DateTime lastVisitedAt;
+  final int visitCount;
+  const VisitedGeohashesTableData({
+    required this.geohash,
+    required this.userId,
+    required this.firstVisitedAt,
+    required this.lastVisitedAt,
+    required this.visitCount,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['geohash'] = Variable<String>(geohash);
+    map['user_id'] = Variable<String>(userId);
+    map['first_visited_at'] = Variable<DateTime>(firstVisitedAt);
+    map['last_visited_at'] = Variable<DateTime>(lastVisitedAt);
+    map['visit_count'] = Variable<int>(visitCount);
+    return map;
+  }
+
+  VisitedGeohashesTableCompanion toCompanion(bool nullToAbsent) {
+    return VisitedGeohashesTableCompanion(
+      geohash: Value(geohash),
+      userId: Value(userId),
+      firstVisitedAt: Value(firstVisitedAt),
+      lastVisitedAt: Value(lastVisitedAt),
+      visitCount: Value(visitCount),
+    );
+  }
+
+  factory VisitedGeohashesTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VisitedGeohashesTableData(
+      geohash: serializer.fromJson<String>(json['geohash']),
+      userId: serializer.fromJson<String>(json['userId']),
+      firstVisitedAt: serializer.fromJson<DateTime>(json['firstVisitedAt']),
+      lastVisitedAt: serializer.fromJson<DateTime>(json['lastVisitedAt']),
+      visitCount: serializer.fromJson<int>(json['visitCount']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'geohash': serializer.toJson<String>(geohash),
+      'userId': serializer.toJson<String>(userId),
+      'firstVisitedAt': serializer.toJson<DateTime>(firstVisitedAt),
+      'lastVisitedAt': serializer.toJson<DateTime>(lastVisitedAt),
+      'visitCount': serializer.toJson<int>(visitCount),
+    };
+  }
+
+  VisitedGeohashesTableData copyWith({
+    String? geohash,
+    String? userId,
+    DateTime? firstVisitedAt,
+    DateTime? lastVisitedAt,
+    int? visitCount,
+  }) => VisitedGeohashesTableData(
+    geohash: geohash ?? this.geohash,
+    userId: userId ?? this.userId,
+    firstVisitedAt: firstVisitedAt ?? this.firstVisitedAt,
+    lastVisitedAt: lastVisitedAt ?? this.lastVisitedAt,
+    visitCount: visitCount ?? this.visitCount,
+  );
+  VisitedGeohashesTableData copyWithCompanion(
+    VisitedGeohashesTableCompanion data,
+  ) {
+    return VisitedGeohashesTableData(
+      geohash: data.geohash.present ? data.geohash.value : this.geohash,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      firstVisitedAt: data.firstVisitedAt.present
+          ? data.firstVisitedAt.value
+          : this.firstVisitedAt,
+      lastVisitedAt: data.lastVisitedAt.present
+          ? data.lastVisitedAt.value
+          : this.lastVisitedAt,
+      visitCount: data.visitCount.present
+          ? data.visitCount.value
+          : this.visitCount,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VisitedGeohashesTableData(')
+          ..write('geohash: $geohash, ')
+          ..write('userId: $userId, ')
+          ..write('firstVisitedAt: $firstVisitedAt, ')
+          ..write('lastVisitedAt: $lastVisitedAt, ')
+          ..write('visitCount: $visitCount')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(geohash, userId, firstVisitedAt, lastVisitedAt, visitCount);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VisitedGeohashesTableData &&
+          other.geohash == this.geohash &&
+          other.userId == this.userId &&
+          other.firstVisitedAt == this.firstVisitedAt &&
+          other.lastVisitedAt == this.lastVisitedAt &&
+          other.visitCount == this.visitCount);
+}
+
+class VisitedGeohashesTableCompanion
+    extends UpdateCompanion<VisitedGeohashesTableData> {
+  final Value<String> geohash;
+  final Value<String> userId;
+  final Value<DateTime> firstVisitedAt;
+  final Value<DateTime> lastVisitedAt;
+  final Value<int> visitCount;
+  final Value<int> rowid;
+  const VisitedGeohashesTableCompanion({
+    this.geohash = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.firstVisitedAt = const Value.absent(),
+    this.lastVisitedAt = const Value.absent(),
+    this.visitCount = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VisitedGeohashesTableCompanion.insert({
+    required String geohash,
+    required String userId,
+    required DateTime firstVisitedAt,
+    required DateTime lastVisitedAt,
+    this.visitCount = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : geohash = Value(geohash),
+       userId = Value(userId),
+       firstVisitedAt = Value(firstVisitedAt),
+       lastVisitedAt = Value(lastVisitedAt);
+  static Insertable<VisitedGeohashesTableData> custom({
+    Expression<String>? geohash,
+    Expression<String>? userId,
+    Expression<DateTime>? firstVisitedAt,
+    Expression<DateTime>? lastVisitedAt,
+    Expression<int>? visitCount,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (geohash != null) 'geohash': geohash,
+      if (userId != null) 'user_id': userId,
+      if (firstVisitedAt != null) 'first_visited_at': firstVisitedAt,
+      if (lastVisitedAt != null) 'last_visited_at': lastVisitedAt,
+      if (visitCount != null) 'visit_count': visitCount,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VisitedGeohashesTableCompanion copyWith({
+    Value<String>? geohash,
+    Value<String>? userId,
+    Value<DateTime>? firstVisitedAt,
+    Value<DateTime>? lastVisitedAt,
+    Value<int>? visitCount,
+    Value<int>? rowid,
+  }) {
+    return VisitedGeohashesTableCompanion(
+      geohash: geohash ?? this.geohash,
+      userId: userId ?? this.userId,
+      firstVisitedAt: firstVisitedAt ?? this.firstVisitedAt,
+      lastVisitedAt: lastVisitedAt ?? this.lastVisitedAt,
+      visitCount: visitCount ?? this.visitCount,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (geohash.present) {
+      map['geohash'] = Variable<String>(geohash.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (firstVisitedAt.present) {
+      map['first_visited_at'] = Variable<DateTime>(firstVisitedAt.value);
+    }
+    if (lastVisitedAt.present) {
+      map['last_visited_at'] = Variable<DateTime>(lastVisitedAt.value);
+    }
+    if (visitCount.present) {
+      map['visit_count'] = Variable<int>(visitCount.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VisitedGeohashesTableCompanion(')
+          ..write('geohash: $geohash, ')
+          ..write('userId: $userId, ')
+          ..write('firstVisitedAt: $firstVisitedAt, ')
+          ..write('lastVisitedAt: $lastVisitedAt, ')
+          ..write('visitCount: $visitCount, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2359,9 +2744,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $MissionInstancesTableTable(this);
   late final $OfflineSessionQueueTableTable offlineSessionQueueTable =
       $OfflineSessionQueueTableTable(this);
+  late final $VisitedGeohashesTableTable visitedGeohashesTable =
+      $VisitedGeohashesTableTable(this);
   late final SessionDao sessionDao = SessionDao(this as AppDatabase);
   late final OfflineSessionQueueDao offlineSessionQueueDao =
       OfflineSessionQueueDao(this as AppDatabase);
+  late final ExplorationDao explorationDao = ExplorationDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2371,6 +2761,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     locationPointsTable,
     missionInstancesTable,
     offlineSessionQueueTable,
+    visitedGeohashesTable,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -4082,6 +4473,243 @@ typedef $$OfflineSessionQueueTableTableProcessedTableManager =
       OfflineSessionQueueTableData,
       PrefetchHooks Function()
     >;
+typedef $$VisitedGeohashesTableTableCreateCompanionBuilder =
+    VisitedGeohashesTableCompanion Function({
+      required String geohash,
+      required String userId,
+      required DateTime firstVisitedAt,
+      required DateTime lastVisitedAt,
+      Value<int> visitCount,
+      Value<int> rowid,
+    });
+typedef $$VisitedGeohashesTableTableUpdateCompanionBuilder =
+    VisitedGeohashesTableCompanion Function({
+      Value<String> geohash,
+      Value<String> userId,
+      Value<DateTime> firstVisitedAt,
+      Value<DateTime> lastVisitedAt,
+      Value<int> visitCount,
+      Value<int> rowid,
+    });
+
+class $$VisitedGeohashesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $VisitedGeohashesTableTable> {
+  $$VisitedGeohashesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get geohash => $composableBuilder(
+    column: $table.geohash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get firstVisitedAt => $composableBuilder(
+    column: $table.firstVisitedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastVisitedAt => $composableBuilder(
+    column: $table.lastVisitedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get visitCount => $composableBuilder(
+    column: $table.visitCount,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$VisitedGeohashesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $VisitedGeohashesTableTable> {
+  $$VisitedGeohashesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get geohash => $composableBuilder(
+    column: $table.geohash,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get firstVisitedAt => $composableBuilder(
+    column: $table.firstVisitedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastVisitedAt => $composableBuilder(
+    column: $table.lastVisitedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get visitCount => $composableBuilder(
+    column: $table.visitCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$VisitedGeohashesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VisitedGeohashesTableTable> {
+  $$VisitedGeohashesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get geohash =>
+      $composableBuilder(column: $table.geohash, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get firstVisitedAt => $composableBuilder(
+    column: $table.firstVisitedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastVisitedAt => $composableBuilder(
+    column: $table.lastVisitedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get visitCount => $composableBuilder(
+    column: $table.visitCount,
+    builder: (column) => column,
+  );
+}
+
+class $$VisitedGeohashesTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VisitedGeohashesTableTable,
+          VisitedGeohashesTableData,
+          $$VisitedGeohashesTableTableFilterComposer,
+          $$VisitedGeohashesTableTableOrderingComposer,
+          $$VisitedGeohashesTableTableAnnotationComposer,
+          $$VisitedGeohashesTableTableCreateCompanionBuilder,
+          $$VisitedGeohashesTableTableUpdateCompanionBuilder,
+          (
+            VisitedGeohashesTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $VisitedGeohashesTableTable,
+              VisitedGeohashesTableData
+            >,
+          ),
+          VisitedGeohashesTableData,
+          PrefetchHooks Function()
+        > {
+  $$VisitedGeohashesTableTableTableManager(
+    _$AppDatabase db,
+    $VisitedGeohashesTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VisitedGeohashesTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$VisitedGeohashesTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$VisitedGeohashesTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> geohash = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<DateTime> firstVisitedAt = const Value.absent(),
+                Value<DateTime> lastVisitedAt = const Value.absent(),
+                Value<int> visitCount = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => VisitedGeohashesTableCompanion(
+                geohash: geohash,
+                userId: userId,
+                firstVisitedAt: firstVisitedAt,
+                lastVisitedAt: lastVisitedAt,
+                visitCount: visitCount,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String geohash,
+                required String userId,
+                required DateTime firstVisitedAt,
+                required DateTime lastVisitedAt,
+                Value<int> visitCount = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => VisitedGeohashesTableCompanion.insert(
+                geohash: geohash,
+                userId: userId,
+                firstVisitedAt: firstVisitedAt,
+                lastVisitedAt: lastVisitedAt,
+                visitCount: visitCount,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $VisitedGeohashesTableTable,
+                    VisitedGeohashesTableData
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $VisitedGeohashesTableTable,
+                    VisitedGeohashesTableData
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$VisitedGeohashesTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VisitedGeohashesTableTable,
+      VisitedGeohashesTableData,
+      $$VisitedGeohashesTableTableFilterComposer,
+      $$VisitedGeohashesTableTableOrderingComposer,
+      $$VisitedGeohashesTableTableAnnotationComposer,
+      $$VisitedGeohashesTableTableCreateCompanionBuilder,
+      $$VisitedGeohashesTableTableUpdateCompanionBuilder,
+      (
+        VisitedGeohashesTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $VisitedGeohashesTableTable,
+          VisitedGeohashesTableData
+        >,
+      ),
+      VisitedGeohashesTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4097,4 +4725,6 @@ class $AppDatabaseManager {
         _db,
         _db.offlineSessionQueueTable,
       );
+  $$VisitedGeohashesTableTableTableManager get visitedGeohashesTable =>
+      $$VisitedGeohashesTableTableTableManager(_db, _db.visitedGeohashesTable);
 }
