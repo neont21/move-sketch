@@ -5,6 +5,8 @@ import '../data/repositories/auth/auth_repository.dart';
 import '../data/repositories/auth/auth_repository_remote.dart';
 import '../data/repositories/common/app_version_repository.dart';
 import '../data/repositories/common/app_version_repository_remote.dart';
+import '../data/repositories/exploration/exploration_repository.dart';
+import '../data/repositories/exploration/exploration_repository_local.dart';
 import '../data/repositories/friendship/friendship_repository.dart';
 import '../data/repositories/friendship/friendship_repository_remote.dart';
 import '../data/repositories/geocoding/geocoding_repository.dart';
@@ -40,6 +42,7 @@ import '../data/services/hardware/device_info_service.dart';
 import '../data/services/hardware/location_service.dart';
 import '../data/services/hardware/network_connectivity_service.dart';
 import '../data/services/local/database/app_database.dart';
+import '../data/services/local/exploration_service.dart';
 import '../data/services/local/offline_session_service.dart';
 import '../data/services/local/session_service.dart';
 import '../data/services/remote/auth_service.dart';
@@ -107,11 +110,19 @@ final offlineSessionServiceProvider = Provider<OfflineSessionService>((ref) {
   return OfflineSessionService(db.offlineSessionQueueDao);
 });
 
-/// NetworkConnectivityService Provider: 디바이스 네트워크 연결 여부 확인
-final networkConnectivityServiceProvider =
-Provider<NetworkConnectivityService>((ref) {
-  return NetworkConnectivityService();
+/// ExplorationService Provider: 로컬 Geohash 기반 새로운 길 탐색 이력 입출력
+final explorationServiceProvider = Provider<ExplorationService>((ref) {
+  final db = ref.watch(appDatabaseProvider);
+
+  return ExplorationService(db.explorationDao);
 });
+
+/// NetworkConnectivityService Provider: 디바이스 네트워크 연결 여부 확인
+final networkConnectivityServiceProvider = Provider<NetworkConnectivityService>(
+  (ref) {
+    return NetworkConnectivityService();
+  },
+);
 
 /// AuthService Provider: Firebase Authentication 기반 계정 관리
 final authServiceProvider = Provider<AuthService>((ref) {
@@ -234,15 +245,24 @@ final offlineSessionRepositoryProvider = Provider<OfflineSessionRepository>((
   );
 });
 
+/// ExplorationRepository Provider: Geohash 기반 새로운 길 탐색(개척) 이력 저장소
+/// 과거 방문했던 Geohash 격자 목록을 조회하고 세션 완료 시 신규 타일을 영구 기록
+final explorationRepositoryProvider = Provider<ExplorationRepository>((ref) {
+  return ExplorationRepositoryLocal(
+    explorationService: ref.watch(explorationServiceProvider),
+  );
+});
+
 /// NetworkConnectivityRepository Provider: 네트워크 상태 및 전환 이벤트 저장소
 /// 네트워크 연결 상태 확인
 final networkConnectivityRepositoryProvider =
-Provider<NetworkConnectivityRepository>((ref) {
-  return NetworkConnectivityRepositoryLocal(
-    networkConnectivityService:
-    ref.watch(networkConnectivityServiceProvider),
-  );
-});
+    Provider<NetworkConnectivityRepository>((ref) {
+      return NetworkConnectivityRepositoryLocal(
+        networkConnectivityService: ref.watch(
+          networkConnectivityServiceProvider,
+        ),
+      );
+    });
 
 /// SessionResultRepository Provider: 완료된 운동 세션 결과물 저장소
 /// 세션 통계 데이터와 이미지를 원격 저장소에 보관하고 개인 캘린더 기록 제공
@@ -368,16 +388,18 @@ final completeSessionUseCaseProvider = Provider<CompleteSessionUseCase>((ref) {
 });
 
 /// SyncPendingSessionsUseCase Provider: 오프라인 미전송 세션 백그라운드 동기화
-final syncPendingSessionsUseCaseProvider =
-Provider<SyncPendingSessionsUseCase>((ref) {
-  return SyncPendingSessionsUseCase(
-    offlineSessionRepository: ref.watch(offlineSessionRepositoryProvider),
-    sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
-    sessionRepository: ref.watch(sessionRepositoryProvider),
-    networkConnectivityRepository:
-    ref.watch(networkConnectivityRepositoryProvider),
-  );
-});
+final syncPendingSessionsUseCaseProvider = Provider<SyncPendingSessionsUseCase>(
+  (ref) {
+    return SyncPendingSessionsUseCase(
+      offlineSessionRepository: ref.watch(offlineSessionRepositoryProvider),
+      sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
+      sessionRepository: ref.watch(sessionRepositoryProvider),
+      networkConnectivityRepository: ref.watch(
+        networkConnectivityRepositoryProvider,
+      ),
+    );
+  },
+);
 
 /// ComposeSketchUseCase Provider: 운동 미션 달성 티어에 따른 스케치 파츠 조합 UseCase
 /// 티어에 맞는 스케치 파츠에 랜덤 틴트를 묻혀 쌓아올린 결과물 생성
