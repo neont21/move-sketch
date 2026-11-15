@@ -11,6 +11,7 @@ import '../../../domain/models/fixed/mission_template.dart';
 import '../../../domain/models/session/interval_tracking_state.dart';
 import '../../../domain/models/session/location_point.dart';
 import '../../../domain/models/session/mission_instance.dart';
+import '../../../domain/models/session/route_exploration_tracking_state.dart';
 import '../../../domain/models/session/sprint_tracking_state.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../utils/exceptions.dart';
@@ -22,6 +23,7 @@ class SessionTrackingState {
   final Duration elapsedDuration;
   final Duration movingDuration;
   final double distanceInMeters;
+  final double exploredDistanceInMeters;
   final double elevationGainMeters;
   final int caloriesBurned;
   final int? currentPaceInSeconds;
@@ -37,6 +39,7 @@ class SessionTrackingState {
     this.elapsedDuration = Duration.zero,
     this.movingDuration = Duration.zero,
     this.distanceInMeters = 0.0,
+    this.exploredDistanceInMeters = 0.0,
     this.elevationGainMeters = 0.0,
     this.caloriesBurned = 0,
     this.currentPaceInSeconds,
@@ -49,6 +52,7 @@ class SessionTrackingState {
   });
 
   double get distanceInKm => distanceInMeters / 1000.0;
+  double get exploredDistanceInKm => exploredDistanceInMeters / 1000.0;
   bool get isValidSession => distanceInMeters >= 10.0 && pathPoints.length >= 3;
 
   SessionStatus get status => session.status;
@@ -84,7 +88,7 @@ class SessionTrackingState {
 
       final timeDiffSeconds = timeDiffMillis / 1000.0;
       final speedMps = segmentDistance / timeDiffSeconds;
-      if (segmentDistance >= 1.5 && speedMps >= 0.5) {
+      if (segmentDistance >= 1.0 && speedMps >= 0.2) {
         totalMovingMillis += timeDiffMillis;
       }
     }
@@ -129,6 +133,7 @@ class SessionTrackingState {
   factory SessionTrackingState.fromSession(
     TrackingSession session, {
     LocationPoint? initialLocation,
+    double exploredDistanceInMeters = 0.0,
   }) {
     final restoredMovingDuration = calculateMovingDurationFromPoints(
       session.pathPoints,
@@ -142,6 +147,7 @@ class SessionTrackingState {
       elapsedDuration: session.elapsedDuration,
       movingDuration: restoredMovingDuration,
       distanceInMeters: session.distanceInMeters,
+      exploredDistanceInMeters: exploredDistanceInMeters,
       elevationGainMeters: restoredElevationGain,
       caloriesBurned: session.caloriesBurned,
       averagePaceInSeconds: session.averagePaceInSeconds,
@@ -157,6 +163,7 @@ class SessionTrackingState {
     Duration? elapsedDuration,
     Duration? movingDuration,
     double? distanceInMeters,
+    double? exploredDistanceInMeters,
     double? elevationGainMeters,
     int? caloriesBurned,
     ValueGetter<int?>? currentPaceInSeconds,
@@ -173,6 +180,8 @@ class SessionTrackingState {
       elapsedDuration: elapsedDuration ?? this.elapsedDuration,
       movingDuration: movingDuration ?? this.movingDuration,
       distanceInMeters: distanceInMeters ?? this.distanceInMeters,
+      exploredDistanceInMeters:
+          exploredDistanceInMeters ?? this.exploredDistanceInMeters,
       elevationGainMeters: elevationGainMeters ?? this.elevationGainMeters,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
       currentPaceInSeconds: currentPaceInSeconds != null
@@ -210,6 +219,8 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
 
   IntervalTrackingState _intervalState = const IntervalTrackingState();
   SprintTrackingState _sprintState = const SprintTrackingState();
+  RouteExplorationTrackingState _routeExplorationState =
+      const RouteExplorationTrackingState();
   double? _smoothedSpeedMps;
 
   double? _calculateRollingSpeedMps(
@@ -266,6 +277,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     required List<MissionInstance> missions,
     required ActivityType activityType,
     required double distanceInKm,
+    required double exploredDistanceInKm,
     required Duration movingDuration,
     required int? averagePaceInSeconds,
     required double? averageSpeedKmh,
@@ -286,7 +298,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         MissionAxis.duration => movingDuration.inMinutes.toDouble(),
         MissionAxis.pace => averagePaceInSeconds!.toDouble(),
         MissionAxis.speed => averageSpeedKmh ?? 0.0,
-        MissionAxis.routeExploration => mission.currentValue,
+        MissionAxis.routeExploration => exploredDistanceInKm,
         MissionAxis.interval => _intervalState.count.toDouble(),
         MissionAxis.sprint => _sprintState.count.toDouble(),
         MissionAxis.unknown => 0.0,
@@ -344,6 +356,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         missions: current.missions,
         activityType: current.session.activityType,
         distanceInKm: current.distanceInKm,
+        exploredDistanceInKm: current.exploredDistanceInKm,
         movingDuration: current.movingDuration,
         averagePaceInSeconds: current.averagePaceInSeconds,
         averageSpeedKmh: current.averageSpeedKmh,
@@ -404,6 +417,12 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
           speedMps >= _minimumMovingSpeedMps) {
         movingDurationDelta = Duration(milliseconds: timeDiffMillis);
         _lastMovedAt = DateTime.now();
+
+        _routeExplorationState = _routeExplorationState.evaluate(
+          latitude: point.latitude,
+          longitude: point.longitude,
+          deltaDistanceMeters: deltaDistance,
+        );
 
         if (lastPoint.altitude != null && point.altitude != null) {
           final altitudeDifference = point.altitude! - lastPoint.altitude!;
@@ -522,6 +541,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
       missions: current.missions,
       activityType: current.session.activityType,
       distanceInKm: newDistanceInKm,
+      exploredDistanceInKm: _routeExplorationState.exploredDistanceKm,
       movingDuration: newMovingDuration,
       averagePaceInSeconds: averagePaceInSeconds,
       averageSpeedKmh: averageSpeedKmh,
@@ -531,6 +551,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
         elapsedDuration: newElapsedDuration,
         movingDuration: newMovingDuration,
         distanceInMeters: newDistance,
+        exploredDistanceInMeters: _routeExplorationState.exploredDistanceMeters,
         elevationGainMeters: newElevationGain,
         caloriesBurned: newCalories,
         pathPoints: updatedPoints,
@@ -663,6 +684,30 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     _intervalState = IntervalTrackingState(count: initialIntervalCount);
     _sprintState = SprintTrackingState(count: initialSprintCount);
 
+    final explorationRepository = ref.read(explorationRepositoryProvider);
+    final visitedGeohashesResult = await explorationRepository
+        .getVisitedGeohashes(currentSession.userId);
+
+    final Set<String> pastVisitedGeohashes;
+
+    switch (visitedGeohashesResult) {
+      case Ok(:final value):
+        pastVisitedGeohashes = value;
+      case Error(:final error):
+        FirebaseCrashlytics.instance.recordError(
+          error,
+          StackTrace.current,
+          reason: '과거 방문 Geohash 이력 로드 실패 (빈 집합으로 폴백하여 세션 진행)',
+          fatal: false,
+        );
+        pastVisitedGeohashes = const {};
+    }
+
+    _routeExplorationState = RouteExplorationTrackingState.fromSessionPoints(
+      pastVisitedGeohashes: pastVisitedGeohashes,
+      points: currentSession.pathPoints,
+    );
+
     _startTimer();
     _startLocationTracking();
 
@@ -676,6 +721,7 @@ class SessionTrackingViewModel extends AsyncNotifier<SessionTrackingState> {
     return SessionTrackingState.fromSession(
       currentSession,
       initialLocation: initialLoc,
+      exploredDistanceInMeters: _routeExplorationState.exploredDistanceMeters,
     );
   }
 

@@ -1,9 +1,14 @@
 import 'dart:typed_data';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
+import '../../../data/repositories/exploration/exploration_repository.dart';
 import '../../../data/repositories/session/offline_session_repository.dart';
 import '../../../data/repositories/session/session_repository.dart';
 import '../../../data/repositories/session_result/session_result_repository.dart';
 import '../../../utils/exceptions.dart';
+import '../../../utils/geohash_helper.dart';
 import '../../../utils/result.dart';
+import '../../models/enums/session_status.dart';
 import '../../models/enums/sync_status.dart';
 import '../../models/fixed/sketch_parts.dart';
 import '../../models/session/session_result.dart';
@@ -12,11 +17,13 @@ final class CompleteSessionUseCase {
   final SessionRepository sessionRepository;
   final SessionResultRepository sessionResultRepository;
   final OfflineSessionRepository offlineSessionRepository;
+  final ExplorationRepository explorationRepository;
 
   CompleteSessionUseCase({
     required this.sessionRepository,
     required this.sessionResultRepository,
     required this.offlineSessionRepository,
+    required this.explorationRepository,
   });
 
   Future<Result<SessionResult>> execute({
@@ -31,6 +38,24 @@ final class CompleteSessionUseCase {
       );
     }
 
+    final Set<String> visitedGeohashesToRecord = {};
+    final preCompleteSessionResult = await sessionRepository.getSession(
+      sessionId,
+    );
+    switch (preCompleteSessionResult) {
+      case Ok(:final value):
+        if (value != null &&
+            value.status != SessionStatus.completed) {
+          for (final point in value.pathPoints) {
+            visitedGeohashesToRecord.add(
+              GeohashHelper.encode(point.latitude, point.longitude),
+            );
+          }
+        }
+      case Error():
+        break;
+    }
+
     final localResult = await sessionRepository.completeSession(
       sessionId: sessionId,
       sketchComposition: sketchComposition,
@@ -43,6 +68,25 @@ final class CompleteSessionUseCase {
         sessionResult = value;
       case Error(:final error):
         return Result.error(error);
+    }
+
+    if (visitedGeohashesToRecord.isNotEmpty) {
+      final recordResult = await explorationRepository.recordVisitedGeohashes(
+        userId: sessionResult.userId,
+        geohashes: visitedGeohashesToRecord,
+        visitedAt: sessionResult.endedAt,
+      );
+      switch (recordResult) {
+        case Ok():
+          break;
+        case Error(:final error):
+          FirebaseCrashlytics.instance.recordError(
+            error,
+            StackTrace.current,
+            reason: '세션 완료 후 방문 Geohash 이력 저장 실패',
+            fatal: false,
+          );
+      }
     }
 
     await offlineSessionRepository.enqueuePendingSession(

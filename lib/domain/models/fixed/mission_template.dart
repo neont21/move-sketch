@@ -184,11 +184,7 @@ class MissionTemplate {
 
   static List<MissionTemplate> getTemplatesFor(ActivityType activity) {
     return defaultTemplates
-        .where(
-          (t) =>
-              t.activityType == activity &&
-              t.axis != MissionAxis.routeExploration,
-        )
+        .where((template) => template.activityType == activity)
         .toList();
   }
 

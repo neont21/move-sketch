@@ -384,6 +384,7 @@ final completeSessionUseCaseProvider = Provider<CompleteSessionUseCase>((ref) {
     sessionRepository: ref.watch(sessionRepositoryProvider),
     sessionResultRepository: ref.watch(sessionResultRepositoryProvider),
     offlineSessionRepository: ref.watch(offlineSessionRepositoryProvider),
+    explorationRepository: ref.watch(explorationRepositoryProvider),
   );
 });
 
