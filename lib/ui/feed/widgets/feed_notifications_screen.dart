@@ -169,26 +169,39 @@ class _FeedNotificationsScreenState
             final hasRead = state.notifications.any(
               (notification) => notification.isRead,
             );
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                child: Row(
-                  spacing: 20,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    OutlinedButton(
-                      onPressed: state.isProcessing || !hasUnread
-                          ? null
-                          : _handleMarkAllAsRead,
-                      child: Text('모두 읽음 표시', style: textTheme.labelMedium),
-                    ),
-                    OutlinedButton(
-                      onPressed: state.isProcessing || !hasRead
-                          ? null
-                          : _handleDeleteReadNotifications,
-                      child: Text('읽은 알림 지우기', style: textTheme.labelMedium),
-                    ),
-                  ],
+            final colorScheme = Theme.of(context).colorScheme;
+
+            return Container(
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainer,
+                border: Border(
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.5),
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                  child: Row(
+                    spacing: 20,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      OutlinedButton(
+                        onPressed: state.isProcessing || !hasUnread
+                            ? null
+                            : _handleMarkAllAsRead,
+                        child: Text('모두 읽음 표시', style: textTheme.labelMedium),
+                      ),
+                      OutlinedButton(
+                        onPressed: state.isProcessing || !hasRead
+                            ? null
+                            : _handleDeleteReadNotifications,
+                        child: Text('읽은 알림 지우기', style: textTheme.labelMedium),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );

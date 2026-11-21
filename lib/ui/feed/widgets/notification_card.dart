@@ -49,9 +49,18 @@ class NotificationCard extends StatelessWidget {
     final bool isNotice = notification.type == NotificationType.notice;
 
     return ListTile(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: notification.isRead
+              ? colorScheme.outline.withValues(alpha: 0.5)
+              : colorScheme.primary.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
       tileColor: notification.isRead
-          ? colorScheme.surfaceContainer
-          : colorScheme.primaryContainer.withValues(alpha: 0.2),
+          ? colorScheme.surface
+          : colorScheme.secondaryContainer.withValues(alpha: 0.5),
       onTap: () {
         onTap();
         final route = _destinationRoute;
