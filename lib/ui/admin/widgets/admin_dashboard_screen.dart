@@ -40,7 +40,7 @@ class AdminDashboardScreen extends ConsumerWidget {
     final AdminState adminState = ref
         .watch(adminViewModelProvider)
         .requireValue;
-    final String adminEmail = adminState.email!;
+    final String adminEmail = adminState.email ?? kAdminEmails.first;
     final bool isProcessing = adminState.isProcessing;
 
     final double screenWidth = MediaQuery.sizeOf(context).width;

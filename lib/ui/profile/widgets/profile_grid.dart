@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../domain/models/social/sketch_post.dart';
+import '../../../utils/image_provider_utils.dart';
 import '../../session/widgets/sketch_card.dart';
 
 class ProfileGrid extends StatelessWidget {
@@ -27,7 +27,7 @@ class ProfileGrid extends StatelessWidget {
         child: GestureDetector(
           onTap: () => onTap(index),
           child: SketchCard(
-            imageProvider: CachedNetworkImageProvider(
+            imageProvider: ImageProviderUtils.resolve(
               sketches[index].sketchUrl,
             ),
             isGrid: true,

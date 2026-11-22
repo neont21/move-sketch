@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../../utils/image_provider_utils.dart';
 
 class UserAvatar extends StatelessWidget {
   final String username;
@@ -48,7 +48,7 @@ class UserAvatar extends StatelessWidget {
     } else if (imageUrl != null && imageUrl!.isNotEmpty) {
       avatar = ClipOval(
         child: Image(
-          image: CachedNetworkImageProvider(imageUrl!),
+          image: ImageProviderUtils.resolve(imageUrl!),
           width: diameter,
           height: diameter,
           fit: BoxFit.cover,

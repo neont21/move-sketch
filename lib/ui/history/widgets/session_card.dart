@@ -1,10 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/assets.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
+import '../../../utils/image_provider_utils.dart';
 import '../../core/widgets/activity_badge.dart';
 import 'delete_history_dialog.dart';
 
@@ -57,7 +57,7 @@ class SessionCard extends StatelessWidget {
               result.resultSketchImageUrl != null &&
                   result.resultSketchImageUrl!.isNotEmpty
               ? Image(
-                  image: CachedNetworkImageProvider(
+                  image: ImageProviderUtils.resolve(
                     result.resultSketchImageUrl!,
                   ),
                   fit: BoxFit.cover,

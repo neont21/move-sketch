@@ -57,6 +57,8 @@ class AdminViewModel extends AsyncNotifier<AdminState> {
 
       if (uid == null) {
         state = const AsyncData(AdminState(isAdmin: false));
+      } else {
+        ref.invalidateSelf();
       }
     });
   }

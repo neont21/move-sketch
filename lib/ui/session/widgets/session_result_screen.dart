@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gal/gal.dart';
@@ -8,6 +7,7 @@ import '../../../domain/models/enums/sync_status.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
 import '../../../utils/exceptions.dart';
+import '../../../utils/image_provider_utils.dart';
 import '../../../utils/result.dart';
 import '../../history/view_models/history_viewmodel.dart';
 import '../../home/view_models/home_viewmodel.dart';
@@ -155,7 +155,7 @@ class _SessionResultScreenState extends ConsumerState<SessionResultScreen> {
                   ? MemoryImage(state.sketchBytes!)
                   : (state.sketchImageUrl != null &&
                             state.sketchImageUrl!.isNotEmpty
-                        ? CachedNetworkImageProvider(state.sketchImageUrl!)
+                        ? ImageProviderUtils.resolve(state.sketchImageUrl!)
                         : AssetImage(state.character.defaultImagePath)
                               as ImageProvider);
 

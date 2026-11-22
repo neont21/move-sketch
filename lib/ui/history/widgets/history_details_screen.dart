@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +6,7 @@ import '../../../domain/models/session/mission_instance.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/date_time_utils.dart';
 import '../../../utils/exceptions.dart';
+import '../../../utils/image_provider_utils.dart';
 import '../../../utils/polyline_utils.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/activity_badge.dart';
@@ -202,7 +202,7 @@ class _HistoryDetailsScreenState extends ConsumerState<HistoryDetailsScreen> {
                       imageProvider:
                           result.resultSketchImageUrl != null &&
                               result.resultSketchImageUrl!.isNotEmpty
-                          ? CachedNetworkImageProvider(
+                          ? ImageProviderUtils.resolve(
                               result.resultSketchImageUrl!,
                             )
                           : const AssetImage(Assets.sampleSketch),

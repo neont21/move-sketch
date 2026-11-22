@@ -1,5 +1,4 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +6,7 @@ import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../routing/routes.dart';
 import '../../../utils/exceptions.dart';
+import '../../../utils/image_provider_utils.dart';
 import '../../../utils/result.dart';
 import '../../core/widgets/error_retry_view.dart';
 import '../../core/widgets/responsive_container.dart';
@@ -110,7 +110,7 @@ class _SessionShareScreenState extends ConsumerState<SessionShareScreen> {
   }) {
     final url = result?.resultSketchImageUrl ?? existingUrl;
     if (url != null && url.isNotEmpty) {
-      return CachedNetworkImageProvider(url);
+      return ImageProviderUtils.resolve(url);
     }
     return AssetImage(character.defaultImagePath);
   }
