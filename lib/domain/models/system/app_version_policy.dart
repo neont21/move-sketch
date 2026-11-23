@@ -1,15 +1,25 @@
 import 'package:flutter/foundation.dart';
+
 import '../enums/update_type.dart';
 
+/// 앱 버전 강제/권장 업데이트 정책 및 배포 정보를 나타내는 불변 모델입니다.
 @immutable
 final class AppVersionPolicy {
+  /// 현재 스토어에 배포된 최신 앱 버전.
   final String latestVersion;
+  /// 현재 스토어에 배포된 최신 빌드 번호.
   final int latestBuildNumber;
+  /// 앱 사용을 위해 요구되는 최소 필수 버전.
   final String minRequiredVersion;
+  /// 앱 사용을 위해 요구되는 최소 필수 빌드 번호.
   final int minRequiredBuildNumber;
+  /// 업데이트 안내 팝업의 제목.
   final String title;
+  /// 업데이트 주요 변경 사항 및 배포 릴리즈 노트.
   final String releaseNotes;
+  /// 구글 플레이스토어 바로가기 URL. (선택 사항)
   final String? androidStoreUrl;
+  /// 애플 앱스토어 바로가기 URL. (선택 사항)
   final String? iosStoreUrl;
 
   const AppVersionPolicy({
@@ -23,6 +33,7 @@ final class AppVersionPolicy {
     this.iosStoreUrl,
   });
 
+  /// 현재 구동 중인 앱의 빌드 번호와 비교하여 필요한 업데이트 수준을 판정합니다.
   UpdateType checkUpdateType(int currentBuildNumber) {
     if (currentBuildNumber < minRequiredBuildNumber) {
       return UpdateType.force;

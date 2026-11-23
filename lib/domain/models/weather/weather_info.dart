@@ -1,13 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+
 import '../../../utils/date_time_utils.dart';
 
+/// 특정 지역의 기상 상태와 기온, 활동 권장 문구를 나타내는 불변 모델입니다.
 @immutable
 class WeatherInfo {
+  /// 기상 상태 설명.
   final String condition;
+  /// 섭씨 기준 현재 기온.
   final double temperature;
+  /// OpenWeatherMap 기상 아이콘 코드.
   final String iconCode;
+  /// 관측 지역 도시명.
   final String cityName;
+  /// 기상 정보 관측 일시.
   final DateTime observedAt;
 
   const WeatherInfo({
@@ -18,12 +25,16 @@ class WeatherInfo {
     required this.observedAt,
   });
 
+  /// OpenWeatherMap의 2배율 기상 아이콘 이미지 URL.
   String get iconUrl => 'https://openweathermap.org/img/wn/$iconCode@2x.png';
 
+  /// 상태와 기온을 간략히 조합한 요약 문자열.
   String get shortSummary => '$condition ${temperature.round()}℃';
 
+  /// 도시명, 상태, 기온을 조합한 완전한 요약 문자열.
   String get summaryWithCity => '$cityName · $condition ${temperature.round()}℃';
 
+  /// 현재 기상 및 기온 조건에 따른 조깅/라이딩 운동 권장 가이드.
   String get recommendation {
     if (condition.contains('뇌우') ||
         condition.contains('번개') ||
@@ -57,6 +68,7 @@ class WeatherInfo {
     return '움직이기 좋아요';
   }
 
+  /// OpenWeatherMap Current Weather API 응답 JSON으로부터 [WeatherInfo]를 역직렬화합니다.
   factory WeatherInfo.fromOpenWeatherMap(Map<String, dynamic> json) {
     final weatherList = (json['weather'] as List<dynamic>?) ?? [];
     final weatherMap = weatherList.isNotEmpty

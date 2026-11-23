@@ -1,16 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
+
 import '../../../utils/date_time_utils.dart';
 
+/// 전체 사용자에게 공지되는 시스템 공지사항 정보를 나타내는 불변 모델입니다.
 @immutable
 final class Notice {
+  /// 공지사항 고유 식별자.
   final String id;
+
+  /// 공지사항 제목.
   final String title;
+
+  /// 공지사항 본문 내용.
   final String content;
+
+  /// 공지사항 작성 및 게시 일시.
   final DateTime createdAt;
+
+  /// 외부 웹 페이지 또는 딥링크 이동을 위한 액션 URL.
   final String? actionUrl;
+
+  /// 액션 링크 버튼에 표시될 레이블 텍스트.
   final String? actionButtonText;
+
+  /// 중요 공지 여부.
   final bool isImportant;
 
   const Notice({
@@ -23,6 +38,9 @@ final class Notice {
     this.isImportant = false,
   });
 
+  /// 관리자의 입력값으로부터 UUID v7 식별자와 현재 시각을 부여하여 신규 [Notice]를 생성합니다.
+  ///
+  /// [actionUrl]과 [actionButtonText]는 공백 문자열인 경우 `null`로 정규화됩니다.
   factory Notice.create({
     required String title,
     required String content,
@@ -83,4 +101,27 @@ final class Notice {
       isImportant: isImportant ?? this.isImportant,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Notice &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          content == other.content &&
+          createdAt == other.createdAt &&
+          actionUrl == other.actionUrl &&
+          actionButtonText == other.actionButtonText &&
+          isImportant == other.isImportant;
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    content,
+    createdAt,
+    actionUrl,
+    actionButtonText,
+    isImportant,
+  );
 }
