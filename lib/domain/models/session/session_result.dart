@@ -4,7 +4,7 @@ import '../../../utils/date_time_utils.dart';
 import '../enums/activity_type.dart';
 import '../enums/mission_axis.dart';
 import '../enums/sync_status.dart';
-import '../fixed/sketch_parts.dart';
+import '../fixed/sketch_composition.dart';
 import 'location_point.dart';
 import 'mission_instance.dart';
 

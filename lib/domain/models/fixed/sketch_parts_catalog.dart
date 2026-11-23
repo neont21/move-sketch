@@ -4,144 +4,16 @@ import '../../../config/assets.dart';
 import '../enums/activity_type.dart';
 import '../enums/character_type.dart';
 import '../enums/sketch_slot.dart';
+import 'sketch_part.dart';
 
-@immutable
-class SketchPart {
-  final String id;
-  final SketchSlot slot;
-  final int tier;
-  final String name;
-  final String assetPath;
-  final bool supportsTint;
-  final int? defaultColorValue;
-  final ActivityType? activityType;
-
-  const SketchPart({
-    required this.id,
-    required this.slot,
-    required this.name,
-    required this.assetPath,
-    this.tier = 0,
-    this.supportsTint = false,
-    this.defaultColorValue,
-    this.activityType,
-  });
-
-  int get zIndex => slot.zIndex;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SketchPart && runtimeType == other.runtimeType && id == other.id;
-
-  @override
-  int get hashCode => id.hashCode;
-}
-
-class SketchComposition {
-  final Map<SketchSlot, SketchPart> parts;
-  final Map<SketchSlot, int> tintColors;
-  final String? imagePath;
-
-  const SketchComposition({
-    required this.parts,
-    this.tintColors = const {},
-    this.imagePath,
-  });
-
-  List<SketchPart> get orderedParts {
-    final list = parts.values.toList();
-    list.sort((a, b) => a.zIndex.compareTo(b.zIndex));
-    return list;
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'parts': parts.map(
-        (key, value) => MapEntry(key.name, {
-          'id': value.id,
-          'slot': value.slot.name,
-          'tier': value.tier,
-          'name': value.name,
-          'assetPath': value.assetPath,
-          'supportsTint': value.supportsTint,
-          'defaultColorValue': value.defaultColorValue,
-          'activityType': value.activityType?.name,
-        }),
-      ),
-      'tintColors': tintColors.map((key, value) => MapEntry(key.name, value)),
-      'imagePath': imagePath,
-    };
-  }
-
-  factory SketchComposition.fromMap(Map<String, dynamic> map) {
-    final rawParts = (map['parts'] as Map?)?.cast<String, dynamic>() ?? {};
-    final parsedParts = <SketchSlot, SketchPart>{};
-    for (final entry in rawParts.entries) {
-      final slot = SketchSlot.fromString(entry.key);
-      if (entry.value is! Map) continue;
-      final p = entry.value as Map<String, dynamic>;
-      parsedParts[slot] = SketchPart(
-        id: p['id'] as String,
-        slot: slot,
-        tier: (p['tier'] as num?)?.toInt() ?? 0,
-        name: p['name'] as String? ?? '',
-        assetPath: p['assetPath'] as String,
-        supportsTint: p['supportsTint'] as bool? ?? false,
-        defaultColorValue: (p['defaultColorValue'] as num?)?.toInt(),
-        activityType: p['activityType'] != null
-            ? ActivityType.fromString(p['activityType'] as String?)
-            : null,
-      );
-    }
-    final rawTints = (map['tintColors'] as Map?)?.cast<String, dynamic>() ?? {};
-    final parsedTints = <SketchSlot, int>{};
-    for (final entry in rawTints.entries) {
-      final slot = SketchSlot.fromString(entry.key);
-      parsedTints[slot] = (entry.value as num).toInt();
-    }
-    return SketchComposition(
-      parts: parsedParts,
-      tintColors: parsedTints,
-      imagePath: map['imagePath'] as String?,
-    );
-  }
-
-  SketchComposition copyWith({
-    Map<SketchSlot, SketchPart>? parts,
-    Map<SketchSlot, int>? tintColors,
-    String? imagePath,
-  }) {
-    return SketchComposition(
-      parts: parts ?? this.parts,
-      tintColors: tintColors ?? this.tintColors,
-      imagePath: imagePath ?? this.imagePath,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SketchComposition &&
-          runtimeType == other.runtimeType &&
-          imagePath == other.imagePath &&
-          mapEquals(parts, other.parts) &&
-          mapEquals(tintColors, other.tintColors);
-
-  @override
-  int get hashCode => Object.hash(
-    imagePath,
-    Object.hashAllUnordered(parts.entries),
-    Object.hashAllUnordered(tintColors.entries),
-  );
-}
-
+/// 앱에 등록된 모든 스케치 파츠 에셋 목록과 슬롯/티어별 파츠 조회 유틸리티를 제공하는 카탈로그 클래스입니다.
 @immutable
 class SketchPartsCatalog {
   const SketchPartsCatalog._();
 
   static final Random _random = Random();
 
+  /// 의상 파츠에 무작위로 적용할 수 있는 8가지 기본 색상(ARGB) 팔레트.
   static const List<int> costumeTintPalette = [
     0xFFEF4444,
     0xFFF97316,
@@ -153,10 +25,12 @@ class SketchPartsCatalog {
     0xFFEC4899,
   ];
 
+  /// 의상 색상 팔레트에서 임의의 색상값을 추첨하여 반환합니다.
   static int getRandomCostumeTint() {
     return costumeTintPalette[_random.nextInt(costumeTintPalette.length)];
   }
 
+  /// 미션 달성 이전의 기본 배경 파츠.
   static const SketchPart defaultBackground = SketchPart(
     id: 'bg_default',
     slot: SketchSlot.background,
@@ -164,6 +38,7 @@ class SketchPartsCatalog {
     assetPath: Assets.bgDefault,
   );
 
+  /// 미션 달성 이전의 기본 표정 파츠.
   static const SketchPart defaultExpression = SketchPart(
     id: 'expr_default',
     slot: SketchSlot.expression,
@@ -171,8 +46,9 @@ class SketchPartsCatalog {
     assetPath: Assets.exprDefault,
   );
 
+  /// 시스템에 등록된 전체 스케치 파츠 목록.
   static final List<SketchPart> allParts = [
-    ...CharacterType.values.map((c) => c.toSketchPart()),
+    ...CharacterType.values.map((character) => character.toSketchPart()),
     defaultBackground,
 
     const SketchPart(
@@ -420,14 +296,19 @@ class SketchPartsCatalog {
       activityType: ActivityType.riding,
     ),
   ];
+
+  /// 파츠 식별자 [id]와 일치하는 [SketchPart]를 검색하여 반환하며, 없는 경우 null을 반환합니다.
   static SketchPart? findById(String id) {
     try {
-      return allParts.firstWhere((p) => p.id == id);
+      return allParts.firstWhere((part) => part.id == id);
     } catch (_) {
       return null;
     }
   }
 
+  /// 지정된 레이어 [slot], 달성 [tier], [activityType] 조건에 부합하는 파츠를 선별하여 반환합니다.
+  ///
+  /// 매칭되는 후보가 2개 이상인 경우 무작위로 하나를 선정하여 반환하며, 없으면 null을 반환합니다.
   static SketchPart? getPartForSlotAndTier({
     required SketchSlot slot,
     required int tier,
@@ -435,12 +316,12 @@ class SketchPartsCatalog {
   ) {
     final candidates = allParts
         .where(
-          (p) =>
-              p.slot == slot &&
-              p.tier == tier &&
+          (part) =>
+              part.slot == slot &&
+              part.tier == tier &&
               (activityType == null ||
-                  p.activityType == null ||
-                  p.activityType == activityType),
+                  part.activityType == null ||
+                  part.activityType == activityType),
         )
         .toList();
     if (candidates.isEmpty) {
@@ -452,6 +333,7 @@ class SketchPartsCatalog {
     return candidates[_random.nextInt(candidates.length)];
   }
 
+  /// 캐릭터 식별자 문자열 [characterId]에 대응하는 캐릭터 베이스 [SketchPart]를 반환합니다.
   static SketchPart getCharacterPart(String? characterId) {
     return CharacterType.fromString(characterId).toSketchPart();
   }

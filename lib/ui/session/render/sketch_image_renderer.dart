@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import '../../../config/assets.dart';
-import '../../../domain/models/fixed/sketch_parts.dart';
+import '../../../domain/models/fixed/sketch_composition.dart';
 
 class SketchImageRenderer {
   const SketchImageRenderer();

@@ -6,7 +6,7 @@ import '../../../config/dependencies.dart';
 import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/enums/session_status.dart';
 import '../../../domain/models/enums/sync_status.dart';
-import '../../../domain/models/fixed/sketch_parts.dart';
+import '../../../domain/models/fixed/sketch_composition.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../domain/models/session/tracking_session.dart';
 import '../../../utils/date_time_utils.dart';

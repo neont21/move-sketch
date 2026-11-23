@@ -1,5 +1,5 @@
 import '../../../config/assets.dart';
-import '../fixed/sketch_parts.dart';
+import '../fixed/sketch_part.dart';
 import 'sketch_slot.dart';
 
 /// 캐릭터의 종류와 에셋 경로 및 스케치 파츠 변환을 정의하는 열거형입니다.

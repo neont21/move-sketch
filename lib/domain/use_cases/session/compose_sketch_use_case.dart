@@ -1,7 +1,9 @@
 import '../../models/enums/character_type.dart';
 import '../../models/enums/sketch_slot.dart';
 import '../../models/fixed/mission_template.dart';
-import '../../models/fixed/sketch_parts.dart';
+import '../../models/fixed/sketch_composition.dart';
+import '../../models/fixed/sketch_part.dart';
+import '../../models/fixed/sketch_parts_catalog.dart';
 import '../../models/session/mission_instance.dart';
 
 class ComposeSketchUseCase {

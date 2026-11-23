@@ -10,7 +10,7 @@ import '../../../utils/geohash_helper.dart';
 import '../../../utils/result.dart';
 import '../../models/enums/session_status.dart';
 import '../../models/enums/sync_status.dart';
-import '../../models/fixed/sketch_parts.dart';
+import '../../models/fixed/sketch_composition.dart';
 import '../../models/session/session_result.dart';
 
 final class CompleteSessionUseCase {

@@ -1,5 +1,5 @@
 import '../../../domain/models/enums/activity_type.dart';
-import '../../../domain/models/fixed/sketch_parts.dart';
+import '../../../domain/models/fixed/sketch_composition.dart';
 import '../../../domain/models/session/location_point.dart';
 import '../../../domain/models/session/mission_instance.dart';
 import '../../../domain/models/session/session_result.dart';

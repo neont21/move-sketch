@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../../../data/services/local/database/app_database.dart';
 import '../enums/mission_axis.dart';
 import '../fixed/mission_template.dart';
-import '../fixed/sketch_parts.dart';
+import '../fixed/sketch_parts_catalog.dart';
 
 @immutable
 class MissionInstance {

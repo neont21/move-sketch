@@ -2,28 +2,24 @@ import 'package:flutter/foundation.dart';
 import '../enums/activity_type.dart';
 import '../enums/mission_axis.dart';
 import '../enums/sketch_slot.dart';
+import 'mission_tier.dart';
 
-@immutable
-class MissionTier {
-  final int tier;
-  final double threshold;
-  final String description;
-
-  const MissionTier({
-    required this.tier,
-    required this.threshold,
-    required this.description,
-  });
-}
-
+/// 운동 종목별 미션 평가 축, 연계 스케치 파츠 슬롯 및 단계별 티어 목록을 정의하는 불변 템플릿 모델입니다.
 @immutable
 class MissionTemplate {
+  /// 미션 템플릿의 고유 식별자.
   final String id;
+  /// 미션 성과를 측정하는 평가 축.
   final MissionAxis axis;
+  /// 미션이 적용되는 운동 종목.
   final ActivityType activityType;
+  /// UI에 표시할 미션 제목.
   final String title;
+  /// 측정 단위 표기.
   final String unit;
+  /// 미션 달성 시 보상으로 해금되는 캐릭터 스케치 레이어 슬롯.
   final SketchSlot partsSlot;
+  /// 단계별 달성 기준을 정의하는 티어 목록.
   final List<MissionTier> tiers;
 
   const MissionTemplate({
@@ -36,6 +32,10 @@ class MissionTemplate {
     required this.tiers,
   });
 
+  /// 사용자가 기록한 측정값 [value]에 대해 충족된 최고 등급의 [MissionTier]를 평가하여 반환합니다.
+  ///
+  /// 티어 목록을 난이도 순서로 정렬하여 가장 높은 기준치를 충족한 티어를 우선 반환하며,
+  /// 최하위 티어 기준에도 도달하지 못한 경우 `null`을 반환합니다.
   MissionTier? evaluateTier(double value) {
     final sortedTiers = List<MissionTier>.from(tiers)
       ..sort((a, b) => axis.compareThresholds(a.threshold, b.threshold));
@@ -48,6 +48,7 @@ class MissionTemplate {
     return null;
   }
 
+  /// 조깅 및 라이딩 종목에 기본 제공되는 사전 정의 미션 템플릿 목록.
   static final List<MissionTemplate> defaultTemplates = [
     MissionTemplate(
       id: 'jogging_distance',
@@ -182,6 +183,7 @@ class MissionTemplate {
     ),
   ];
 
+  /// 지정된 활동 종목([activity])에 해당하는 미션 템플릿 목록을 필터링하여 반환합니다.
   static List<MissionTemplate> getTemplatesFor(ActivityType activity) {
     return defaultTemplates
         .where((template) => template.activityType == activity)
