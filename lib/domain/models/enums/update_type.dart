@@ -1,1 +1,9 @@
-enum UpdateType { force, recommend, none }
+/// 원격 앱 버전 정책에 따른 클라이언트 업데이트 권고 유형을 정의하는 열거형입니다.
+enum UpdateType {
+  /// 앱 이용을 위해 필수적으로 진행해야 하는 강제 업데이트.
+  force,
+  /// 사용자 선택에 따라 건너뛸 수 있는 권장 업데이트.
+  recommend,
+  /// 최신 버전이거나 업데이트가 필요 없는 상태.
+  none,
+}
