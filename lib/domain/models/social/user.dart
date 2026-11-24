@@ -4,11 +4,19 @@ import '../../../utils/date_time_utils.dart';
 import '../enums/character_type.dart';
 import 'notification_settings.dart';
 
+/// 피드, 댓글, 친구 목록 등 다른 도메인 객체에 내장되는 경량 사용자 요약 정보를 나타내는 불변 모델입니다.
 @immutable
-class UserSummary {
+final class UserSummary {
+  /// 사용자 고유 식별자.
   final String uid;
+
+  /// 검색 및 멘션에 사용되는 고유 계정 아이디.
   final String username;
+
+  /// 화면에 표시되는 사용자 닉네임.
   final String nickname;
+
+  /// 사용자 프로필 이미지 URL.
   final String? imageUrl;
 
   const UserSummary({
@@ -54,6 +62,7 @@ class UserSummary {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is UserSummary &&
+          runtimeType == other.runtimeType &&
           uid == other.uid &&
           username == other.username &&
           nickname == other.nickname &&
@@ -63,21 +72,43 @@ class UserSummary {
   int get hashCode => Object.hash(uid, username, nickname, imageUrl);
 }
 
+/// 서비스에 가입된 사용자의 전체 프로필, 캐릭터, 알림 설정 및 계정 메타데이터를 나타내는 불변 모델입니다.
 @immutable
-class User {
+final class User {
+  /// 사용자 고유 식별자.
   final String uid;
+
+  /// 중복 불가 고유 계정 아이디.
   final String username;
+
+  /// 사용자 계정 이메일 주소.
   final String? email;
+
+  /// 화면에 표시되는 사용자 닉네임.
   final String nickname;
+
+  /// 프로필 이미지 URL.
   final String? imageUrl;
+
+  /// 프로필 자기소개 문구.
   final String? description;
+
+  /// 사용자가 선택한 대표 파트너 캐릭터 종류.
   final CharacterType selectedCharacter;
 
+  /// 푸시 알림 및 운동 리마인더 설정 정보.
   final NotificationSettings notificationSettings;
+
+  /// 원격 푸시 알림 수신을 위한 FCM 디바이스 토큰.
   final String? fcmToken;
 
+  /// 계정 최초 가입 일시.
   final DateTime createdAt;
+
+  /// 프로필 정보 최종 수정 일시.
   final DateTime? updatedAt;
+
+  /// 회원 탈퇴 처리 일시.
   final DateTime? deletedAt;
 
   const User({
@@ -95,8 +126,10 @@ class User {
     this.fcmToken,
   });
 
+  /// 탈퇴 처리된 비활성 계정인지 여부.
   bool get isDeleted => deletedAt != null;
 
+  /// 현재 사용자 정보로부터 경량 임베딩용 [UserSummary] 모델을 생성하여 반환합니다.
   UserSummary toSummary() {
     return UserSummary(
       uid: uid,
