@@ -1,10 +1,13 @@
-final class GeohashHelper {
-  GeohashHelper._();
-
+/// 위도 및 경도 좌표를 Geohash Base32 격자 문자열로 인코딩하는 유틸리티입니다.
+abstract final class GeohashHelper {
   static const String _base32Characters = '0123456789bcdefghjkmnpqrstuvwxyz';
 
+  /// 기본 Geohash 정밀도 자릿수. (8자리 기준 약 38m × 19m 격자 크기)
   static const int defaultPrecision = 8;
 
+  /// 위도([latitude])와 경도([longitude])를 지정된 정밀도([precision])의 Geohash 문자열로 인코딩합니다.
+  ///
+  /// 좌표가 유효 범위(위도 -90~90, 경도 -180~180)를 벗어나면 [ArgumentError]를 던집니다.
   static String encode(
     double latitude,
     double longitude, {

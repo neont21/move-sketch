@@ -1,3 +1,4 @@
+/// 사용자 입력 폼 필드의 유효성 검증 규칙을 제공하는 유틸리티입니다.
 abstract final class Validators {
   static final RegExp _letterRegex = RegExp(r'[A-Za-z]');
   static final RegExp _digitRegex = RegExp(r'[0-9]');
@@ -49,6 +50,7 @@ abstract final class Validators {
     'system_',
   ];
 
+  /// 닉네임 입력값([value])의 공백 여부 및 최대 길이(10자)를 검증합니다.
   static String? validateNickname(String? value) {
     if (value == null || value.trim().isEmpty) {
       return '닉네임을 입력해 주세요.';
@@ -59,6 +61,7 @@ abstract final class Validators {
     return null;
   }
 
+  /// 계정 아이디([value])의 길이(3~20자), 허용 문자, 시스템 예약어 포함 여부를 검증합니다.
   static String? validateUsername(String? value) {
     if (value == null || value.trim().isEmpty) {
       return '아이디를 입력해 주세요.';
@@ -82,6 +85,7 @@ abstract final class Validators {
     return null;
   }
 
+  /// 이메일 주소([value])의 공백 여부 및 표준 이메일 형식을 검증합니다.
   static String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
       return '이메일을 입력해 주세요.';
@@ -92,6 +96,7 @@ abstract final class Validators {
     return null;
   }
 
+  /// 비밀번호([value])의 최소 길이(8자)와 영문·숫자 조합 포함 여부를 검증합니다.
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return '비밀번호를 입력해 주세요.';
@@ -107,6 +112,7 @@ abstract final class Validators {
     return null;
   }
 
+  /// 확인용 비밀번호([confirmValue])가 원본 비밀번호([originalPassword])와 일치하는지 검증합니다.
   static String? validateConfirmPassword(
     String? confirmValue,
     String originalPassword,
@@ -120,6 +126,7 @@ abstract final class Validators {
     return null;
   }
 
+  /// 필수 URL 입력값([value])이 유효한 HTTP/HTTPS 스킴과 호스트를 포함하는지 검증합니다.
   static String? validateUrl(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'URL을 입력해 주세요.';
@@ -134,6 +141,7 @@ abstract final class Validators {
     return null;
   }
 
+  /// 선택 입력 URL([value])에 값이 존재하는 경우에만 [validateUrl] 규칙을 검증합니다.
   static String? validateOptionalUrl(String? value) {
     if (value == null || value.trim().isEmpty) {
       return null;
@@ -141,6 +149,7 @@ abstract final class Validators {
     return validateUrl(value);
   }
 
+  /// 인앱 문의 본문([value])의 최소 길이(10자) 및 최대 길이(1,000자)를 검증합니다.
   static String? validateInquiryContent(String? value) {
     if (value == null || value.trim().isEmpty) {
       return '문의 및 제보 내용을 입력해 주세요.';

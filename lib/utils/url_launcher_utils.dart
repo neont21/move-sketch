@@ -1,30 +1,44 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../domain/models/system/app_device_info.dart';
 import 'exceptions.dart';
 import 'result.dart';
 
+/// 외부 웹 브라우저, 앱 스토어 및 문의 메일 클라이언트 실행 기능을 제공하는 유틸리티입니다.
 abstract final class UrlLauncherUtils {
   static const String _iosAppId = '6819965333';
   static const String _androidPackageName = 'com.neonsigntrap.move_sketch';
 
+  /// 고객 지원 및 문의 수신용 공식 이메일 주소.
   static const String supportEmail = 'movesketch@neonsigntrap.com';
 
+  /// 애플 앱스토어 앱 상세 페이지 URL.
   static const String iosStoreUrl =
       'https://apps.apple.com/kr/app/id$_iosAppId';
+
+  /// 구글 플레이스토어 앱 직접 실행 마켓 스킴 URL.
   static const String androidStoreUrl =
       'market://details?id=$_androidPackageName';
+
+  /// 구글 플레이스토어 웹 폴백 URL.
   static const String androidWebStoreUrl =
       'https://play.google.com/store/apps/details?id=$_androidPackageName';
 
+  /// 공지사항 웹 페이지 URL.
   static const String noticesWebUrl =
       'https://movesketch.neonsigntrap.com/notices.html';
+
+  /// 개인정보 처리방침 웹 페이지 URL.
   static const String privacyWebUrl =
       'https://movesketch.neonsigntrap.com/privacy.html';
+
+  /// 서비스 이용약관 웹 페이지 URL.
   static const String termsWebUrl =
       'https://movesketch.neonsigntrap.com/terms.html';
 
+  /// 지정된 URL 문자열([urlString])을 외부 브라우저 또는 인앱 브라우저([inApp])로 실행합니다.
   static Future<Result<void>> openExternalUrl(
     String urlString, {
     bool inApp = false,
@@ -56,6 +70,7 @@ abstract final class UrlLauncherUtils {
     }
   }
 
+  /// 현재 플랫폼(iOS/Android)에 맞는 앱 스토어로 이동합니다. ([customStoreUrl]이 지정된 경우 해당 URL을 우선 실행)
   static Future<Result<void>> openStore({String? customStoreUrl}) async {
     if (customStoreUrl != null && customStoreUrl.trim().isNotEmpty) {
       return openExternalUrl(customStoreUrl);
@@ -81,6 +96,7 @@ abstract final class UrlLauncherUtils {
     }
   }
 
+  // mailto: URI 스킴에서 공백이 '+'로 잘못 인코딩되는 것을 방지하기 위해 퍼센트 인코딩(%20)을 적용한 쿼리 문자열을 생성합니다.
   static String? _encodeQueryParameters(Map<String, String> parameters) {
     return parameters.entries
         .map(
@@ -90,6 +106,7 @@ abstract final class UrlLauncherUtils {
         .join('&');
   }
 
+  /// 기기 및 앱 환경 정보([deviceInfo])가 미리 채워진 문의 이메일 작성 화면을 엽니다.
   static Future<Result<void>> openInquiryEmail({
     required AppDeviceInfo deviceInfo,
   }) async {
