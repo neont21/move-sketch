@@ -12,10 +12,18 @@ import '../../models/enums/notification_type.dart';
 import '../../models/social/app_notification.dart';
 import '../../models/social/friendship.dart';
 
-class AcceptFriendRequestUseCase {
+/// 수신한 친구 요청을 수락 처리하고 요청자에게 수락 알림을 발송하는 유즈케이스 클래스입니다.
+final class AcceptFriendRequestUseCase {
+  /// 친구 관계 상태 변경을 담당하는 저장소.
   final FriendshipRepository friendshipRepository;
+
+  /// 현재 로그인된 사용자 식별자 확인을 위한 인증 저장소.
   final AuthRepository authRepository;
+
+  /// 알림 발신자 요약 프로필 조회를 위한 사용자 저장소.
   final UserRepository userRepository;
+
+  /// 친구 수락 알림 전송을 담당하는 알림 저장소.
   final NotificationRepository notificationRepository;
 
   AcceptFriendRequestUseCase({
@@ -25,6 +33,7 @@ class AcceptFriendRequestUseCase {
     required this.notificationRepository,
   });
 
+  // 현재 인증된 사용자의 UID를 조회하며, 세션이 유효하지 않은 경우 AuthException을 반환합니다.
   Result<String> _getCurrentUserId() {
     final currentUserId = authRepository.currentUid;
     if (currentUserId == null || currentUserId.isEmpty) {
@@ -33,6 +42,7 @@ class AcceptFriendRequestUseCase {
     return Result.ok(currentUserId);
   }
 
+  // 친구 수락 성공 후 백그라운드로 상대방에게 수락 알림을 전송하며, 실패 시 Crashlytics에 비치명 오류로 기록합니다.
   void _dispatchNotification({required String targetUserId}) {
     unawaited(() async {
       final userResult = await userRepository.getCurrentUserProfile();
@@ -70,6 +80,7 @@ class AcceptFriendRequestUseCase {
     }());
   }
 
+  /// 대상 사용자([targetUserId])가 보낸 친구 요청을 수락하고 갱신된 [Friendship]을 반환합니다.
   Future<Result<Friendship>> execute(String targetUserId) async {
     final authCheckResult = _getCurrentUserId();
 

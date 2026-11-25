@@ -13,10 +13,18 @@ import '../../models/social/app_notification.dart';
 import '../../models/social/comment.dart';
 import '../../models/social/user.dart';
 
-class AddCommentUseCase {
+/// 스케치 게시물에 댓글 또는 답글을 등록하고 대상자에게 알림을 발송하는 유즈케이스 클래스입니다.
+final class AddCommentUseCase {
+  /// 댓글 저장 및 게시물 댓글 수 갱신을 담당하는 저장소.
   final SketchPostRepository sketchPostRepository;
+
+  /// 현재 로그인된 사용자 식별자 확인을 위한 인증 저장소.
   final AuthRepository authRepository;
+
+  /// 댓글 작성자 요약 프로필 조회를 위한 사용자 저장소.
   final UserRepository userRepository;
+
+  /// 댓글 및 답글 알림 전송을 담당하는 알림 저장소.
   final NotificationRepository notificationRepository;
 
   AddCommentUseCase({
@@ -26,6 +34,7 @@ class AddCommentUseCase {
     required this.notificationRepository,
   });
 
+  // 현재 인증된 사용자의 UID를 조회하며, 세션이 유효하지 않은 경우 AuthException을 반환합니다.
   Result<String> _getCurrentUserId() {
     final currentUserId = authRepository.currentUid;
     if (currentUserId == null || currentUserId.isEmpty) {
@@ -34,6 +43,7 @@ class AddCommentUseCase {
     return Result.ok(currentUserId);
   }
 
+  // 댓글/답글 등록 완료 후 수신 대상자에게 알림을 비동기 전송하며, 실패 시 Crashlytics에 비치명 오류로 기록합니다.
   void _dispatchNotification({
     required String targetUserId,
     required String sketchId,
@@ -68,6 +78,10 @@ class AddCommentUseCase {
     }());
   }
 
+  /// 스케치 게시물([sketchId])에 댓글 또는 답글([parentCommentId])을 작성하여 저장합니다.
+  ///
+  /// 공백 입력을 검증한 뒤 작성자 프로필을 조회하여 [Comment]를 생성하며,
+  /// 답글인 경우 원댓글 작성자([parentCommentAuthorId])와 게시물 작성자([sketchAuthorId])에게 중복 없이 알림을 전송합니다.
   Future<Result<Comment>> execute({
     required String sketchId,
     required String sketchAuthorId,
