@@ -2,15 +2,18 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:move_sketch/domain/models/system/app_device_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../../domain/models/system/app_device_info.dart';
+
+/// 실행 중인 단말기의 하드웨어 모델, OS 버전 및 앱 버전 정보를 수집하는 하드웨어 서비스 클래스입니다.
 class DeviceInfoService {
   final DeviceInfoPlugin _deviceInfoPlugin;
 
   DeviceInfoService({DeviceInfoPlugin? deviceInfoPlugin})
     : _deviceInfoPlugin = deviceInfoPlugin ?? DeviceInfoPlugin();
 
+  /// 현재 실행 플랫폼에 맞는 기기 및 앱 메타데이터를 조회하여 [AppDeviceInfo]로 반환합니다.
   Future<AppDeviceInfo> getDeviceInfo() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final String appVersion =
