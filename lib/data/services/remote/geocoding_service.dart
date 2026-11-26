@@ -1,10 +1,15 @@
 import 'dart:convert';
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:http/http.dart' as http;
 
+/// OpenStreetMap Nominatim API를 호출하여 GPS 좌표를 한국어 행정구역명으로 변환하는 서비스 클래스입니다.
 class GeocodingService {
   final http.Client _client;
+
+  /// 역지오코딩 요청을 보낼 API 기본 URL.
   final String baseUrl;
+
   DateTime _lastRequestTime = DateTime(2000);
 
   GeocodingService({
@@ -12,6 +17,10 @@ class GeocodingService {
     this.baseUrl = 'https://nominatim.openstreetmap.org',
   }) : _client = client ?? http.Client();
 
+  /// 위도([latitude])와 경도([longitude])를 기반으로 한국어 행정구역명을 조회합니다.
+  ///
+  /// Nominatim API 사용 정책(초당 최대 1회 요청)을 준수하기 위해 직전 요청과 1.1초 미만 간격이면 대기하며,
+  /// 네트워크 오류나 응답 파싱 실패 시 Crashlytics에 비치명 오류를 기록하고 `'알 수 없는 위치'`를 반환합니다.
   Future<String> reverseGeocode({
     required double latitude,
     required double longitude,

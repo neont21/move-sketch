@@ -1,11 +1,16 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../../../domain/models/weather/weather_info.dart';
 import '../../../utils/exceptions.dart';
 
+/// OpenWeatherMap REST API를 호출하여 현재 기상 정보를 조회하는 서비스 클래스입니다.
 class WeatherService {
   final http.Client _client;
   final String _apiKey;
+
+  /// OpenWeatherMap API 기본 엔드포인트 URL.
   final String baseUrl;
 
   WeatherService({
@@ -15,6 +20,9 @@ class WeatherService {
   }) : _client = client ?? http.Client(),
        _apiKey = apiKey ?? const String.fromEnvironment('OPENWEATHER_API_KEY');
 
+  /// 위도([latitude])와 경도([longitude])에 해당하는 지역의 현재 기상 정보를 조회하여 [WeatherInfo]로 반환합니다.
+  ///
+  /// API 키가 누락된 경우 [NetworkException]을, 비정상 HTTP 응답 시 [ApiException]을 던집니다. (10초 타임아웃)
   Future<WeatherInfo> fetchCurrentWeather({
     required double latitude,
     required double longitude,
@@ -42,9 +50,6 @@ class WeatherService {
       return WeatherInfo.fromOpenWeatherMap(data);
     }
 
-    throw ApiException(
-      '날씨 정보를 불러오는 데 실패했습니다',
-      statusCode: response.statusCode,
-    );
+    throw ApiException('날씨 정보를 불러오는 데 실패했습니다', statusCode: response.statusCode);
   }
 }
