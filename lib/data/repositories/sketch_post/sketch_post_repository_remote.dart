@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+
 import '../../../domain/models/social/comment.dart';
 import '../../../domain/models/social/sketch_post.dart';
 import '../../../domain/models/social/user.dart';
@@ -11,9 +12,15 @@ import '../../services/remote/firestore/user_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'sketch_post_repository.dart';
 
+/// [SketchPostService], [FriendshipService], [UserService]를 조합하여 소셜 피드 및 댓글을 관리하는 [SketchPostRepository] 구현체입니다.
 final class SketchPostRepositoryRemote implements SketchPostRepository {
+  /// Firestore 스케치 게시물 및 댓글 원격 서비스.
   final SketchPostService sketchPostService;
+
+  /// 피드 조회 시 친구 목록 확보를 위한 Firestore 서비스.
   final FriendshipService friendshipService;
+
+  /// 게시물·댓글 작성자의 최신 프로필 정보 보정을 위한 Firestore 서비스.
   final UserService userService;
 
   SketchPostRepositoryRemote({
@@ -259,6 +266,7 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
     }
   }
 
+  // 게시물 스냅샷의 작성자 정보를 최신 사용자 프로필 요약으로 일괄 동기화합니다.
   Future<List<SketchPost>> _hydratePostsWithLatestAuthors(
     List<SketchPost> posts,
   ) async {
@@ -284,6 +292,7 @@ final class SketchPostRepositoryRemote implements SketchPostRepository {
     }).toList();
   }
 
+  // 댓글 스냅샷의 작성자 정보를 최신 사용자 프로필 요약으로 일괄 동기화합니다.
   Future<List<Comment>> _hydrateCommentsWithLatestAuthors(
     List<Comment> comments,
   ) async {

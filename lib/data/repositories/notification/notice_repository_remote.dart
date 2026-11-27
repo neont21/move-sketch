@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+
 import '../../../domain/models/system/notice.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -6,7 +7,9 @@ import '../../services/remote/firestore/notice_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'notice_repository.dart';
 
-class NoticeRepositoryRemote implements NoticeRepository {
+/// [NoticeService]를 통해 공지사항 조회 및 관리를 수행하는 [NoticeRepository] 구현체입니다.
+final class NoticeRepositoryRemote implements NoticeRepository {
+  /// Firestore 공지사항 원격 서비스.
   final NoticeService noticeService;
 
   NoticeRepositoryRemote({required this.noticeService});

@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+
 import '../../../domain/models/social/block_status.dart';
 import '../../../domain/models/social/friendship.dart';
 import '../../../domain/models/social/recommended_user.dart';
@@ -10,8 +11,12 @@ import '../../services/remote/firestore/user_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'friendship_repository.dart';
 
+/// [FriendshipService]와 [UserService]를 조합하여 친구·요청·차단 및 추천 관계를 관리하는 [FriendshipRepository] 구현체입니다.
 final class FriendshipRepositoryRemote implements FriendshipRepository {
+  /// Firestore 친구 및 차단 관계 서비스.
   final FriendshipService friendshipService;
+
+  /// 사용자 요약 프로필 배치 조회를 위한 Firestore 서비스.
   final UserService userService;
 
   FriendshipRepositoryRemote({
@@ -199,12 +204,12 @@ final class FriendshipRepositoryRemote implements FriendshipRepository {
       );
 
       final mutualFriendsMap = <String, List<String>>{};
-      for (int i = 0; i < myFriendIds.length; i++) {
-        final String myFriendId = myFriendIds[i];
-        final List<String> friendsOfFriendIds = mutualFriendsMapsList[i];
-        for (final fofId in friendsOfFriendIds) {
-          if (!excludeSet.contains(fofId)) {
-            mutualFriendsMap.putIfAbsent(fofId, () => []).add(myFriendId);
+      for (int index = 0; index < myFriendIds.length; index++) {
+        final String myFriendId = myFriendIds[index];
+        final List<String> friendsOfFriendIds = mutualFriendsMapsList[index];
+        for (final candidateId in friendsOfFriendIds) {
+          if (!excludeSet.contains(candidateId)) {
+            mutualFriendsMap.putIfAbsent(candidateId, () => []).add(myFriendId);
           }
         }
       }
@@ -353,6 +358,7 @@ final class FriendshipRepositoryRemote implements FriendshipRepository {
     errorMessage: '친구 삭제 처리 중 오류가 발생했습니다.',
   );
 
+  // 친구 요청 거절·취소 및 친구 삭제에서 공통으로 사용하는 관계 문서 삭제 헬퍼입니다.
   Future<Result<void>> _deleteFriendshipRelationship({
     required String currentUserId,
     required String targetUserId,

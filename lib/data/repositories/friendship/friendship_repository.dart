@@ -3,85 +3,86 @@ import '../../../domain/models/social/recommended_user.dart';
 import '../../../domain/models/social/user.dart';
 import '../../../utils/result.dart';
 
+/// 친구 관계, 친구 요청, 함께 아는 친구, 추천 친구, 차단 및 관심 친구 관리를 추상화한 저장소 인터페이스입니다.
 abstract interface class FriendshipRepository {
-  /// 현재 사용자의 친구 목록을 조회한다. (나 탭 > 친구)
+  /// 사용자([currentUserId])의 친구 요약 목록을 조회합니다. (나 탭 > 친구)
   Future<Result<List<UserSummary>>> getFriends(String currentUserId);
 
-  /// 현재 사용자가 받은 친구 요청 목록을 조회한다. (나 탭 > 친구)
+  /// 사용자([currentUserId])가 받은 친구 요청자 요약 목록을 조회합니다. (나 탭 > 친구)
   Future<Result<List<UserSummary>>> getReceivedFriendRequests(
     String currentUserId,
   );
 
-  /// 현재 사용자가 보낸 친구 요청 목록을 최신순으로 조회한다.
+  /// 사용자([currentUserId])가 보낸 친구 요청 대상자 요약 목록을 최신순으로 조회합니다.
   Future<Result<List<UserSummary>>> getSentFriendRequests(String currentUserId);
 
-  /// 특정 상대와의 친구 관계를 조회한다. (사용자 검색 및 사용자 프로필)
+  /// 현재 사용자([currentUserId])와 대상 사용자([targetUserId]) 간의 친구 관계를 조회합니다. (사용자 검색 및 프로필)
   Future<Result<Friendship?>> getFriendship({
     required String currentUserId,
     required String targetUserId,
   });
 
-  /// 함께 아는 친구를 조회한다. (사용자 프로필)
+  /// 현재 사용자([currentUserId])와 대상 사용자([targetUserId])가 함께 아는 친구 목록을 조회합니다. (사용자 프로필)
   Future<Result<List<UserSummary>>> getMutualFriends({
     required String currentUserId,
     required String targetUserId,
   });
 
-  /// 추천 친구 목록을 조회한다. (사용자 검색)
+  /// 사용자([currentUserId])의 친구 네트워크 기반 추천 친구 목록을 조회합니다. (사용자 검색)
   Future<Result<List<RecommendedUser>>> getRecommendedFriends(
     String currentUserId, {
     int limit = 10,
   });
 
-  /// 친구 요청을 전송하며, 상대가 요청을 보낸 상태라면 자동 수락 처리한다.
+  /// 대상 사용자([targetUserId])에게 친구 요청을 전송합니다. (상대가 이미 요청을 보낸 상태면 자동 수락)
   Future<Result<Friendship>> sendFriendRequest({
     required String currentUserId,
     required String targetUserId,
   });
 
-  /// 받은 친구 요청을 수락한다.
+  /// 대상 사용자([targetUserId])로부터 받은 친구 요청을 수락합니다.
   Future<Result<Friendship>> acceptFriendRequest({
     required String currentUserId,
     required String targetUserId,
   });
 
-  /// 받은 친구 요청을 거절한다.
+  /// 대상 사용자([targetUserId])로부터 받은 친구 요청을 거절합니다.
   Future<Result<void>> declineFriendRequest({
     required String currentUserId,
     required String targetUserId,
   });
 
-  /// 보낸 친구 요청을 취소한다.
+  /// 대상 사용자([targetUserId])에게 보낸 친구 요청을 취소합니다.
   Future<Result<void>> cancelFriendRequest({
     required String currentUserId,
     required String targetUserId,
   });
 
-  /// 친구 관계를 삭제한다.
+  /// 대상 사용자([targetUserId])와의 친구 관계를 삭제합니다.
   Future<Result<void>> removeFriend({
     required String currentUserId,
     required String targetUserId,
   });
 
-  /// 상대를 차단하며 친구였을 경우 친구 관계도 삭제한다.
+  /// 대상 사용자([targetUser])를 차단합니다. (기존 친구 관계가 있는 경우 함께 삭제)
   Future<Result<void>> blockUser({
     required String currentUserId,
     required UserSummary targetUser,
   });
 
-  /// 사용자 차단을 해제하며 친구 관계는 복구되지 않는다.
+  /// 대상 사용자([targetUserId])에 대한 차단을 해제합니다. (삭제된 친구 관계는 복구되지 않음)
   Future<Result<void>> unblockUser({
     required String currentUserId,
     required String targetUserId,
   });
 
-  /// 내가 차단한 사용자 목록을 조회한다. (설정 > 차단한 사용자)
+  /// 사용자([currentUserId])가 차단한 사용자 목록을 조회합니다. (설정 > 차단한 사용자)
   Future<Result<List<UserSummary>>> getBlockedUsers(String currentUserId);
 
-  /// 내가 차단한 사용자와 나를 차단한 사용자의 UID를 조회한다. (사용자 검색)
+  /// 나([currentUserId])와 양방향 차단 관계에 있는 모든 사용자 UID 목록을 조회합니다. (사용자 검색)
   Future<Result<List<String>>> getBlockedUserIds(String currentUserId);
 
-  /// 특정 친구에 대한 관심 친구 설정을 토글하고 변경된 관심 친구 여부를 반환한다. (사용자 프로필)
+  /// 친구([targetUserId])에 대한 관심 친구 알림 설정을 토글하고 변경된 상태를 반환합니다. (사용자 프로필)
   Future<Result<bool>> toggleFavoriteFriend({
     required String currentUserId,
     required String targetUserId,

@@ -1,8 +1,10 @@
 import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../services/remote/firebase_messaging_service.dart';
@@ -10,9 +12,13 @@ import '../../services/remote/firestore/user_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'push_notification_repository.dart';
 
+/// [FirebaseMessagingService]와 [UserService]를 조합하여 FCM 푸시 알림 및 기기 토큰을 관리하는 [PushNotificationRepository] 구현체입니다.
 final class PushNotificationRepositoryRemote
     implements PushNotificationRepository {
+  /// Firebase Cloud Messaging 래퍼 서비스.
   final FirebaseMessagingService firebaseMessagingService;
+
+  /// 사용자 문서의 FCM 토큰 갱신을 위한 Firestore 서비스.
   final UserService userService;
 
   StreamSubscription<String>? _tokenRefreshSubscription;
@@ -94,6 +100,7 @@ final class PushNotificationRepositoryRemote
     }
   }
 
+  // Apple 플랫폼에서 APNs 토큰 발급 지연을 고려해 최대 3초간 재시도하며 대기합니다.
   Future<String?> _waitForApnsToken() async {
     String? apnsToken = await firebaseMessagingService.getAPNSToken();
     int retryCount = 0;
@@ -105,6 +112,7 @@ final class PushNotificationRepositoryRemote
     return apnsToken;
   }
 
+  // FCM 토큰 갱신 시 Firestore 동기화를 시도하고, 실패 시 비치명적 오류로 Crashlytics에 기록합니다.
   Future<void> _handleTokenRefresh({
     required String userId,
     required String token,

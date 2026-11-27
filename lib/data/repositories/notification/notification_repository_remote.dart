@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+
 import '../../../domain/models/social/app_notification.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
@@ -6,7 +7,9 @@ import '../../services/remote/firestore/notification_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'notification_repository.dart';
 
+/// [NotificationService]를 통해 인앱 알림의 조회·상태 갱신·삭제 및 발송을 처리하는 [NotificationRepository] 구현체입니다.
 final class NotificationRepositoryRemote implements NotificationRepository {
+  /// Firestore 인앱 알림 원격 서비스.
   final NotificationService notificationService;
 
   NotificationRepositoryRemote({required this.notificationService});
