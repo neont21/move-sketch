@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+
 import '../../../domain/models/enums/report_status.dart';
 import '../../../domain/models/social/report.dart';
 import '../../../utils/exceptions.dart';
@@ -7,7 +8,9 @@ import '../../services/remote/firestore/report_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'report_repository.dart';
 
+/// [ReportService]를 통해 신고 접수 및 처리 상태 관리를 수행하는 [ReportRepository] 구현체입니다.
 final class ReportRepositoryRemote implements ReportRepository {
+  /// Firestore 신고 원격 서비스.
   final ReportService reportService;
 
   ReportRepositoryRemote({required this.reportService});

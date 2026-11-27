@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:firebase_auth/firebase_auth.dart' as auth show User;
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+
 import '../../../domain/models/enums/character_type.dart';
 import '../../../domain/models/social/social_auth_result.dart';
 import '../../../domain/models/social/user.dart';
@@ -13,9 +15,15 @@ import '../../services/remote/storage_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'auth_repository.dart';
 
+/// [AuthService], [UserService], [StorageService]를 조합하여 원격 인증 및 계정 관리를 수행하는 [AuthRepository] 구현체입니다.
 final class AuthRepositoryRemote implements AuthRepository {
+  /// Firebase Authentication 및 소셜 로그인 인증 서비스.
   final AuthService authService;
+
+  /// Firestore 사용자 프로필 및 아이디 매핑 서비스.
   final UserService userService;
+
+  /// Firebase Storage 프로필 이미지 업로드 서비스.
   final StorageService storageService;
 
   AuthRepositoryRemote({
@@ -24,6 +32,7 @@ final class AuthRepositoryRemote implements AuthRepository {
     required this.storageService,
   });
 
+  // 이메일/비밀번호 가입자 중 이메일 미인증 상태의 미완료 세션을 무효화합니다.
   bool _isValidSessionUser(auth.User? user) {
     if (user == null) {
       return false;
@@ -163,6 +172,7 @@ final class AuthRepositoryRemote implements AuthRepository {
     }
   }
 
+  // Firestore 문서 생성 실패 시 이미 생성된 Firebase Auth 계정을 롤백 삭제합니다.
   Future<void> _createUserDocumentsWithRollback({
     required String uid,
     required String username,
@@ -308,6 +318,7 @@ final class AuthRepositoryRemote implements AuthRepository {
     }
   }
 
+  // 소셜 로그인 사용자의 기존 프로필 유무 및 탈퇴 여부를 판별하여 인증 결과를 반환합니다.
   Future<Result<SocialAuthResult>> _handleSocialUserVerification(
     auth.User fbUser,
   ) async {
@@ -481,6 +492,7 @@ final class AuthRepositoryRemote implements AuthRepository {
     }
   }
 
+  // Firestore 이메일 매핑 갱신 실패 시 방금 연결한 'password' 공급자 연동을 롤백 해제합니다.
   Future<void> _updateAccountEmailWithRollback({
     required String uid,
     required String username,
@@ -608,6 +620,7 @@ final class AuthRepositoryRemote implements AuthRepository {
     }
   }
 
+  // Firestore 사용자 문서를 먼저 삭제한 뒤 Firebase Auth 계정을 최종 삭제합니다.
   Future<void> _executeAccountDeletion({
     required String uid,
     required String username,

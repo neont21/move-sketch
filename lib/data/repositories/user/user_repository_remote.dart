@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../domain/models/enums/character_type.dart';
@@ -13,10 +14,18 @@ import '../../services/remote/storage_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'user_repository.dart';
 
+/// [AuthService], [UserService], [StorageService], [FriendshipService]를 조합하여 원격 사용자 정보를 관리하는 [UserRepository] 구현체입니다.
 final class UserRepositoryRemote implements UserRepository {
+  /// 현재 인증 세션 확인을 위한 Firebase Auth 서비스.
   final AuthService authService;
+
+  /// Firestore 사용자 문서 조회·갱신 서비스.
   final UserService userService;
+
+  /// Firebase Storage 프로필 이미지 업로드 서비스.
   final StorageService storageService;
+
+  /// 사용자 검색 시 차단 목록 필터링을 위한 친구·차단 서비스.
   final FriendshipService friendshipService;
 
   UserRepositoryRemote({
@@ -26,6 +35,7 @@ final class UserRepositoryRemote implements UserRepository {
     required this.friendshipService,
   });
 
+  // 지정된 조회 전략으로 사용자 프로필을 조회하고 예외를 AppException으로 변환합니다.
   Future<Result<User?>> _fetchUserProfile(
     String uid, {
     required Source source,

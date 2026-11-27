@@ -11,8 +11,12 @@ import '../../services/remote/storage_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'inquiry_repository.dart';
 
+/// [InquiryService]와 [StorageService]를 조합하여 인앱 문의/제보를 원격으로 처리하는 [InquiryRepository] 구현체입니다.
 final class InquiryRepositoryRemote implements InquiryRepository {
+  /// Firestore 문의/제보 원격 서비스.
   final InquiryService inquiryService;
+
+  /// Firebase Storage 첨부 이미지 업로드 서비스.
   final StorageService storageService;
 
   InquiryRepositoryRemote({
