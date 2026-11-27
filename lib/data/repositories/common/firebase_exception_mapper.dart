@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../utils/exceptions.dart';
 
+/// 일반 [FirebaseException]을 도메인 계층의 구조화된 [AppException]으로 변환하는 확장입니다.
 extension FirebaseExceptionMapper on FirebaseException {
+  /// Firebase 오류 코드(`code`)를 분석하여 적절한 [AppException] 하위 타입과 사용자 친화적 메시지로 매핑합니다.
   AppException toAppException({String? defaultMessage}) {
     return switch (code) {
       'unavailable' || 'deadline-exceeded' || 'retry-limit-exceeded' =>
@@ -30,7 +33,9 @@ extension FirebaseExceptionMapper on FirebaseException {
   }
 }
 
+/// 인증 전용 [FirebaseAuthException]을 도메인 [AuthException]으로 변환하는 확장입니다.
 extension FirebaseAuthExceptionMapper on FirebaseAuthException {
+  /// Firebase Auth 오류 코드(`code`)에 대응하는 한국어 안내 메시지가 담긴 [AuthException]을 반환합니다.
   AuthException toAuthException({String? defaultMessage}) {
     return switch (code) {
       'no-current-user' => AuthException(

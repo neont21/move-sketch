@@ -1,11 +1,14 @@
 import 'dart:async';
+
 import '../../../domain/models/session/location_point.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../services/hardware/location_service.dart';
 import 'location_repository.dart';
 
+/// [LocationService]를 통해 단말기 GPS 센서 데이터를 제공하는 [LocationRepository] 구현체입니다.
 final class LocationRepositoryLocal implements LocationRepository {
+  /// GPS 하드웨어 서비스.
   final LocationService locationService;
 
   LocationRepositoryLocal({required this.locationService});
@@ -35,12 +38,12 @@ final class LocationRepositoryLocal implements LocationRepository {
         return const Result.error(LocationException('위치 권한이 허용되지 않았습니다.'));
       }
 
-      final loc = await locationService.getCurrentLocation();
-      if (loc == null) {
+      final location = await locationService.getCurrentLocation();
+      if (location == null) {
         return const Result.error(LocationException('현재 위치 정보를 가져올 수 없습니다.'));
       }
 
-      return Result.ok(loc);
+      return Result.ok(location);
     } on TimeoutException catch (e) {
       return Result.error(LocationException('위치 수신 시간이 초과되었습니다.', cause: e));
     } on AppException catch (e) {

@@ -3,7 +3,9 @@ import '../../../utils/result.dart';
 import '../../services/local/exploration_service.dart';
 import 'exploration_repository.dart';
 
+/// [ExplorationService]를 통해 로컬 SQLite에 Geohash 탐색 이력을 저장·조회하는 [ExplorationRepository] 구현체입니다.
 final class ExplorationRepositoryLocal implements ExplorationRepository {
+  /// Geohash 방문 이력 로컬 서비스.
   final ExplorationService explorationService;
 
   const ExplorationRepositoryLocal({required this.explorationService});

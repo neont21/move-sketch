@@ -2,7 +2,8 @@ import '../../../domain/models/session/location_point.dart';
 import '../../services/remote/geocoding_service.dart';
 import 'geocoding_repository.dart';
 
-class GeocodingRepositoryRemote implements GeocodingRepository {
+/// [GeocodingService]를 통해 원격 역지오코딩 및 세션 경로 태그 조합을 수행하는 [GeocodingRepository] 구현체입니다.
+final class GeocodingRepositoryRemote implements GeocodingRepository {
   final GeocodingService _geocodingService;
 
   GeocodingRepositoryRemote({GeocodingService? geocodingService})
@@ -45,4 +46,3 @@ class GeocodingRepositoryRemote implements GeocodingRepository {
     return [startTag, waypointTag, endTag];
   }
 }
-

@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:http/http.dart' as http;
+
 import '../../../domain/models/weather/weather_info.dart';
 import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../services/remote/weather_service.dart';
 import 'weather_repository.dart';
 
+/// [WeatherService]를 통해 OpenWeatherMap 기상 정보를 조회하고 HTTP/네트워크 예외를 [AppException]으로 변환하는 [WeatherRepository] 구현체입니다.
 final class WeatherRepositoryRemote implements WeatherRepository {
+  /// OpenWeatherMap 원격 API 서비스.
   final WeatherService weatherService;
 
   WeatherRepositoryRemote({required this.weatherService});
@@ -47,7 +51,7 @@ final class WeatherRepositoryRemote implements WeatherRepository {
       return Result.error(NetworkException('날씨 서버 응답 시간이 초과되었습니다.', cause: e));
     } on HttpException catch (e) {
       return Result.error(NetworkException(e.message, cause: e));
-    }on FormatException catch (e, trace) {
+    } on FormatException catch (e, trace) {
       FirebaseCrashlytics.instance.recordError(
         e,
         trace,
