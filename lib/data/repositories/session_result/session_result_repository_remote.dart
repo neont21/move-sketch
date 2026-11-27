@@ -1,5 +1,7 @@
 import 'dart:typed_data';
+
 import 'package:firebase_core/firebase_core.dart';
+
 import '../../../domain/models/enums/activity_type.dart';
 import '../../../domain/models/session/session_result.dart';
 import '../../../utils/exceptions.dart';
@@ -10,9 +12,15 @@ import '../../services/remote/storage_service.dart';
 import '../common/firebase_exception_mapper.dart';
 import 'session_result_repository.dart';
 
+/// [SessionResultService], [StorageService], [SketchPostService]를 조합하여 원격 세션 결과를 관리하는 [SessionResultRepository] 구현체입니다.
 final class SessionResultRepositoryRemote implements SessionResultRepository {
+  /// Firestore 세션 결과 원격 서비스.
   final SessionResultService sessionResultService;
+
+  /// Firebase Storage 이미지 업로드·다운로드 서비스.
   final StorageService storageService;
+
+  /// 공유된 피드 게시물 연쇄 삭제를 위한 Firestore 서비스.
   final SketchPostService sketchPostService;
 
   SessionResultRepositoryRemote({
@@ -140,11 +148,11 @@ final class SessionResultRepositoryRemote implements SessionResultRepository {
       );
 
       final finishedDateSet = dates
-          .map((d) => DateTime(d.year, d.month, d.day))
+          .map((date) => DateTime(date.year, date.month, date.day))
           .toSet();
 
-      final weeklyDone = List<bool>.generate(7, (i) {
-        final targetDate = today.subtract(Duration(days: 6 - i));
+      final weeklyDone = List<bool>.generate(7, (dayOffset) {
+        final targetDate = today.subtract(Duration(days: 6 - dayOffset));
         return finishedDateSet.contains(targetDate);
       });
 

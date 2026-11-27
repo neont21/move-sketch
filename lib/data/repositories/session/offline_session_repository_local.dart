@@ -9,7 +9,9 @@ import '../../../utils/result.dart';
 import '../../services/local/offline_session_service.dart';
 import 'offline_session_repository.dart';
 
+/// [OfflineSessionService]를 통해 오프라인 세션 큐와 로컬 스케치 파일을 관리하는 [OfflineSessionRepository] 구현체입니다.
 final class OfflineSessionRepositoryLocal implements OfflineSessionRepository {
+  /// 오프라인 대기 큐 및 파일 시스템 로컬 서비스.
   final OfflineSessionService offlineSessionService;
 
   OfflineSessionRepositoryLocal({required this.offlineSessionService});

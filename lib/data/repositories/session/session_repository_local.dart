@@ -1,4 +1,5 @@
 import 'package:latlong2/latlong.dart';
+
 import '../../../domain/models/enums/activity_type.dart';
 import '../../../domain/models/enums/session_status.dart';
 import '../../../domain/models/fixed/sketch_composition.dart';
@@ -11,7 +12,9 @@ import '../../../utils/result.dart';
 import '../../services/local/session_service.dart';
 import 'session_repository.dart';
 
+/// [SessionService]를 통해 로컬 SQLite에 실시간 운동 세션 데이터를 저장·관리하는 [SessionRepository] 구현체입니다.
 final class SessionRepositoryLocal implements SessionRepository {
+  /// 활성 세션 로컬 데이터베이스 서비스.
   final SessionService sessionService;
 
   SessionRepositoryLocal({required this.sessionService});
@@ -202,6 +205,7 @@ final class SessionRepositoryLocal implements SessionRepository {
     }
   }
 
+  // 출발지 및 도착지와의 직선 거리 합이 가장 큰 중간 좌표를 대표 경유지로 선정합니다.
   LocationPoint _calculateFurthestWaypoint(List<LocationPoint> pathPoints) {
     final start = pathPoints.first.toLatLng();
     final end = pathPoints.last.toLatLng();
@@ -210,15 +214,15 @@ final class SessionRepositoryLocal implements SessionRepository {
     LocationPoint waypoint = pathPoints[1];
     double maxDistanceSum = -1.0;
 
-    for (int i = 1; i < pathPoints.length - 1; i++) {
-      final current = pathPoints[i].toLatLng();
+    for (int index = 1; index < pathPoints.length - 1; index++) {
+      final current = pathPoints[index].toLatLng();
       final total =
           distance.as(LengthUnit.Meter, start, current) +
           distance.as(LengthUnit.Meter, end, current);
 
       if (total > maxDistanceSum) {
         maxDistanceSum = total;
-        waypoint = pathPoints[i];
+        waypoint = pathPoints[index];
       }
     }
     return waypoint;
