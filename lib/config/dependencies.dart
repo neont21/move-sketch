@@ -169,7 +169,7 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
 });
 
-/// NoticeService: Firestore 기반 공지사항 알림 관리
+/// NoticeService Provider: Firestore 기반 공지사항 알림 관리
 final noticeServiceProvider = Provider<NoticeService>((ref) {
   return NoticeService();
 });
@@ -482,7 +482,7 @@ final declineFriendRequestUseCaseProvider =
       );
     });
 
-/// RemoveFriendUseCase Provider: 사용자를 친구 목록에저 제거하는 UseCase
+/// RemoveFriendUseCase Provider: 사용자를 친구 목록에서 제거하는 UseCase
 final removeFriendUseCaseProvider = Provider<RemoveFriendUseCase>((ref) {
   return RemoveFriendUseCase(
     friendshipRepository: ref.watch(friendshipRepositoryProvider),

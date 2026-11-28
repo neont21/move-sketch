@@ -1,3 +1,4 @@
+/// 앱 전반에서 사용하는 정적 이미지·SVG 에셋 경로와 동적 경로 헬퍼를 정의하는 유틸리티 클래스입니다.
 abstract final class Assets {
   // 공통 / 기본 에셋
   static const String sampleSketch = 'assets/sample_sketch.png';
@@ -58,15 +59,20 @@ abstract final class Assets {
   static const String effectSupersonic = 'assets/parts/effect_supersonic.png';
 
   // 기본형 캐릭터
-  static const String defaultCharacterBear = 'assets/characters/default_bear.png';
+  static const String defaultCharacterBear =
+      'assets/characters/default_bear.png';
   static const String defaultCharacterCat = 'assets/characters/default_cat.png';
   static const String defaultCharacterDog = 'assets/characters/default_dog.png';
-  static const String defaultCharacterPanda = 'assets/characters/default_panda.png';
+  static const String defaultCharacterPanda =
+      'assets/characters/default_panda.png';
 
   // 동적 경로 헬퍼
+  /// 캐릭터 식별자([id])에 해당하는 파츠 기본 캐릭터 이미지 경로를 반환합니다.
   static String character(String id) =>
       'assets/parts/character_${id.toLowerCase()}_basic.png';
+  /// 캐릭터 식별자([id])에 해당하는 기본형 캐릭터 일러스트 경로를 반환합니다.
   static String defaultCharacter(String id) =>
       'assets/characters/default_${id.toLowerCase()}.png';
+  /// 파츠 파일명([filename])에 해당하는 에셋 전체 경로를 반환합니다.
   static String part(String filename) => 'assets/parts/$filename';
 }

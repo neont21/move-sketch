@@ -1,29 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'activity_colors.dart';
 
-class MoveSketchTheme {
+/// MoveSketch 앱의 브랜드 컬러 팔레트와 Material 3 [ThemeData]를 정의하는 테마 클래스입니다.
+abstract final class MoveSketchTheme {
+  /// 보조 강조 및 컨테이너용 밝은 브랜드 오렌지 색상.
   static const Color brand300 = Color(0xFFEC6E38);
+
+  /// 기본 브랜드 메인 오렌지 색상.
   static const Color brand400 = Color(0xFFDD4814);
+
+  /// 눌림·강조 상태용 진한 브랜드 오렌지 색상.
   static const Color brand500 = Color(0xFFAE3000);
+
+  /// 브랜드 오렌지 틴트 강조 색상.
   static const Color brandTint16 = Color(0xFFD54100);
 
+  /// 손글씨 제목·라벨 등에 사용하는 보조 네이비 색상.
   static const Color navy = Color(0xFF3A4A7A);
+
+  /// 오류 및 경고 상태용 브릭 레드 색상.
   static const Color brickRed = Color(0xFFB23B1A);
 
+  /// 종이 질감의 기본 스캐폴드 배경 색상.
   static const Color paperBackground = Color(0xFFFBF7F2);
+
+  /// 카드 및 입력 필드 표면 색상.
   static const Color paperSurface = Colors.white;
+
+  /// 비활성·보조 컨테이너용 따뜻한 틴트 배경 색상.
   static const Color paperTint = Color(0xFFF0E7DC);
 
+  /// 기본 본문 및 제목용 진한 잉크 색상.
   static const Color ink = Color(0xFF1F1B19);
+
+  /// 보조 설명 텍스트용 중간 톤 잉크 색상.
   static const Color inkMuted = Color(0xFF4A423D);
+
+  /// 캡션·플레이스홀더용 연한 잉크 색상.
   static const Color inkFaint = Color(0xFF8A7D73);
 
+  /// 기본 테두리 색상.
   static const Color border = Color(0xFFEAE3DA);
+
+  /// 강조된 구분선 및 테두리 색상.
   static const Color borderStrong = Color(0xFFDDD2C5);
 
+  /// 모달·오버레이용 반투명 딤 색상.
   static const Color dim = Color(0x80000000);
 
+  /// 앱 전역에 적용되는 라이트 모드 Material 3 [ThemeData].
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -150,21 +177,15 @@ class MoveSketchTheme {
         centerTitle: false,
       ),
       actionIconTheme: ActionIconThemeData(
-          backButtonIconBuilder: (context) => const Icon(Icons.chevron_left),
+        backButtonIconBuilder: (context) => const Icon(Icons.chevron_left),
       ),
       focusColor: brand400.withValues(alpha: 0.12),
       navigationBarTheme: NavigationBarThemeData(
         iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(
-              color: brand400,
-              size: 24,
-            );
+            return const IconThemeData(color: brand400, size: 24);
           }
-          return const IconThemeData(
-            color: inkFaint,
-            size: 24,
-          );
+          return const IconThemeData(color: inkFaint, size: 24);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
           if (states.contains(WidgetState.selected)) {
@@ -239,9 +260,7 @@ class MoveSketchTheme {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      extensions: const [
-        ActivityColors.light, // ✨ 등록
-      ],
+      extensions: const [ActivityColors.light],
     );
   }
 }

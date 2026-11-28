@@ -39,28 +39,35 @@ import '../ui/settings/widgets/settings_screen.dart';
 import '../ui/shell/widgets/move_sketch_shell.dart';
 import 'routes.dart';
 
+/// 루트 레벨 화면을 표시하는 최상위 내비게이터 키.
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
 
+// 홈 탭 StatefulShellBranch 전용 내비게이터 키.
 final GlobalKey<NavigatorState> _homeNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'home',
 );
 
+// 피드 탭 StatefulShellBranch 전용 내비게이터 키.
 final GlobalKey<NavigatorState> _feedNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'feed',
 );
 
+// 기록 탭 StatefulShellBranch 전용 내비게이터 키.
 final GlobalKey<NavigatorState> _historyNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'history');
 
+// 나 탭 StatefulShellBranch 전용 내비게이터 키.
 final GlobalKey<NavigatorState> _meNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'me',
 );
 
+/// 전역 스낵바 및 배너 출력을 제어하는 [ScaffoldMessengerState] 키.
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>(debugLabel: 'scaffoldMessenger');
 
+/// [authViewModelProvider]의 인증 상태 변화를 감지해 [GoRouter]의 리다이렉트 재평가를 트리거하는 [ChangeNotifier]입니다.
 class RouterRefreshListenable extends ChangeNotifier {
   RouterRefreshListenable(Ref ref) {
     ref.listen<AsyncValue<User?>>(authViewModelProvider, (_, _) {
@@ -69,6 +76,7 @@ class RouterRefreshListenable extends ChangeNotifier {
   }
 }
 
+/// 인증 상태와 플랫폼(웹·모바일)에 따른 리다이렉트 및 4탭 셸 라우트 트리를 구성하는 [GoRouter] 프로바이더.
 final routerProvider = Provider<GoRouter>((ref) {
   final refreshListenable = RouterRefreshListenable(ref);
   ref.onDispose(refreshListenable.dispose);
@@ -159,7 +167,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: Routes.feedNotificationsRelative,
-                    builder: (context, state) => const FeedNotificationsScreen(),
+                    builder: (context, state) =>
+                        const FeedNotificationsScreen(),
                     routes: [
                       GoRoute(
                         path: Routes.postRelative,
@@ -278,17 +287,20 @@ final routerProvider = Provider<GoRouter>((ref) {
                     routes: [
                       GoRoute(
                         path: Routes.meSettingsAccountRelative,
-                        builder: (context, state) => const AccountSettingsScreen(),
+                        builder: (context, state) =>
+                            const AccountSettingsScreen(),
                         routes: [
                           GoRoute(
                             path: Routes.meSettingsPasswordRelative,
-                            builder: (context, state) => const ModifyPasswordScreen(),
+                            builder: (context, state) =>
+                                const ModifyPasswordScreen(),
                           ),
                         ],
                       ),
                       GoRoute(
                         path: Routes.meSettingsCharacterRelative,
-                        builder: (context, state) => const ChangeCharacterScreen(),
+                        builder: (context, state) =>
+                            const ChangeCharacterScreen(),
                       ),
                       GoRoute(
                         path: Routes.meSettingsNotificationsRelative,
@@ -301,7 +313,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                       ),
                       GoRoute(
                         path: Routes.meSettingsInquiryRelative,
-                        builder: (context, state) => const InquiryReportScreen(),
+                        builder: (context, state) =>
+                            const InquiryReportScreen(),
                       ),
                     ],
                   ),

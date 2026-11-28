@@ -1,16 +1,30 @@
 import 'package:flutter/material.dart';
 
+/// [BuildContext]에서 [ActivityColors] 테마 확장에 간편하게 접근하기 위한 확장입니다.
 extension ActivityColorsBuildContext on BuildContext {
+  /// 현재 테마에 등록된 [ActivityColors] 인스턴스.
   ActivityColors get activityColors =>
       Theme.of(this).extension<ActivityColors>()!;
 }
 
-class ActivityColors extends ThemeExtension<ActivityColors> {
+/// 운동 활동 유형별 시맨틱 색상을 정의하는 [ThemeExtension] 불변 모델입니다.
+final class ActivityColors extends ThemeExtension<ActivityColors> {
+  /// 조깅 대표 강조 색상.
   final Color jogging;
+
+  /// 조깅 텍스트·아이콘용 진한 잉크 색상.
   final Color joggingInk;
+
+  /// 조깅 배지·카드 배경용 반투명 채움 색상.
   final Color joggingFill;
+
+  /// 라이딩 대표 강조 색상.
   final Color riding;
+
+  /// 라이딩 텍스트·아이콘용 진한 잉크 색상.
   final Color ridingInk;
+
+  /// 라이딩 배지·카드 배경용 반투명 채움 색상.
   final Color ridingFill;
 
   const ActivityColors({
@@ -22,6 +36,7 @@ class ActivityColors extends ThemeExtension<ActivityColors> {
     required this.ridingFill,
   });
 
+  /// 라이트 테마용 기본 활동 색상 프리셋.
   static const light = ActivityColors(
     jogging: Color(0xFF599940),
     joggingInk: Color(0xFF2D6121),
@@ -64,4 +79,3 @@ class ActivityColors extends ThemeExtension<ActivityColors> {
     );
   }
 }
-
