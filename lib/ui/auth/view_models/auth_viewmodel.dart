@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../config/dependencies.dart';
 import '../../../data/repositories/auth/auth_repository.dart';
 import '../../../data/repositories/user/user_repository.dart';
@@ -13,14 +15,17 @@ import '../../../utils/exceptions.dart';
 import '../../../utils/result.dart';
 import '../../core/view_models/push_notification_viewmodel.dart';
 
-class AuthViewModel extends AsyncNotifier<User?> {
+/// 앱 전역의 사용자 인증 상태([User?])를 관리하고 로그인·회원가입·소셜 온보딩·로그아웃·탈퇴를 조율하는 ViewModel입니다.
+final class AuthViewModel extends AsyncNotifier<User?> {
   AuthRepository get _authRepository => ref.read(authRepositoryProvider);
   UserRepository get _userRepository => ref.read(userRepositoryProvider);
 
   StreamSubscription<String?>? _authSubscription;
 
+  /// 현재 계정에 연결된 인증 공급자 식별자 목록.
   List<String> get linkedProviders => _authRepository.linkedProviders;
 
+  // 네이티브 모바일 환경에서 푸시 알림 초기화 및 Crashlytics 사용자 식별자를 연동합니다.
   void _setupNativeUserServices(String userId) {
     if (!kIsWeb) {
       ref.read(pushNotificationViewModelProvider.notifier).initialize(userId);
@@ -28,12 +33,14 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
+  // 로그아웃 또는 계정 탈퇴 시 Crashlytics 사용자 식별자를 초기화합니다.
   void _clearNativeUserIdentifier() {
     if (!kIsWeb) {
       FirebaseCrashlytics.instance.setUserIdentifier('');
     }
   }
 
+  // Firebase Auth 상태 스트림을 구독해 외부 세션 만료·전환 시 프로필 상태를 동기화합니다.
   void _listenAuthState() {
     _authSubscription?.cancel();
 
@@ -100,6 +107,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     return user;
   }
 
+  /// 서버에서 현재 사용자의 최신 프로필을 다시 조회해 상태를 갱신합니다.
   Future<Result<User>> refreshCurrentUser() async {
     final profileResult = await _userRepository.getCurrentUserProfile();
     switch (profileResult) {
@@ -116,6 +124,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
+  /// 아이디 또는 이메일([username])과 비밀번호([password])로 로그인을 수행합니다.
   Future<Result<User>> signIn({
     required String username,
     required String password,
@@ -146,6 +155,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
+  /// 아이디([username]), 닉네임([nickname]), 이메일([email]), 비밀번호([password]) 및 초기 캐릭터([character])로 회원가입을 수행합니다.
   Future<Result<User>> signUp({
     required String username,
     required String nickname,
@@ -183,14 +193,17 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
+  /// 입력한 아이디([username])의 사용 가능 여부를 확인합니다.
   Future<Result<bool>> isUsernameAvailable(String username) async {
     return _authRepository.isUsernameAvailable(username);
   }
 
+  /// 지정된 이메일([email])로 비밀번호 재설정 안내 메일을 발송합니다.
   Future<Result<void>> sendPasswordResetEmail(String email) async {
     return _authRepository.sendPasswordResetEmail(email);
   }
 
+  /// Google 계정으로 로그인하거나 신규 소셜 온보딩 분기 결과를 반환합니다.
   Future<Result<SocialAuthResult>> signInWithGoogle() async {
     if (state.isLoading) {
       return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
@@ -222,6 +235,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
+  /// Apple 계정으로 로그인하거나 신규 소셜 온보딩 분기 결과를 반환합니다.
   Future<Result<SocialAuthResult>> signInWithApple() async {
     if (state.isLoading) {
       return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
@@ -253,6 +267,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
+  /// 소셜 로그인 신규 사용자의 프로필을 등록하고 가입 절차를 완료합니다.
   Future<Result<User>> completeSocialSignUp({
     required String username,
     required String nickname,
@@ -289,6 +304,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
+  /// FCM 토큰을 무효화한 뒤 현재 사용자 계정을 로그아웃합니다.
   Future<Result<void>> signOut() async {
     if (state.isLoading) {
       return const Result.error(ValidationException('이미 요청이 진행 중입니다.'));
@@ -320,6 +336,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     }
   }
 
+  /// 현재 비밀번호([currentPassword])를 검증한 뒤 새 비밀번호([newPassword])로 변경합니다.
   Future<Result<void>> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -334,6 +351,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     );
   }
 
+  /// 비밀번호 재인증 후 FCM 토큰과 계정 데이터를 영구 삭제합니다.
   Future<Result<void>> deleteAccountWithPassword({
     required String currentPassword,
     required String username,
@@ -371,6 +389,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     return result;
   }
 
+  /// Google 재인증 후 FCM 토큰과 계정 데이터를 영구 삭제합니다.
   Future<Result<bool>> deleteAccountWithGoogle({
     required String username,
   }) async {
@@ -407,6 +426,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
     return result;
   }
 
+  /// Apple 재인증 후 FCM 토큰과 계정 데이터를 영구 삭제합니다.
   Future<Result<bool>> deleteAccountWithApple({
     required String username,
   }) async {
@@ -444,10 +464,12 @@ class AuthViewModel extends AsyncNotifier<User?> {
   }
 }
 
+/// [AuthViewModel] 상태를 제공하는 전역 [AsyncNotifierProvider].
 final authViewModelProvider = AsyncNotifierProvider<AuthViewModel, User?>(() {
   return AuthViewModel();
 });
 
+/// 현재 로그인된 [User] 객체를 구독하는 편의 [Provider].
 final currentUserProvider = Provider<User?>((ref) {
   return ref.watch(authViewModelProvider).value;
 });
